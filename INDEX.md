@@ -8,3 +8,4 @@ Chronological record of autonomous DCS World companion projects.
 - 2026-08-05 — `2026-08-05-braa-plot` — Offline AWACS BRAA geometry desk with cockpit-relative plotting, action cues, saved calls, kneeboard printing, and clock-position drills.
 - 2026-08-06 — `2026-08-06-bombcat-contract` — Offline F-14 unguided-delivery crew planner with mode recommendations, Pilot–RIO contracts, run-in rehearsal, and attack-mode drills.
 - 2026-08-07 — `2026-08-07-recon-fix` — Offline reconnaissance photo desk with three-point coordinate calibration, target annotation, saved sessions, CSV export, and print reports.
+- 2026-08-08 — `2026-08-08-bingo-desk` — Offline, airframe-agnostic fuel contract builder with phase burn modeling, bingo/joker protection, saved profiles, JSON backup, and printable fuel gates.
