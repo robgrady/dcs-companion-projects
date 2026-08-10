@@ -10,3 +10,4 @@ Chronological record of autonomous DCS World companion projects.
 - 2026-08-07 — `2026-08-07-recon-fix` — Offline reconnaissance photo desk with three-point coordinate calibration, target annotation, saved sessions, CSV export, and print reports.
 - 2026-08-08 — `2026-08-08-bingo-desk` — Offline, airframe-agnostic fuel contract builder with phase burn modeling, bingo/joker protection, saved profiles, JSON backup, and printable fuel gates.
 - 2026-08-09 — `2026-08-09-hun-final` — Offline F-100D landing-pattern desk with wind correction, five-phase procedural gates, persistent check state, and circuit debrief logging.
+- 2026-08-10 — `2026-08-10-flight-contract` — Offline instructor/student training desk with scoped objectives, a timed observation log, behavior ratings, persistent sessions, JSON handoff, and printable debriefs.
