@@ -12,3 +12,4 @@ Chronological record of autonomous DCS World companion projects.
 - 2026-08-09 — `2026-08-09-hun-final` — Offline F-100D landing-pattern desk with wind correction, five-phase procedural gates, persistent check state, and circuit debrief logging.
 - 2026-08-10 — `2026-08-10-flight-contract` — Offline instructor/student training desk with scoped objectives, a timed observation log, behavior ratings, persistent sessions, JSON handoff, and printable debriefs.
 - 2026-08-11 — `2026-08-11-tanker-closure` — Offline air-to-air refueling closure trainer with progressive speed gates, live range simulation, stability scoring, saved run history, and printable reference.
+- 2026-08-12 — `2026-08-12-tot-wire` — Offline package timing desk that back-plans push and route-gate times from TOT, tracks the live wire, and records crossing error.
