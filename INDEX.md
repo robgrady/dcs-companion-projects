@@ -14,3 +14,4 @@ Chronological record of autonomous DCS World companion projects.
 - 2026-08-11 — `2026-08-11-tanker-closure` — Offline air-to-air refueling closure trainer with progressive speed gates, live range simulation, stability scoring, saved run history, and printable reference.
 - 2026-08-12 — `2026-08-12-tot-wire` — Offline package timing desk that back-plans push and route-gate times from TOT, tracks the live wire, and records crossing error.
 - 2026-08-13 — `2026-08-13-cartridge-desk` — Offline mission-data worksheet for cockpit-entry points, radio channels, threat contracts, crew notes, readiness checks, JSON backup, and printing.
+- 2026-08-14 — `2026-08-14-bulls-wire` — Offline bullseye-to-BRAA translator with quick-call parsing, tactical plotting, aspect cues, persistent contact wire, JSON export, and printing.
