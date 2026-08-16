@@ -16,3 +16,4 @@ Chronological record of autonomous DCS World companion projects.
 - 2026-08-13 — `2026-08-13-cartridge-desk` — Offline mission-data worksheet for cockpit-entry points, radio channels, threat contracts, crew notes, readiness checks, JSON backup, and printing.
 - 2026-08-14 — `2026-08-14-bulls-wire` — Offline bullseye-to-BRAA translator with quick-call parsing, tactical plotting, aspect cues, persistent contact wire, JSON export, and printing.
 - 2026-08-15 — `2026-08-15-wind-ledger` — Offline DCS weather translator with runway selection, wind components, layer-change cues, density-altitude estimate, saved snapshots, and printable brief.
+- 2026-08-16 — `2026-08-16-bindline` — Offline mission-first control-map workbench with prioritization, duplicate-label checks, eyes-out recall drills, JSON backup, and printable maps.
