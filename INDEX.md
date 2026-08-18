@@ -18,3 +18,4 @@ Chronological record of autonomous DCS World companion projects.
 - 2026-08-15 — `2026-08-15-wind-ledger` — Offline DCS weather translator with runway selection, wind components, layer-change cues, density-altitude estimate, saved snapshots, and printable brief.
 - 2026-08-16 — `2026-08-16-bindline` — Offline mission-first control-map workbench with prioritization, duplicate-label checks, eyes-out recall drills, JSON backup, and printable maps.
 - 2026-08-17 — `2026-08-17-axis-wire` — Offline DCS response-curve bench with transfer visualization, tuning presets, precision-gate validation, persistent notes, and recipe export.
+- 2026-08-18 — `2026-08-18-envelope-desk` — Offline personal stores-envelope ledger with provenance, comparison, planned-pass matching, recall drills, JSON backup, and printing.
