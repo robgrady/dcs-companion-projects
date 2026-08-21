@@ -21,3 +21,4 @@ Chronological record of autonomous DCS World companion projects.
 - 2026-08-18 — `2026-08-18-envelope-desk` — Offline personal stores-envelope ledger with provenance, comparison, planned-pass matching, recall drills, JSON backup, and printing.
 - 2026-08-19 — `2026-08-19-laser-board` — Offline laser-code deconfliction desk with active assignment tracking, duplicate-code warnings, radio briefs, JSON backup, and printing.
 - 2026-08-20 — `2026-08-20-lts-waypoint-wire` — Offline F-14B(U) LANTIRN target-fix staging desk with coordinate parsing, LTS capacity and HAE guardrails, route geometry, crew readbacks, drills, backup, and printing.
+- 2026-08-21 — `2026-08-21-mod-sift` — Offline binary-isolation workbench for narrowing post-update DCS mod faults with saved decision history, A/B confirmation, and JSON export.

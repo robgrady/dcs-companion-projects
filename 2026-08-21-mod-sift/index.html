@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mod Sift — DCS Mod Isolation Workbench</title>
+<style>
+:root{color-scheme:dark;--bg:#11130f;--panel:#191c17;--panel2:#20241d;--ink:#f2f0e7;--muted:#a8ad9d;--line:#343a2f;--signal:#e2b24b;--signal2:#ffd470;--good:#8ec07c;--bad:#e07a5f;--r:10px;--mono:"SFMono-Regular",Consolas,"Liberation Mono",monospace;--sans:Arial,"Helvetica Neue",sans-serif}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.45}button,input,textarea{font:inherit}button,input,textarea{outline:none}button:focus-visible,input:focus-visible,textarea:focus-visible{box-shadow:0 0 0 3px var(--bg),0 0 0 5px var(--signal2)}
+header{border-bottom:1px solid var(--line);padding:18px clamp(16px,4vw,48px);display:flex;align-items:end;justify-content:space-between;gap:20px;background:#151712}.eyebrow,.label{font:700 11px/1.2 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--signal2)}h1{font-size:clamp(25px,4vw,42px);line-height:1;margin:5px 0 0;letter-spacing:-.035em}header p{margin:0;color:var(--muted);max-width:520px;font-size:14px}
+main{max-width:1320px;margin:auto;padding:28px clamp(16px,4vw,48px) 60px;display:grid;grid-template-columns:minmax(280px,390px) 1fr;gap:22px}.panel{border:1px solid var(--line);background:var(--panel);border-radius:var(--r)}.setup{padding:20px;align-self:start;position:sticky;top:16px}.workspace{min-width:0}.section-title{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px}h2{font-size:18px;margin:0;letter-spacing:-.015em}h3{font-size:15px;margin:0}.count{font:700 12px var(--mono);color:var(--muted)}label{display:block;font-size:13px;font-weight:700;margin:14px 0 6px}.hint{color:var(--muted);font-size:12px;margin:6px 0}.field,textarea{width:100%;border:1px solid var(--line);background:#10120f;color:var(--ink);padding:10px 11px;border-radius:7px}textarea{min-height:180px;resize:vertical;font-family:var(--mono);font-size:13px}.check{display:flex;gap:9px;align-items:flex-start;margin:14px 0;font-weight:400}.check input{width:18px;height:18px;accent-color:var(--signal);flex:0 0 auto}.actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}.btn{border:1px solid var(--line);border-radius:7px;background:var(--panel2);color:var(--ink);min-height:44px;padding:9px 14px;font-weight:700;cursor:pointer}.btn:hover{border-color:#626b58}.btn.primary{background:var(--signal);color:#1a160b;border-color:var(--signal);flex:1}.btn.primary:hover{background:var(--signal2)}.btn.danger{color:#ffb3a2}.btn:disabled{opacity:.45;cursor:not-allowed}
+.empty{min-height:520px;display:grid;place-items:center;padding:32px;text-align:center}.empty-inner{max-width:500px}.empty .mark{width:54px;height:54px;margin:0 auto 18px;border:1px solid var(--line);border-radius:50%;display:grid;place-items:center;font:700 20px var(--mono);color:var(--signal2)}.empty h2{font-size:26px}.empty p{color:var(--muted)}
+.run{display:none}.run.active{display:block}.statusbar{display:grid;grid-template-columns:repeat(3,1fr);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;margin-bottom:16px}.stat{padding:15px 17px;background:var(--panel);border-right:1px solid var(--line)}.stat:last-child{border:0}.stat strong{display:block;font:700 24px var(--mono);margin-top:4px}.stat strong.run-label{font-size:15px}.stat small{color:var(--muted)}
+.test-card{padding:22px}.instruction{display:grid;grid-template-columns:1fr auto;gap:22px;align-items:start;border-bottom:1px solid var(--line);padding-bottom:18px;margin-bottom:18px}.step-no{font:700 12px var(--mono);color:var(--signal2)}.instruction h2{font-size:clamp(22px,3vw,32px);margin:5px 0}.instruction p{margin:0;color:var(--muted);max-width:700px}.badge{font:700 12px var(--mono);padding:7px 9px;border:1px solid var(--line);border-radius:999px;white-space:nowrap}.groups{display:grid;grid-template-columns:1fr 1fr;gap:12px}.group{background:#121410;border:1px solid var(--line);border-radius:8px;padding:14px;min-width:0}.group.test{border-color:#80672f}.group header{background:none;border:0;padding:0;align-items:center}.group ul{list-style:none;padding:0;margin:12px 0 0;max-height:260px;overflow:auto}.group li{padding:7px 2px;border-top:1px solid #292d25;font:13px var(--mono);overflow-wrap:anywhere}.group.muted{opacity:.62}.outcomes{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}.outcome{min-height:62px;text-align:left;padding:10px 14px}.outcome span{display:block;font-size:11px;color:var(--muted);font-weight:400;margin-top:2px}.outcome.bad{border-color:#764536}.outcome.good{border-color:#486541}
+.result{padding:28px;border-color:#80672f}.result h2{font-size:32px;margin:6px 0}.result p{color:var(--muted)}.culprit{font:700 clamp(20px,4vw,40px) var(--mono);overflow-wrap:anywhere;color:var(--signal2);margin:18px 0;padding:18px 0;border-block:1px solid var(--line)}
+.history{margin-top:16px;padding:18px}.history ol{margin:0;padding-left:25px}.history li{padding:10px 4px;border-bottom:1px solid var(--line);color:var(--muted)}.history strong{color:var(--ink)}.notice{border:1px solid #5e522f;background:#211e14;padding:11px 13px;border-radius:7px;color:#d8cfb8;font-size:12px;margin-top:14px}.toolbar{display:flex;justify-content:space-between;gap:10px;margin-top:14px}
+@media(max-width:850px){main{grid-template-columns:1fr}.setup{position:static}.groups,.outcomes{grid-template-columns:1fr}.statusbar{grid-template-columns:1fr}.stat{border-right:0;border-bottom:1px solid var(--line)}.stat:last-child{border:0}.instruction{grid-template-columns:1fr}.badge{justify-self:start}header{align-items:start;flex-direction:column}}
+@media print{body{background:white;color:#111}.setup,.outcomes,.toolbar,header p{display:none}main{display:block;padding:0}.panel,.statusbar,.stat,.group,.result{background:white;border-color:#bbb;color:#111}.run{display:block!important}.history li,.instruction p,.hint,.stat small{color:#444}header{background:white;border-color:#bbb;padding:0 0 18px;margin-bottom:20px}.workspace{width:100%}}
+</style>
+</head>
+<body>
+<header><div><div class="eyebrow">DCS maintenance / offline</div><h1>MOD SIFT</h1></div><p>A disciplined binary-isolation workbench for finding a suspect mod after an update. It records decisions; it never reads or changes your DCS files.</p></header>
+<main>
+<section class="panel setup" aria-labelledby="setupTitle">
+ <div class="section-title"><h2 id="setupTitle">Test manifest</h2><span class="count" id="lineCount">0 MODS</span></div>
+ <label for="build">DCS build / incident label</label><input class="field" id="build" type="text" placeholder="e.g. 2.9.28 — hangs at 44%" autocomplete="off">
+ <label for="mods">Suspect mods <span class="hint">— one per line</span></label><textarea id="mods" spellcheck="false" placeholder="Aircraft mod — Saved Games&#10;Export script — Export.lua&#10;Cockpit texture pack — root"></textarea>
+ <p class="hint">Use the exact names from your mod manager. Keep mutually dependent mods on one line as a single test unit.</p>
+ <label class="check"><input type="checkbox" id="baseline"><span><strong>Clean baseline passes</strong><br><span class="hint">DCS starts with all listed mods disabled. If it does not, stop: the list cannot isolate this fault.</span></span></label>
+ <div class="actions"><button class="btn primary" id="start" type="button">Begin isolation</button><button class="btn" id="loadDemo" type="button">Example</button></div>
+ <div class="notice"><strong>Safety gate:</strong> disable/enable mods using your normal manager and follow official repair guidance. Do not delete files based on this page.</div>
+</section>
+<section class="workspace">
+ <div class="panel empty" id="empty"><div class="empty-inner"><div class="mark">½</div><h2>Turn a long mod list into a short test.</h2><p>Confirm a clean baseline, then Mod Sift divides the suspect set. After each launch, report whether the fault returned. A 16-mod set typically narrows to one candidate in four decisions.</p></div></div>
+ <div class="run" id="run">
+  <div class="statusbar"><div class="stat"><span class="label">Candidates</span><strong id="candidateCount">0</strong><small>still under suspicion</small></div><div class="stat"><span class="label">Decision</span><strong id="decisionCount">0</strong><small>tests recorded</small></div><div class="stat"><span class="label">Run label</span><strong id="runLabel" class="run-label">—</strong><small>saved in this browser</small></div></div>
+  <section class="panel test-card" id="testCard" aria-live="polite">
+   <div class="instruction"><div><div class="step-no" id="stepNo">NEXT TEST</div><h2>Enable only the amber set.</h2><p>Leave the holdout set disabled, launch DCS, and reproduce the same scenario used for your clean baseline. Then record the outcome below.</p></div><span class="badge" id="splitBadge">0 / 0 split</span></div>
+   <div class="groups"><div class="group test"><header><h3>ENABLE + TEST</h3><span class="count" id="testCount">0</span></header><ul id="testList"></ul></div><div class="group muted"><header><h3>KEEP DISABLED</h3><span class="count" id="holdCount">0</span></header><ul id="holdList"></ul></div></div>
+   <div class="outcomes"><button class="btn outcome bad" id="failed" type="button">Issue reproduced<span>The suspect is in the enabled set</span></button><button class="btn outcome good" id="passed" type="button">Test was clean<span>The suspect is in the disabled holdout</span></button></div>
+  </section>
+  <section class="panel result" id="result" hidden><div class="label">Isolation candidate</div><h2>One test unit remains.</h2><div class="culprit" id="culprit"></div><p>Confirm it with an A/B test: disable this unit and verify clean behavior, then enable it alone and check whether the same fault returns. Dependency conflicts can require testing combinations.</p></section>
+  <section class="panel history"><div class="section-title"><h2>Decision log</h2><span class="count" id="savedAt">NOT STARTED</span></div><ol id="historyList"><li>No decisions recorded.</li></ol><div class="toolbar"><div><button class="btn" id="undo" type="button">Undo last</button><button class="btn" id="export" type="button">Export log</button></div><button class="btn danger" id="reset" type="button">Reset run</button></div></section>
+ </div>
+</section>
+</main>
+<script>
+(()=>{'use strict';
+const $=id=>document.getElementById(id), KEY='dcs-mod-sift-v1';
+const els={build:$('build'),mods:$('mods'),baseline:$('baseline'),start:$('start'),empty:$('empty'),run:$('run'),testCard:$('testCard'),result:$('result'),history:$('historyList')};
+let state={active:false,label:'',all:[],candidates:[],history:[],started:null};
+function uniqueLines(v){return [...new Set(v.split(/\r?\n/).map(x=>x.trim()).filter(Boolean))]}
+function save(){localStorage.setItem(KEY,JSON.stringify(state));$('savedAt').textContent='SAVED '+new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}
+function esc(s){return s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function halves(){let n=Math.ceil(state.candidates.length/2);return [state.candidates.slice(0,n),state.candidates.slice(n)]}
+function render(){
+ const lines=uniqueLines(els.mods.value);$('lineCount').textContent=lines.length+' MOD'+(lines.length===1?'':'S');
+ els.empty.hidden=state.active;els.run.classList.toggle('active',state.active);if(!state.active)return;
+ $('candidateCount').textContent=state.candidates.length;$('decisionCount').textContent=state.history.length;$('runLabel').textContent=state.label||'Unlabeled';
+ const done=state.candidates.length<=1;els.testCard.hidden=done;els.result.hidden=!done;
+ if(done){$('culprit').textContent=state.candidates[0]||'No candidate';}
+ else{const [a,b]=halves();$('stepNo').textContent='TEST '+(state.history.length+1);$('splitBadge').textContent=a.length+' / '+b.length+' split';$('testCount').textContent=a.length;$('holdCount').textContent=b.length;$('testList').innerHTML=a.map(x=>'<li>'+esc(x)+'</li>').join('');$('holdList').innerHTML=b.map(x=>'<li>'+esc(x)+'</li>').join('')}
+ els.history.innerHTML=state.history.length?state.history.map((h,i)=>'<li><strong>Test '+(i+1)+': '+(h.issue?'issue reproduced':'clean')+'.</strong> '+h.kept.length+' of '+h.before.length+' candidates retained.</li>').join(''):'<li>No decisions recorded.</li>';
+ $('undo').disabled=!state.history.length;
+}
+function begin(){const mods=uniqueLines(els.mods.value);if(mods.length<2){alert('Enter at least two suspect mod units.');els.mods.focus();return}if(!els.baseline.checked){alert('Confirm that the clean baseline passes before isolating mods.');els.baseline.focus();return}state={active:true,label:els.build.value.trim()||'DCS mod incident',all:mods,candidates:[...mods],history:[],started:new Date().toISOString()};save();render()}
+function decide(issue){if(state.candidates.length<2)return;const before=[...state.candidates],[a,b]=halves(),kept=issue?a:b;state.history.push({at:new Date().toISOString(),issue,before,tested:a,holdout:b,kept:[...kept]});state.candidates=[...kept];save();render()}
+function undo(){const h=state.history.pop();if(!h)return;state.candidates=h.before;save();render()}
+function reset(){if(state.active&&!confirm('Clear the current isolation run?'))return;state={active:false,label:'',all:[],candidates:[],history:[],started:null};localStorage.removeItem(KEY);els.build.value='';els.mods.value='';els.baseline.checked=false;render()}
+function exportLog(){const report={tool:'Mod Sift',exported:new Date().toISOString(),...state,assumption:'A clean all-mods-disabled baseline passes; each decision reproduces the same scenario.'},blob=new Blob([JSON.stringify(report,null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='mod-sift-'+new Date().toISOString().slice(0,10)+'.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500)}
+els.mods.addEventListener('input',render);els.start.addEventListener('click',begin);$('failed').addEventListener('click',()=>decide(true));$('passed').addEventListener('click',()=>decide(false));$('undo').addEventListener('click',undo);$('reset').addEventListener('click',reset);$('export').addEventListener('click',exportLog);$('loadDemo').addEventListener('click',()=>{els.build.value='Post-update loading hang';els.mods.value=['Aircraft pack — Saved Games','Cockpit labels — root','Export telemetry script','Ground assets pack','Sound overhaul','VR shader mod'].join('\n');els.baseline.checked=true;render()});
+try{const prior=JSON.parse(localStorage.getItem(KEY));if(prior&&prior.active&&Array.isArray(prior.candidates)){state=prior;els.build.value=prior.label;els.mods.value=prior.all.join('\n');els.baseline.checked=true}}catch(e){localStorage.removeItem(KEY)}render();
+})();
+</script>
+</body>
+</html>
