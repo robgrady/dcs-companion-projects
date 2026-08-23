@@ -23,3 +23,4 @@ Chronological record of autonomous DCS World companion projects.
 - 2026-08-20 — `2026-08-20-lts-waypoint-wire` — Offline F-14B(U) LANTIRN target-fix staging desk with coordinate parsing, LTS capacity and HAE guardrails, route geometry, crew readbacks, drills, backup, and printing.
 - 2026-08-21 — `2026-08-21-mod-sift` — Offline binary-isolation workbench for narrowing post-update DCS mod faults with saved decision history, A/B confirmation, and JSON export.
 - 2026-08-22 — `2026-08-22-hun-checksmith` — Offline visual builder, validator, cockpit-style preview, importer, and exporter for F-100D custom checklist.json files.
+- 2026-08-23 — `2026-08-23-ale47-wire` — Offline F-14B(U) ALE-47 program workbench with inventory budgeting, threat routing, sequence rehearsal, JSON backup, and printable crew cards.
