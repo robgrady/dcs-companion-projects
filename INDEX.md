@@ -24,3 +24,4 @@ Chronological record of autonomous DCS World companion projects.
 - 2026-08-21 — `2026-08-21-mod-sift` — Offline binary-isolation workbench for narrowing post-update DCS mod faults with saved decision history, A/B confirmation, and JSON export.
 - 2026-08-22 — `2026-08-22-hun-checksmith` — Offline visual builder, validator, cockpit-style preview, importer, and exporter for F-100D custom checklist.json files.
 - 2026-08-23 — `2026-08-23-ale47-wire` — Offline F-14B(U) ALE-47 program workbench with inventory budgeting, threat routing, sequence rehearsal, JSON backup, and printable crew cards.
+- 2026-08-24 — `2026-08-24-threat-fifteen` — Offline F-16C DTC threat-site triage desk that ranks the 15 pre-planned threat slots, handles overflow, and produces cockpit-entry cards.
