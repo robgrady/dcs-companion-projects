@@ -26,3 +26,4 @@ Chronological record of autonomous DCS World companion projects.
 - 2026-08-23 — `2026-08-23-ale47-wire` — Offline F-14B(U) ALE-47 program workbench with inventory budgeting, threat routing, sequence rehearsal, JSON backup, and printable crew cards.
 - 2026-08-24 — `2026-08-24-threat-fifteen` — Offline F-16C DTC threat-site triage desk that ranks the 15 pre-planned threat slots, handles overflow, and produces cockpit-entry cards.
 - 2026-08-25 — `2026-08-25-kru-commit-board` — Offline MiG-29A GCI rehearsal desk that converts KRU cues into an intercept contract, estimates timeline compression, and saves a debriefable cue wire.
+- 2026-08-26 — `2026-08-26-patchline` — Offline DCS update-verification desk with scoped pre/post-patch checks, evidence capture, status filters, JSON handoff, and printable run cards.
