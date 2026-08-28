@@ -28,3 +28,4 @@ Chronological record of autonomous DCS World companion projects.
 - 2026-08-25 — `2026-08-25-kru-commit-board` — Offline MiG-29A GCI rehearsal desk that converts KRU cues into an intercept contract, estimates timeline compression, and saves a debriefable cue wire.
 - 2026-08-26 — `2026-08-26-patchline` — Offline DCS update-verification desk with scoped pre/post-patch checks, evidence capture, status filters, JSON handoff, and printable run cards.
 - 2026-08-27 — `2026-08-27-range-wire` — Offline training-range pass sequencer with safety contracts, live radio-call tracking, persistent notes, JSON handoff, and printable range cards.
+- 2026-08-28 — `2026-08-28-freq-marshal` — Offline mission radio-frequency allocation desk with bulk assignment, collision and separation checks, persistent planning, JSON/CSV handoff, and printable comm cards.
