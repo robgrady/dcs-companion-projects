@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark">
+<title>Lesson Lifeline — DCS Training Prompt Companion</title>
+<style>
+:root{
+  --bg:#0d1110;--panel:#151b19;--panel-2:#1b2320;--line:#34403b;--line-strong:#526059;
+  --ink:#f1f0e9;--muted:#aab4ad;--accent:#e9b949;--accent-ink:#1c1608;--good:#78c69b;--danger:#ef8b78;
+  --focus:#f4d47e;--radius:6px;--shadow:0 18px 50px rgba(0,0,0,.24);
+  --sans:"Avenir Next","Segoe UI",sans-serif;--mono:"SFMono-Regular",Consolas,monospace;
+}
+*{box-sizing:border-box}html{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16px}
+body{margin:0;min-height:100vh;background:linear-gradient(90deg,rgba(255,255,255,.018) 1px,transparent 1px) 0 0/48px 48px,var(--bg)}
+button,input,textarea,select{font:inherit}button,input,textarea,select{outline:none}button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible,a:focus-visible{box-shadow:0 0 0 3px var(--bg),0 0 0 5px var(--focus)}
+button{min-height:44px;border:1px solid var(--line-strong);border-radius:var(--radius);background:var(--panel-2);color:var(--ink);padding:.65rem .9rem;cursor:pointer;font-weight:650;letter-spacing:.01em}
+button:hover{border-color:var(--accent);color:#fff}button.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}button.primary:hover{background:#f3ca67;color:#171105}
+button.ghost{background:transparent}.danger{color:var(--danger)}button:disabled{opacity:.42;cursor:not-allowed}
+input,textarea,select{width:100%;color:var(--ink);background:#0f1513;border:1px solid var(--line-strong);border-radius:var(--radius);padding:.72rem .78rem}
+textarea{resize:vertical;line-height:1.45}label{display:grid;gap:.4rem;color:var(--muted);font-size:.8rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.appbar{height:64px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 clamp(1rem,3vw,2.5rem);background:rgba(13,17,16,.94);position:sticky;top:0;z-index:20;backdrop-filter:blur(8px)}
+.brand{display:flex;align-items:center;gap:.8rem}.brand-mark{width:12px;height:30px;background:var(--accent);clip-path:polygon(0 0,100% 0,100% 70%,0 100%)}
+.brand h1{font-size:1rem;margin:0;letter-spacing:.14em;text-transform:uppercase}.brand small{display:block;color:var(--muted);font:600 .68rem var(--mono);letter-spacing:.04em;margin-top:.15rem}.top-actions{display:flex;gap:.5rem}.top-actions button{min-height:38px;padding:.45rem .7rem;font-size:.82rem}
+.shell{display:grid;grid-template-columns:290px minmax(0,1fr);min-height:calc(100vh - 64px)}
+.rail{border-right:1px solid var(--line);padding:1.2rem;background:rgba(18,24,22,.86);display:flex;flex-direction:column;gap:1rem}.rail-head{display:flex;align-items:center;justify-content:space-between}.eyebrow{font:700 .68rem var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--accent)}
+.lesson-list{list-style:none;margin:0;padding:0;display:grid;gap:.45rem}.lesson-button{width:100%;text-align:left;background:transparent;border-color:transparent;padding:.7rem;display:grid;gap:.2rem}.lesson-button[aria-current="true"]{background:var(--panel-2);border-color:var(--line-strong)}.lesson-button span{font-size:.92rem}.lesson-button small{font:500 .69rem var(--mono);color:var(--muted)}
+.rail-footer{margin-top:auto;border-top:1px solid var(--line);padding-top:1rem;color:var(--muted);font-size:.73rem;line-height:1.5}.key{border:1px solid var(--line-strong);border-bottom-width:2px;border-radius:4px;padding:.08rem .35rem;color:var(--ink);font:600 .68rem var(--mono)}
+.workspace{min-width:0;padding:clamp(1rem,3vw,2.5rem)}.workspace-inner{max-width:1180px;margin:0 auto}.statusline{display:flex;align-items:end;justify-content:space-between;gap:1rem;margin-bottom:1rem}.statusline h2{font-size:clamp(1.35rem,2.4vw,2rem);margin:.25rem 0 0;text-wrap:pretty}.statusline p{margin:.3rem 0 0;color:var(--muted)}
+.progress-wrap{min-width:190px;text-align:right}.progress-meta{font:650 .72rem var(--mono);color:var(--muted);margin-bottom:.4rem}.progress{height:6px;background:#28302d;border-radius:9px;overflow:hidden}.progress span{display:block;height:100%;background:var(--accent);transition:width .2s ease}
+.stage{display:grid;grid-template-columns:minmax(0,1fr) 310px;gap:1rem}.prompt-card,.side-card,.empty,.editor{border:1px solid var(--line);background:var(--panel);border-radius:var(--radius);box-shadow:var(--shadow)}
+.prompt-card{min-height:520px;display:flex;flex-direction:column}.prompt-head{padding:1rem 1.2rem;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:1rem}.zone{font:750 .72rem var(--mono);text-transform:uppercase;letter-spacing:.1em;color:var(--accent)}.step-state{font:650 .7rem var(--mono);color:var(--muted)}
+.prompt-body{padding:clamp(1.4rem,4vw,3.2rem);flex:1;display:flex;align-items:center}.prompt-text{font-size:clamp(1.75rem,4.4vw,4rem);font-weight:560;line-height:1.12;letter-spacing:-.025em;text-wrap:pretty;margin:0;max-width:18ch}.prompt-text.done{text-decoration:line-through;text-decoration-color:var(--good);color:var(--muted)}
+.prompt-foot{padding:1rem 1.2rem;border-top:1px solid var(--line);display:grid;grid-template-columns:auto 1fr auto;gap:.6rem}.prompt-foot .primary{min-width:150px}.side-stack{display:grid;gap:1rem;align-content:start}.side-card{padding:1rem}.side-card h3{font-size:.75rem;text-transform:uppercase;letter-spacing:.1em;margin:0 0 .75rem;color:var(--muted)}
+.timer-readout{font:500 2.25rem var(--mono);font-variant-numeric:tabular-nums;letter-spacing:-.06em}.timer-actions{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-top:.7rem}.notes{min-height:112px}.jump-list{max-height:244px;overflow:auto;display:grid;gap:.3rem}.jump{width:100%;min-height:38px;text-align:left;background:transparent;border-color:transparent;padding:.45rem .55rem;font-size:.77rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.jump.active{border-color:var(--accent);color:var(--accent)}.jump.complete::before{content:"✓ ";color:var(--good)}
+.empty{padding:clamp(2rem,7vw,6rem);text-align:left;max-width:820px}.empty h2{font-size:clamp(2rem,5vw,4rem);line-height:1;margin:.5rem 0 1rem;max-width:13ch}.empty p{max-width:60ch;color:var(--muted);line-height:1.65}.empty button{margin-top:1rem}
+.editor{padding:clamp(1rem,3vw,2rem)}.editor h2{margin:.3rem 0 1.5rem}.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}.form-grid .wide{grid-column:1/-1}.format-note{font:500 .72rem/1.5 var(--mono);color:var(--muted);margin:.2rem 0 0}.editor-actions{display:flex;justify-content:flex-end;gap:.6rem;margin-top:1rem}.editor textarea{min-height:260px}
+.toast{position:fixed;right:1rem;bottom:1rem;max-width:360px;background:var(--ink);color:#111;padding:.8rem 1rem;border-radius:var(--radius);box-shadow:var(--shadow);font-weight:700;transform:translateY(140%);transition:.2s;z-index:40}.toast.show{transform:translateY(0)}
+.dialog{border:1px solid var(--line-strong);border-radius:var(--radius);background:var(--panel);color:var(--ink);padding:0;max-width:520px;width:calc(100% - 2rem);box-shadow:var(--shadow)}.dialog::backdrop{background:rgba(0,0,0,.72)}.dialog-body{padding:1.2rem}.dialog h2{margin:.2rem 0 .6rem}.dialog p{color:var(--muted);line-height:1.55}.dialog-actions{display:flex;justify-content:flex-end;gap:.5rem;padding:1rem 1.2rem;border-top:1px solid var(--line)}
+@media(max-width:850px){.shell{grid-template-columns:1fr}.rail{border-right:0;border-bottom:1px solid var(--line);padding:.8rem}.lesson-list{display:flex;overflow:auto}.lesson-button{min-width:180px}.rail-footer{display:none}.stage{grid-template-columns:1fr}.side-stack{grid-template-columns:1fr 1fr}.prompt-card{min-height:430px}}
+@media(max-width:560px){.appbar{height:auto;min-height:64px}.brand small,.top-actions .hide-mobile{display:none}.workspace{padding:1rem}.statusline{align-items:start;flex-direction:column}.progress-wrap{width:100%;text-align:left}.prompt-foot{grid-template-columns:1fr 1fr}.prompt-foot .primary{grid-column:1/-1;grid-row:1}.side-stack,.form-grid{grid-template-columns:1fr}.form-grid .wide{grid-column:auto}.prompt-text{font-size:clamp(1.65rem,9vw,2.8rem)}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+@media print{body{background:#fff;color:#000}.appbar,.rail,.top-actions,.side-stack,.prompt-foot,.statusline .eyebrow,.progress-wrap{display:none!important}.shell{display:block}.workspace{padding:0}.prompt-card{border:0;box-shadow:none;min-height:auto}.prompt-head{border-bottom:2px solid #000}.prompt-body{padding:1.2rem;display:block}.prompt-text{font-size:24pt;max-width:none}.print-all{display:block!important}.print-step{break-inside:avoid;border-bottom:1px solid #888;padding:12pt 0}.print-step b{font:10pt var(--mono)}.print-step p{font-size:16pt;margin:5pt 0}.print-step small{font-size:10pt}.prompt-card{display:none}.statusline{display:block!important}.statusline p{color:#333}.workspace-inner{max-width:none}}
+.print-all{display:none}
+</style>
+</head>
+<body>
+<header class="appbar">
+  <div class="brand"><span class="brand-mark" aria-hidden="true"></span><div><h1>Lesson Lifeline</h1><small>DCS prompt recovery desk · offline</small></div></div>
+  <div class="top-actions">
+    <button id="printBtn" class="ghost hide-mobile" type="button">Print lesson</button>
+    <button id="exportBtn" class="ghost hide-mobile" type="button">Export</button>
+    <button id="newBtn" class="primary" type="button">New lesson</button>
+  </div>
+</header>
+<div class="shell">
+  <aside class="rail" aria-label="Saved lessons">
+    <div class="rail-head"><span class="eyebrow">Saved lessons</span><button id="importBtn" class="ghost" type="button" aria-label="Import lesson">Import</button></div>
+    <ul id="lessonList" class="lesson-list"></ul>
+    <div class="rail-footer"><strong>Flight controls</strong><br><span class="key">←</span> previous &nbsp; <span class="key">→</span> next<br><span class="key">Space</span> mark / advance &nbsp; <span class="key">R</span> read<br><br>Shortcuts pause while typing.</div>
+  </aside>
+  <main class="workspace" id="workspace"><div class="workspace-inner" id="view"></div></main>
+</div>
+<input id="fileInput" class="sr-only" type="file" accept="application/json,.json">
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+<dialog id="confirmDialog" class="dialog"><div class="dialog-body"><span class="eyebrow">Confirm removal</span><h2>Delete this lesson?</h2><p id="confirmText"></p></div><div class="dialog-actions"><button id="cancelDelete" type="button">Keep it</button><button id="confirmDelete" class="danger" type="button">Delete lesson</button></div></dialog>
+<script>
+(()=>{
+'use strict';
+const KEY='dcs.lessonLifeline.v1';
+const starter={id:'lifeline-walkthrough',title:'Lesson Lifeline walk-through',module:'COMPANION',created:'2026-09-02T00:00:00.000Z',updated:'2026-09-02T00:00:00.000Z',index:0,done:[],notes:'',steps:[
+ {zone:'SETUP',text:'Create a lesson and paste the prompts you want available beside DCS.'},
+ {zone:'FORMAT',text:'Put an optional panel zone before a vertical bar, then the instruction.'},
+ {zone:'FLY',text:'Use the large prompt, arrow keys, readback, and scratchpad without losing your place.'},
+ {zone:'DEBRIEF',text:'Export the lesson as JSON or print every step as a compact reference.'}
+]};
+let state=load();let mode='run';let editingId=null;let timer={seconds:0,running:false,handle:null};let pendingDelete=null;
+const $=s=>document.querySelector(s);const view=$('#view'),list=$('#lessonList');
+function load(){try{const x=JSON.parse(localStorage.getItem(KEY));if(x&&Array.isArray(x.lessons))return x}catch(e){}return{active:starter.id,lessons:[starter]}}
+function save(){localStorage.setItem(KEY,JSON.stringify(state))}
+function active(){return state.lessons.find(x=>x.id===state.active)||null}
+function esc(s=''){return String(s).replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]))}
+function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('show');clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove('show'),2300)}
+function slug(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6)}
+function render(){renderList();if(mode==='edit')renderEditor();else renderRun()}
+function renderList(){list.innerHTML=state.lessons.map(l=>`<li><button class="lesson-button" data-id="${esc(l.id)}" aria-current="${l.id===state.active}"><span>${esc(l.title)}</span><small>${esc(l.module)} · ${l.steps.length} steps</small></button></li>`).join('')||'<li><small>No saved lessons</small></li>';list.querySelectorAll('button').forEach(b=>b.onclick=()=>{stopTimer();state.active=b.dataset.id;mode='run';save();render()})}
+function renderRun(){const l=active();if(!l){view.innerHTML=`<section class="empty"><span class="eyebrow">No active lesson</span><h2>Keep the instruction after DCS lets it go.</h2><p>Build a private step deck from your own training notes. Your position, completions, and scratchpad stay on this device.</p><button class="primary" id="emptyNew">Create first lesson</button></section>`;$('#emptyNew').onclick=newLesson;return}
+ const i=Math.max(0,Math.min(l.index,l.steps.length-1));l.index=i;const step=l.steps[i],isDone=l.done.includes(i),pct=l.steps.length?Math.round(l.done.length/l.steps.length*100):0;
+ view.innerHTML=`<div class="statusline"><div><span class="eyebrow">${esc(l.module)} · active lesson</span><h2>${esc(l.title)}</h2><p>${l.done.length} complete · position saved automatically</p></div><div class="progress-wrap"><div class="progress-meta">STEP ${i+1} / ${l.steps.length} · ${pct}% COMPLETE</div><div class="progress" aria-label="${pct}% complete"><span style="width:${pct}%"></span></div></div></div>
+ <div class="stage"><article class="prompt-card" aria-live="polite"><div class="prompt-head"><span class="zone">${esc(step.zone||'GENERAL')}</span><span class="step-state">${isDone?'CHECKED':'ACTIVE'} · ${String(i+1).padStart(2,'0')}</span></div><div class="prompt-body"><p class="prompt-text ${isDone?'done':''}">${esc(step.text)}</p></div><div class="prompt-foot"><button id="prevBtn" type="button" ${i===0?'disabled':''}>← Previous</button><button id="readBtn" type="button">Read aloud</button><button id="doneBtn" class="primary" type="button">${isDone?'Reopen step':'Check & advance'}</button></div></article>
+ <aside class="side-stack"><section class="side-card"><h3>Step stopwatch</h3><div class="timer-readout" id="timerReadout">00:00</div><div class="timer-actions"><button id="timerToggle">Start</button><button id="timerReset">Reset</button></div></section><section class="side-card"><h3>Scratchpad</h3><label><span class="sr-only">Lesson notes</span><textarea class="notes" id="notes" placeholder="Frequencies, switch location, what stopped progress…">${esc(l.notes||'')}</textarea></label></section><section class="side-card"><h3>Jump to prompt</h3><div class="jump-list">${l.steps.map((s,n)=>`<button class="jump ${n===i?'active':''} ${l.done.includes(n)?'complete':''}" data-jump="${n}" title="${esc(s.text)}">${String(n+1).padStart(2,'0')} · ${esc(s.zone||'GENERAL')} — ${esc(s.text)}</button>`).join('')}</div></section><section class="side-card"><h3>Lesson actions</h3><div class="timer-actions"><button id="editBtn">Edit</button><button id="deleteBtn" class="danger">Delete</button></div></section></aside></div>
+ <section class="print-all"><h1>${esc(l.title)}</h1>${l.steps.map((s,n)=>`<div class="print-step"><b>${String(n+1).padStart(2,'0')} · ${esc(s.zone||'GENERAL')}</b><p>${esc(s.text)}</p></div>`).join('')}<p><small>Lesson Lifeline · user-authored training reference · verify against the current DCS module manual.</small></p></section>`;
+ bindRun(l);updateTimer()}
+function bindRun(l){$('#prevBtn').onclick=()=>move(-1);$('#doneBtn').onclick=toggleDone;$('#readBtn').onclick=readStep;$('#timerToggle').onclick=toggleTimer;$('#timerReset').onclick=resetTimer;$('#notes').oninput=e=>{l.notes=e.target.value;l.updated=new Date().toISOString();save()};document.querySelectorAll('[data-jump]').forEach(b=>b.onclick=()=>{l.index=+b.dataset.jump;resetTimer();save();render()});$('#editBtn').onclick=()=>{editingId=l.id;mode='edit';stopTimer();render()};$('#deleteBtn').onclick=()=>askDelete(l)}
+function move(delta){const l=active();if(!l)return;l.index=Math.max(0,Math.min(l.steps.length-1,l.index+delta));resetTimer();save();render()}
+function toggleDone(){const l=active(),i=l.index;if(l.done.includes(i)){l.done=l.done.filter(n=>n!==i)}else{l.done=[...l.done,i].sort((a,b)=>a-b);if(i<l.steps.length-1)l.index++}l.updated=new Date().toISOString();resetTimer();save();render()}
+function readStep(){const l=active();if(!l||!('speechSynthesis'in window)){toast('Readback is not available in this browser.');return}speechSynthesis.cancel();const s=l.steps[l.index];const u=new SpeechSynthesisUtterance(`${s.zone||'General'}. ${s.text}`);u.rate=.92;speechSynthesis.speak(u);toast('Reading current prompt')}
+function updateTimer(){const el=$('#timerReadout');if(el)el.textContent=`${String(Math.floor(timer.seconds/60)).padStart(2,'0')}:${String(timer.seconds%60).padStart(2,'0')}`;const b=$('#timerToggle');if(b)b.textContent=timer.running?'Pause':'Start'}
+function toggleTimer(){timer.running=!timer.running;if(timer.running){timer.handle=setInterval(()=>{timer.seconds++;updateTimer()},1000)}else stopTimer(false);updateTimer()}
+function stopTimer(setFalse=true){clearInterval(timer.handle);timer.handle=null;if(setFalse)timer.running=false}
+function resetTimer(){stopTimer();timer.seconds=0;updateTimer()}
+function newLesson(){editingId=null;mode='edit';stopTimer();render()}
+function parseSteps(raw){return raw.split(/\n+/).map(x=>x.trim()).filter(Boolean).map(line=>{line=line.replace(/^\s*(?:\d+[.)]|[-*])\s*/,'');const p=line.indexOf('|');return p>0?{zone:line.slice(0,p).trim().slice(0,30),text:line.slice(p+1).trim()}:{zone:'GENERAL',text:line}}).filter(x=>x.text)}
+function renderEditor(){const l=editingId?state.lessons.find(x=>x.id===editingId):null;view.innerHTML=`<section class="editor"><span class="eyebrow">${l?'Revise lesson':'Build lesson'}</span><h2>${l?'Keep the prompt deck current.':'Create a prompt deck you can resume.'}</h2><form id="lessonForm"><div class="form-grid"><label>Lesson title<input id="titleInput" required maxlength="80" value="${esc(l?.title||'')}"></label><label>Aircraft / module<input id="moduleInput" required maxlength="30" value="${esc(l?.module||'')}"></label><label class="wide">Prompts — one per line<textarea id="stepsInput" required>${esc(l?l.steps.map(s=>`${s.zone} | ${s.text}`).join('\n'):'')}</textarea><span class="format-note">FORMAT: PANEL ZONE | Instruction. Numbered or bulleted lines are accepted. No aircraft data is supplied—use your module’s current manual or your own notes.</span></label></div><div class="editor-actions"><button id="cancelEdit" type="button">Cancel</button><button class="primary" type="submit">${l?'Save changes':'Create lesson'}</button></div></form></section>`;
+ $('#cancelEdit').onclick=()=>{mode='run';render()};$('#lessonForm').onsubmit=e=>{e.preventDefault();const title=$('#titleInput').value.trim(),module=$('#moduleInput').value.trim().toUpperCase(),steps=parseSteps($('#stepsInput').value);if(!steps.length){toast('Add at least one usable prompt.');return}const now=new Date().toISOString();if(l){l.title=title;l.module=module;l.steps=steps;l.index=Math.min(l.index,steps.length-1);l.done=l.done.filter(n=>n<steps.length);l.updated=now}else{const n={id:slug(),title,module,steps,index:0,done:[],notes:'',created:now,updated:now};state.lessons.push(n);state.active=n.id}mode='run';save();render();toast(l?'Lesson updated':'Lesson created')};setTimeout(()=>$('#titleInput').focus(),0)}
+function askDelete(l){pendingDelete=l.id;$('#confirmText').textContent=`“${l.title}” and its saved progress will be removed from this browser.`;$('#confirmDialog').showModal()}
+function deleteLesson(){state.lessons=state.lessons.filter(x=>x.id!==pendingDelete);state.active=state.lessons[0]?.id||null;pendingDelete=null;save();$('#confirmDialog').close();render();toast('Lesson deleted')}
+function exportData(){const l=active();if(!l){toast('No lesson to export.');return}const blob=new Blob([JSON.stringify({format:'lesson-lifeline',version:1,lesson:l},null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`${l.title.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')||'lesson'}.json`;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500);toast('Lesson exported')}
+function importData(file){if(!file)return;const r=new FileReader();r.onload=()=>{try{const data=JSON.parse(r.result),src=data.lesson||data;if(!src.title||!src.module||!Array.isArray(src.steps)||!src.steps.length)throw Error();const steps=src.steps.map(s=>({zone:String(s.zone||'GENERAL').slice(0,30),text:String(s.text||'').trim()})).filter(s=>s.text);if(!steps.length)throw Error();const now=new Date().toISOString(),l={id:slug(),title:String(src.title).slice(0,80),module:String(src.module).slice(0,30),steps,index:0,done:[],notes:String(src.notes||''),created:now,updated:now};state.lessons.push(l);state.active=l.id;mode='run';save();render();toast('Lesson imported')}catch(e){toast('That file is not a valid Lesson Lifeline export.')}};r.readAsText(file)}
+$('#newBtn').onclick=newLesson;$('#printBtn').onclick=()=>{if(active())window.print();else toast('No lesson to print.')};$('#exportBtn').onclick=exportData;$('#importBtn').onclick=()=>$('#fileInput').click();$('#fileInput').onchange=e=>{importData(e.target.files[0]);e.target.value=''};$('#cancelDelete').onclick=()=>{$('#confirmDialog').close();pendingDelete=null};$('#confirmDelete').onclick=deleteLesson;
+document.addEventListener('keydown',e=>{if(e.target.matches('input,textarea,select')||mode!=='run'||!active())return;if(e.key==='ArrowLeft'){e.preventDefault();move(-1)}else if(e.key==='ArrowRight'){e.preventDefault();move(1)}else if(e.code==='Space'){e.preventDefault();toggleDone()}else if(e.key.toLowerCase()==='r'){e.preventDefault();readStep()}});
+render();
+})();
+</script>
+</body>
+</html>

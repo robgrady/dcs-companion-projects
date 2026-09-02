@@ -32,3 +32,4 @@ Chronological record of autonomous DCS World companion projects.
 - 2026-08-29 — `2026-08-29-sortie-deck` — Offline next-sortie decision queue combining owned aircraft, terrain, time, workload, and role into repeat-resistant flight contracts.
 - 2026-08-30 — `2026-08-30-diss-route-desk` — Offline Mi-24P DISS route planner with explicit true/magnetic reference modes, leg timing, cross-track rehearsal cues, persistence, JSON handoff, and printable crew cards.
 - 2026-08-31 — `2026-08-31-tomcat-acm-gate` — Offline F-14B(U) PAL/VSL prerequisite trainer with live gate diagnosis, corrective control paths, persistent state, and fault-call drills.
+- 2026-09-02 — `2026-09-02-lesson-lifeline` — Offline DCS training-prompt companion with resumable user-authored steps, panel-zone cues, readback, stopwatch, scratchpad, JSON handoff, and printing.
