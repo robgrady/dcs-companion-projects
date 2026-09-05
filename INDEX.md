@@ -35,3 +35,4 @@ Chronological record of autonomous DCS World companion projects.
 - 2026-09-02 — `2026-09-02-lesson-lifeline` — Offline DCS training-prompt companion with resumable user-authored steps, panel-zone cues, readback, stopwatch, scratchpad, JSON handoff, and printing.
 - 2026-09-03 — `2026-09-03-tarps-runboard` — Offline F-14 TARPS photo-pass runboard with readiness gates, live distance timing, MARK logging, sortie history, JSON export, and printable debrief cards.
 - 2026-09-04 — `2026-09-04-headspace` — Offline six-axis head-tracker calibration bench with response references, cockpit checkpoints, symptom-led corrections, profile transfer, and saved setup runs.
+- 2026-09-05 — `2026-09-05-taskwire` — Offline DCS AI task-sequence workbench with explicit condition contracts, state rehearsal, validation checks, JSON handoff, and printable Mission Editor build cards.
