@@ -1,0 +1,393 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#151713">
+<title>Apache DTC Split — AH-64D mission allocation desk</title>
+<style>
+:root {
+  color-scheme: dark;
+  --bg: #10120f;
+  --panel: #191c17;
+  --panel-2: #20241e;
+  --field: #121510;
+  --ink: #f0eee4;
+  --muted: #a9ac9f;
+  --line: #3d4338;
+  --line-hot: #68745f;
+  --green: #b6d99d;
+  --green-deep: #263522;
+  --amber: #e0bd72;
+  --red: #ef8a7b;
+  --blue: #9bb9c1;
+  --radius: 4px;
+  --space: 16px;
+  --shadow: 0 14px 36px rgba(0,0,0,.28);
+  --sans: "Avenir Next", Avenir, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --mono: Menlo, Monaco, Consolas, monospace;
+}
+* { box-sizing: border-box; }
+html { background: var(--bg); }
+body { margin: 0; min-height: 100vh; background: var(--bg); color: var(--ink); font-family: var(--sans); line-height: 1.45; }
+button, input, select, textarea { font: inherit; }
+button, select, input, textarea { color: var(--ink); }
+button { cursor: pointer; }
+button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 3px solid var(--amber); outline-offset: 2px; }
+.sr-only { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; }
+.app-header { position: sticky; top: 0; z-index: 20; display: grid; grid-template-columns: minmax(220px,1fr) auto; gap: 20px; align-items: center; min-height: 78px; padding: 12px clamp(16px,3vw,40px); border-bottom: 1px solid var(--line); background: rgba(16,18,15,.96); backdrop-filter: blur(10px); }
+.brand { display:flex; gap:14px; align-items:center; min-width:0; }
+.brand-mark { width:44px; height:44px; border:1px solid var(--green); display:grid; place-items:center; color:var(--green); font:700 12px/1 var(--mono); letter-spacing:.08em; }
+h1 { font-size: clamp(20px,2.1vw,29px); line-height:1; margin:0; letter-spacing:.02em; }
+.subtitle { margin:5px 0 0; color:var(--muted); font-size:13px; }
+.header-actions { display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end; }
+.btn { min-height:42px; padding:9px 13px; border:1px solid var(--line-hot); border-radius:var(--radius); background:var(--panel-2); color:var(--ink); font-weight:650; letter-spacing:.01em; }
+.btn:hover { border-color:var(--green); background:#282d25; }
+.btn.primary { background:var(--green); border-color:var(--green); color:#11150f; }
+.btn.danger { color:var(--red); }
+.btn.small { min-height:34px; padding:6px 9px; font-size:12px; }
+main { max-width: 1600px; margin:0 auto; padding: clamp(16px,2.4vw,34px); }
+.mission-strip { display:grid; grid-template-columns: 1fr 1fr auto; border:1px solid var(--line); background:var(--panel); box-shadow:var(--shadow); }
+.mission-card { padding:18px 20px; border-right:1px solid var(--line); }
+.mission-card:last-child { border:0; }
+.eyebrow { color:var(--green); font:700 11px/1 var(--mono); letter-spacing:.15em; text-transform:uppercase; }
+.mission-card h2 { margin:8px 0 6px; font-size:18px; }
+.mission-card p { margin:0; color:var(--muted); font-size:13px; }
+.big-count { min-width:150px; display:grid; align-content:center; text-align:center; padding:16px; }
+.big-count strong { font:700 25px/1 var(--mono); color:var(--green); }
+.big-count span { margin-top:7px; color:var(--muted); font-size:11px; letter-spacing:.1em; text-transform:uppercase; }
+.workspace { display:grid; grid-template-columns:minmax(290px,360px) minmax(0,1fr); gap:18px; margin-top:18px; }
+.panel { border:1px solid var(--line); background:var(--panel); }
+.panel-head { min-height:58px; display:flex; align-items:center; justify-content:space-between; gap:12px; padding:13px 16px; border-bottom:1px solid var(--line); }
+.panel-head h2 { margin:0; font-size:15px; letter-spacing:.05em; text-transform:uppercase; }
+.panel-body { padding:16px; }
+.field { margin-bottom:14px; }
+.field label, .field legend { display:block; margin:0 0 6px; color:var(--muted); font-size:12px; font-weight:700; letter-spacing:.04em; }
+input, select, textarea { width:100%; min-height:44px; padding:10px 11px; border:1px solid var(--line-hot); border-radius:var(--radius); background:var(--field); }
+textarea { min-height:76px; resize:vertical; }
+.two { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.assignment { display:grid; grid-template-columns:repeat(3,1fr); gap:7px; border:0; padding:0; margin:0 0 14px; }
+.assignment legend { grid-column:1/-1; }
+.assignment input { position:absolute; width:1px; min-height:1px; opacity:0; pointer-events:none; }
+.assignment label { display:grid; min-height:48px; place-items:center; margin:0; border:1px solid var(--line-hot); border-radius:var(--radius); color:var(--ink); cursor:pointer; font:700 12px var(--mono); }
+.assignment input:checked + label { border-color:var(--green); background:var(--green-deep); color:var(--green); }
+.assignment input:focus-visible + label { outline:3px solid var(--amber); outline-offset:2px; }
+.form-actions { display:flex; gap:8px; }
+.form-actions .btn { flex:1; }
+.note { border-top:1px solid var(--line); margin-top:16px; padding-top:14px; color:var(--muted); font-size:12px; }
+.note strong { color:var(--amber); }
+.capacity { display:grid; grid-template-columns:repeat(5,minmax(96px,1fr)); border-bottom:1px solid var(--line); }
+.meter { padding:13px 12px; border-right:1px solid var(--line); min-width:0; }
+.meter:last-child { border:0; }
+.meter-top { display:flex; align-items:baseline; justify-content:space-between; gap:6px; }
+.meter-name { overflow:hidden; text-overflow:ellipsis; color:var(--muted); font-size:11px; white-space:nowrap; }
+.meter-value { font:700 11px var(--mono); }
+.track { height:4px; margin-top:8px; background:#30362d; }
+.track i { display:block; height:100%; width:0; background:var(--green); transition:width .18s ease; }
+.track i.warn { background:var(--amber); }
+.track i.over { background:var(--red); }
+.toolbar { display:grid; grid-template-columns:minmax(180px,1fr) 150px 130px auto; gap:8px; padding:12px 16px; border-bottom:1px solid var(--line); }
+.toolbar input, .toolbar select { min-height:40px; }
+.table-wrap { overflow:auto; min-height:390px; }
+table { width:100%; border-collapse:collapse; font-size:13px; }
+th { position:sticky; top:0; z-index:2; padding:10px 12px; background:#22261f; color:var(--muted); font-size:10px; letter-spacing:.1em; text-align:left; text-transform:uppercase; white-space:nowrap; }
+td { padding:11px 12px; border-top:1px solid #30352d; vertical-align:top; }
+tbody tr:hover { background:#1f231d; }
+.label-main { font-weight:750; }
+.label-sub { margin-top:3px; color:var(--muted); font:11px var(--mono); }
+.pill { display:inline-block; padding:3px 7px; border:1px solid var(--line-hot); border-radius:99px; font:700 10px var(--mono); letter-spacing:.05em; }
+.pill.a { color:var(--blue); border-color:#567078; }
+.pill.b { color:var(--amber); border-color:#7a6843; }
+.pill.both { color:var(--green); border-color:#58704d; }
+.row-actions { display:flex; gap:5px; justify-content:flex-end; }
+.icon-btn { min-width:34px; min-height:34px; border:1px solid var(--line); border-radius:var(--radius); background:transparent; color:var(--muted); }
+.icon-btn:hover { color:var(--ink); border-color:var(--green); }
+.empty { padding:72px 24px; text-align:center; }
+.empty strong { display:block; font-size:18px; }
+.empty p { max-width:470px; margin:7px auto 0; color:var(--muted); font-size:13px; }
+.statusbar { display:flex; justify-content:space-between; gap:12px; padding:10px 16px; border-top:1px solid var(--line); color:var(--muted); font:11px var(--mono); }
+.alerts { margin-top:18px; border:1px solid var(--line); background:var(--panel); }
+.alert-list { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); }
+.alert { padding:13px 16px; border-top:1px solid var(--line); color:var(--muted); font-size:13px; }
+.alert:nth-child(odd) { border-right:1px solid var(--line); }
+.alert.error { color:var(--red); }
+.alert.warn { color:var(--amber); }
+.alert.ok { color:var(--green); }
+.toast { position:fixed; right:18px; bottom:18px; z-index:50; max-width:360px; padding:12px 15px; border:1px solid var(--green); background:#20291c; color:var(--green); box-shadow:var(--shadow); transform:translateY(20px); opacity:0; pointer-events:none; transition:.18s ease; }
+.toast.show { transform:none; opacity:1; }
+dialog { width:min(760px,calc(100vw - 30px)); padding:0; border:1px solid var(--line-hot); border-radius:var(--radius); background:var(--panel); color:var(--ink); box-shadow:0 30px 90px #000; }
+dialog::backdrop { background:rgba(0,0,0,.72); }
+.dialog-head { display:flex; justify-content:space-between; align-items:center; padding:14px 17px; border-bottom:1px solid var(--line); }
+.dialog-head h2 { margin:0; font-size:17px; }
+.dialog-body { padding:17px; }
+.dialog-actions { display:flex; justify-content:flex-end; gap:8px; padding:13px 17px; border-top:1px solid var(--line); }
+.handoff { width:100%; min-height:330px; font:12px/1.55 var(--mono); }
+@media (max-width: 980px) {
+  .app-header { position:relative; grid-template-columns:1fr; }
+  .header-actions { justify-content:flex-start; }
+  .workspace { grid-template-columns:1fr; }
+  .capacity { grid-template-columns:repeat(3,1fr); }
+  .meter:nth-child(3) { border-right:0; }
+  .toolbar { grid-template-columns:1fr 1fr; }
+}
+@media (max-width: 620px) {
+  .mission-strip { grid-template-columns:1fr; }
+  .mission-card { border-right:0; border-bottom:1px solid var(--line); }
+  .big-count { min-height:90px; }
+  .capacity { grid-template-columns:1fr 1fr; }
+  .meter:nth-child(odd) { border-right:1px solid var(--line); }
+  .meter:nth-child(even) { border-right:0; }
+  .toolbar { grid-template-columns:1fr; }
+  .two { grid-template-columns:1fr; }
+  .alert-list { grid-template-columns:1fr; }
+  .alert:nth-child(odd) { border-right:0; }
+  .hide-mobile { display:none; }
+}
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition:none !important; scroll-behavior:auto !important; } }
+@media print {
+  :root { color-scheme:light; --bg:#fff; --panel:#fff; --panel-2:#fff; --field:#fff; --ink:#111; --muted:#444; --line:#888; --line-hot:#555; --green:#1e4b22; }
+  body { font-size:12pt; background:#fff; }
+  .app-header, .editor, .toolbar, .alerts, .row-actions, .statusbar { display:none !important; }
+  main { max-width:none; padding:0; }
+  .workspace { display:block; margin-top:14px; }
+  .panel, .mission-strip { box-shadow:none; break-inside:avoid; }
+  .table-wrap { overflow:visible; min-height:0; }
+  th { position:static; }
+  .hide-print { display:none; }
+}
+</style>
+</head>
+<body>
+<header class="app-header">
+  <div class="brand">
+    <div class="brand-mark" aria-hidden="true">DTC<br>SPLIT</div>
+    <div><h1>Apache DTC Split</h1><p class="subtitle">AH-64D dual-mission allocation and capacity check</p></div>
+  </div>
+  <nav class="header-actions" aria-label="Project actions">
+    <button class="btn" id="handoffBtn" type="button">Crew handoff</button>
+    <button class="btn" id="importBtn" type="button">Import</button>
+    <button class="btn" id="exportBtn" type="button">Export JSON</button>
+    <button class="btn" id="printBtn" type="button">Print brief</button>
+    <input class="sr-only" id="fileInput" type="file" accept="application/json,.json">
+  </nav>
+</header>
+<main>
+  <section class="mission-strip" aria-label="Mission allocation summary">
+    <article class="mission-card"><span class="eyebrow">Mission A</span><h2 id="missionAName">Primary AO</h2><p id="aSummary">No records assigned</p></article>
+    <article class="mission-card"><span class="eyebrow">Mission B</span><h2 id="missionBName">Contingency AO</h2><p id="bSummary">No records assigned</p></article>
+    <div class="big-count"><strong id="totalCount">0</strong><span>unique records staged</span></div>
+  </section>
+
+  <div class="workspace">
+    <aside class="panel editor" aria-labelledby="editorTitle">
+      <div class="panel-head"><h2 id="editorTitle">Stage a record</h2><button class="btn small" id="namesBtn" type="button">Mission names</button></div>
+      <form class="panel-body" id="recordForm">
+        <input type="hidden" id="recordId">
+        <div class="field"><label for="label">Tactical label</label><input id="label" required maxlength="28" autocomplete="off" placeholder="e.g. FARP EAGLE"></div>
+        <div class="two">
+          <div class="field"><label for="category">DTC category</label><select id="category" required></select></div>
+          <div class="field"><label for="type">Type / identifier</label><input id="type" maxlength="18" autocomplete="off" placeholder="e.g. WP, LZ, NAI"></div>
+        </div>
+        <fieldset class="assignment"><legend>Load into</legend>
+          <input id="assignA" name="assignment" type="radio" value="A" checked><label for="assignA">MISSION A</label>
+          <input id="assignB" name="assignment" type="radio" value="B"><label for="assignB">MISSION B</label>
+          <input id="assignBoth" name="assignment" type="radio" value="BOTH"><label for="assignBoth">BOTH</label>
+        </fieldset>
+        <div class="two">
+          <div class="field"><label for="priority">Priority</label><select id="priority"><option value="1">1 — Essential</option><option value="2" selected>2 — Planned</option><option value="3">3 — Reference</option></select></div>
+          <div class="field"><label for="coordinate">Coordinate / location</label><input id="coordinate" maxlength="48" autocomplete="off" placeholder="MGRS or lat/long"></div>
+        </div>
+        <div class="field"><label for="notes">Crew note</label><textarea id="notes" maxlength="180" placeholder="Purpose, trigger, restriction, or handoff note"></textarea></div>
+        <div class="form-actions"><button class="btn primary" id="saveBtn" type="submit">Stage record</button><button class="btn" id="cancelBtn" type="button" hidden>Cancel edit</button></div>
+        <p class="note"><strong>Planning aid:</strong> this desk mirrors announced category limits; it does not write a DCS cartridge file. Enter records in DCS DTC after crew review.</p>
+      </form>
+    </aside>
+
+    <section class="panel" aria-labelledby="manifestTitle">
+      <div class="panel-head"><h2 id="manifestTitle">Allocation manifest</h2><span class="eyebrow" id="visibleCount">0 shown</span></div>
+      <div class="capacity" id="capacityMeters" aria-label="Capacity meters"></div>
+      <div class="toolbar">
+        <label class="sr-only" for="search">Search records</label><input id="search" type="search" placeholder="Search label, type, location, note">
+        <label class="sr-only" for="missionFilter">Filter mission</label><select id="missionFilter"><option value="ALL">All missions</option><option value="A">Mission A</option><option value="B">Mission B</option><option value="BOTH">Shared only</option></select>
+        <label class="sr-only" for="categoryFilter">Filter category</label><select id="categoryFilter"><option value="ALL">All categories</option></select>
+        <button class="btn small danger" id="clearBtn" type="button">Clear all</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Record</th><th>Category</th><th>Load</th><th class="hide-mobile">Priority</th><th class="hide-mobile">Location</th><th><span class="sr-only">Actions</span></th></tr></thead>
+          <tbody id="recordsBody"></tbody>
+        </table>
+        <div class="empty" id="emptyState"><strong>No DTC records staged</strong><p>Add only mission-relevant points, measures, zones, routes, or presets. Shared records consume capacity in both mission files.</p></div>
+      </div>
+      <div class="statusbar"><span id="saveStatus">Local save ready</span><span>OFFLINE · FILE-SAFE</span></div>
+    </section>
+  </div>
+
+  <section class="alerts" aria-labelledby="alertsTitle">
+    <div class="panel-head"><h2 id="alertsTitle">Crew review</h2><span class="eyebrow" id="reviewState">READY</span></div>
+    <div class="alert-list" id="alertList"></div>
+  </section>
+</main>
+
+<dialog id="namesDialog">
+  <form method="dialog">
+    <div class="dialog-head"><h2>Mission file names</h2><button class="icon-btn" value="cancel" aria-label="Close">×</button></div>
+    <div class="dialog-body two">
+      <div class="field"><label for="nameA">Mission A</label><input id="nameA" maxlength="32"></div>
+      <div class="field"><label for="nameB">Mission B</label><input id="nameB" maxlength="32"></div>
+    </div>
+    <div class="dialog-actions"><button class="btn" value="cancel">Cancel</button><button class="btn primary" id="saveNames" value="default">Save names</button></div>
+  </form>
+</dialog>
+<dialog id="handoffDialog">
+  <div class="dialog-head"><h2>Crew handoff text</h2><button class="icon-btn" id="closeHandoff" type="button" aria-label="Close">×</button></div>
+  <div class="dialog-body"><textarea class="handoff" id="handoffText" aria-label="Generated crew handoff"></textarea></div>
+  <div class="dialog-actions"><button class="btn" id="copyHandoff" type="button">Copy text</button><button class="btn primary" id="doneHandoff" type="button">Done</button></div>
+</dialog>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script>
+(() => {
+'use strict';
+const STORAGE_KEY = 'apache-dtc-split-v1';
+const categories = [
+  {id:'WH', name:'Waypoint / Hazard', short:'W/H', cap:50},
+  {id:'CM', name:'Control Measure', short:'CM', cap:49},
+  {id:'TT', name:'Target / Threat', short:'T/T', cap:50},
+  {id:'ROUTE', name:'Route', short:'Routes', cap:10},
+  {id:'LINE', name:'Battlefield Line', short:'Lines', cap:15},
+  {id:'EA', name:'Engagement Area', short:'EAs', cap:12},
+  {id:'PFZ', name:'Priority Fire Zone', short:'PFZs', cap:8},
+  {id:'NFZ', name:'No Fire Zone', short:'NFZs', cap:8},
+  {id:'ADF', name:'ADF Preset', short:'ADF', cap:10},
+  {id:'COM', name:'COM Preset', short:'COM', cap:10},
+  {id:'MSG', name:'Text Message', short:'Msgs', cap:10}
+];
+const state = loadState();
+let editingId = null;
+const $ = id => document.getElementById(id);
+const els = {
+ form:$('recordForm'), id:$('recordId'), label:$('label'), category:$('category'), type:$('type'), priority:$('priority'), coordinate:$('coordinate'), notes:$('notes'),
+ body:$('recordsBody'), empty:$('emptyState'), search:$('search'), missionFilter:$('missionFilter'), categoryFilter:$('categoryFilter'), meters:$('capacityMeters'), alerts:$('alertList')
+};
+
+function cleanState(raw) {
+  const safe = raw && typeof raw === 'object' ? raw : {};
+  return {
+    names: {A:String(safe.names?.A || 'Primary AO').slice(0,32), B:String(safe.names?.B || 'Contingency AO').slice(0,32)},
+    records: Array.isArray(safe.records) ? safe.records.filter(r => r && categories.some(c => c.id === r.category)).map(r => ({
+      id:String(r.id || makeId()), label:String(r.label || '').slice(0,28), category:r.category, type:String(r.type || '').slice(0,18),
+      assignment:['A','B','BOTH'].includes(r.assignment) ? r.assignment : 'A', priority:['1','2','3'].includes(String(r.priority)) ? String(r.priority) : '2',
+      coordinate:String(r.coordinate || '').slice(0,48), notes:String(r.notes || '').slice(0,180), created:Number(r.created) || Date.now()
+    })).filter(r => r.label) : []
+  };
+}
+function loadState() { try { return cleanState(JSON.parse(localStorage.getItem(STORAGE_KEY))); } catch (_) { return cleanState({}); } }
+function saveState(message='Saved locally') { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); $('saveStatus').textContent = message; }
+function makeId() { return (crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36)+Math.random().toString(36).slice(2)); }
+function esc(value) { const d=document.createElement('div'); d.textContent=String(value ?? ''); return d.innerHTML; }
+function cat(id) { return categories.find(c => c.id === id); }
+function applies(r, mission) { return r.assignment === mission || r.assignment === 'BOTH'; }
+function count(category, mission) { return state.records.filter(r => r.category === category && applies(r, mission)).length; }
+function toast(message) { const t=$('toast'); t.textContent=message; t.classList.add('show'); clearTimeout(toast.timer); toast.timer=setTimeout(()=>t.classList.remove('show'),2400); }
+
+function setupOptions() {
+  categories.forEach(c => {
+    els.category.add(new Option(`${c.name} · ${c.cap}`, c.id));
+    els.categoryFilter.add(new Option(c.name, c.id));
+  });
+}
+function render() {
+  $('missionAName').textContent=state.names.A; $('missionBName').textContent=state.names.B;
+  const a=state.records.filter(r=>applies(r,'A')).length, b=state.records.filter(r=>applies(r,'B')).length;
+  $('aSummary').textContent=`${a} loaded record${a===1?'':'s'} · ${overages('A')} limits exceeded`;
+  $('bSummary').textContent=`${b} loaded record${b===1?'':'s'} · ${overages('B')} limits exceeded`;
+  $('totalCount').textContent=state.records.length;
+  renderMeters(); renderTable(); renderAlerts();
+}
+function overages(mission) { return categories.filter(c=>count(c.id,mission)>c.cap).length; }
+function renderMeters() {
+  const mission = els.missionFilter.value === 'B' ? 'B' : 'A';
+  const headline = categories.slice(0,5);
+  els.meters.innerHTML=headline.map(c=>{
+    const n=count(c.id,mission), pct=Math.min(100,(n/c.cap)*100), cls=n>c.cap?'over':n/c.cap>=.8?'warn':'';
+    return `<div class="meter" title="${esc(c.name)} in Mission ${mission}"><div class="meter-top"><span class="meter-name">${esc(c.short)} · ${mission}</span><span class="meter-value">${n}/${c.cap}</span></div><div class="track"><i class="${cls}" style="width:${pct}%"></i></div></div>`;
+  }).join('');
+}
+function filteredRecords() {
+  const q=els.search.value.trim().toLowerCase(), mf=els.missionFilter.value, cf=els.categoryFilter.value;
+  return state.records.filter(r => {
+    const text=[r.label,r.type,r.coordinate,r.notes,cat(r.category)?.name].join(' ').toLowerCase();
+    const missionOK=mf==='ALL' || (mf==='BOTH' ? r.assignment==='BOTH' : applies(r,mf));
+    return (!q || text.includes(q)) && missionOK && (cf==='ALL' || r.category===cf);
+  }).sort((a,b)=>Number(a.priority)-Number(b.priority) || a.label.localeCompare(b.label));
+}
+function renderTable() {
+  const list=filteredRecords();
+  $('visibleCount').textContent=`${list.length} shown`;
+  els.empty.hidden=list.length>0;
+  els.body.innerHTML=list.map(r=>`<tr>
+    <td><div class="label-main">${esc(r.label)}</div><div class="label-sub">${esc(r.type || '—')}</div></td>
+    <td>${esc(cat(r.category).short)}</td>
+    <td><span class="pill ${r.assignment.toLowerCase()}">${r.assignment==='BOTH'?'A + B':r.assignment}</span></td>
+    <td class="hide-mobile">P${esc(r.priority)}</td>
+    <td class="hide-mobile">${esc(r.coordinate || '—')}</td>
+    <td><div class="row-actions"><button class="icon-btn" data-action="move" data-id="${esc(r.id)}" title="Cycle allocation" aria-label="Cycle allocation for ${esc(r.label)}">⇄</button><button class="icon-btn" data-action="edit" data-id="${esc(r.id)}" aria-label="Edit ${esc(r.label)}">Edit</button><button class="icon-btn" data-action="delete" data-id="${esc(r.id)}" aria-label="Delete ${esc(r.label)}">×</button></div></td>
+  </tr>`).join('');
+}
+function renderAlerts() {
+  const alerts=[];
+  ['A','B'].forEach(m => categories.forEach(c => { const n=count(c.id,m); if(n>c.cap) alerts.push({level:'error',text:`Mission ${m}: ${c.name} exceeds ${c.cap} by ${n-c.cap}.`}); else if(n/c.cap>=.8) alerts.push({level:'warn',text:`Mission ${m}: ${c.name} is at ${n} of ${c.cap}.`}); }));
+  ['A','B'].forEach(m => {
+    const seen=new Map(); state.records.filter(r=>applies(r,m)).forEach(r=>{ const key=`${r.category}|${r.label.toLowerCase()}`; seen.set(key,(seen.get(key)||0)+1); });
+    seen.forEach((n,key)=>{ if(n>1) alerts.push({level:'warn',text:`Mission ${m}: duplicate label “${key.split('|')[1].toUpperCase()}” within ${cat(key.split('|')[0]).name}.`}); });
+  });
+  if(!state.records.length) alerts.push({level:'ok',text:'Desk is empty. Stage only records required by the sortie contract.'});
+  else if(!alerts.length) alerts.push({level:'ok',text:'Both mission allocations are within announced category limits; no duplicate labels detected.'});
+  els.alerts.innerHTML=alerts.map(a=>`<div class="alert ${a.level}">${esc(a.text)}</div>`).join('');
+  $('reviewState').textContent=alerts.some(a=>a.level==='error')?'OVER LIMIT':alerts.some(a=>a.level==='warn')?'CHECK':'READY';
+}
+function resetForm() {
+  editingId=null; els.form.reset(); $('assignA').checked=true; els.priority.value='2'; els.id.value=''; $('editorTitle').textContent='Stage a record'; $('saveBtn').textContent='Stage record'; $('cancelBtn').hidden=true;
+}
+function editRecord(id) {
+  const r=state.records.find(x=>x.id===id); if(!r) return;
+  editingId=id; els.id.value=id; els.label.value=r.label; els.category.value=r.category; els.type.value=r.type; els.priority.value=r.priority; els.coordinate.value=r.coordinate; els.notes.value=r.notes;
+  $(`assign${r.assignment==='BOTH'?'Both':r.assignment}`).checked=true; $('editorTitle').textContent='Edit staged record'; $('saveBtn').textContent='Save changes'; $('cancelBtn').hidden=false; els.label.focus();
+}
+function deleteRecord(id) { const r=state.records.find(x=>x.id===id); if(!r || !confirm(`Delete “${r.label}”?`)) return; state.records=state.records.filter(x=>x.id!==id); if(editingId===id) resetForm(); saveState(); render(); toast('Record deleted'); }
+function cycleAssignment(id) { const r=state.records.find(x=>x.id===id); if(!r) return; r.assignment={A:'B',B:'BOTH',BOTH:'A'}[r.assignment]; saveState(); render(); toast(`Moved to ${r.assignment==='BOTH'?'both missions':'Mission '+r.assignment}`); }
+function generateHandoff() {
+  const lines=['APACHE DTC SPLIT — CREW HANDOFF',`Generated: ${new Date().toLocaleString()}`,'','REVIEW: Planning aid only; enter and verify in DCS DTC.'];
+  ['A','B'].forEach(m=>{
+    lines.push('',`MISSION ${m} — ${state.names[m].toUpperCase()}`);
+    const records=state.records.filter(r=>applies(r,m)).sort((a,b)=>Number(a.priority)-Number(b.priority)||a.category.localeCompare(b.category)||a.label.localeCompare(b.label));
+    if(!records.length) lines.push('  No records staged.');
+    categories.forEach(c=>{ const group=records.filter(r=>r.category===c.id); if(group.length){ lines.push(`  ${c.name.toUpperCase()} (${group.length}/${c.cap})`); group.forEach(r=>lines.push(`    P${r.priority} ${r.label}${r.type?' ['+r.type+']':''}${r.coordinate?' — '+r.coordinate:''}${r.notes?' — '+r.notes:''}`)); }});
+  });
+  return lines.join('\n');
+}
+function exportJSON() {
+  const payload={app:'Apache DTC Split',version:1,exported:new Date().toISOString(),...state};
+  const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'}), url=URL.createObjectURL(blob), a=document.createElement('a'); a.href=url; a.download=`apache-dtc-split-${new Date().toISOString().slice(0,10)}.json`; a.click(); setTimeout(()=>URL.revokeObjectURL(url),1000); toast('JSON exported');
+}
+function importJSON(file) {
+  const reader=new FileReader(); reader.onload=()=>{ try { const imported=cleanState(JSON.parse(reader.result)); if(!confirm(`Replace this desk with ${imported.records.length} imported record(s)?`)) return; state.names=imported.names; state.records=imported.records; resetForm(); saveState('Import saved locally'); render(); toast('Import complete'); } catch(_) { alert('That file is not a valid Apache DTC Split export.'); } }; reader.readAsText(file);
+}
+
+setupOptions();
+els.form.addEventListener('submit',e=>{ e.preventDefault(); const wasEditing=Boolean(editingId); const record={id:editingId||makeId(), label:els.label.value.trim(), category:els.category.value, type:els.type.value.trim(), assignment:document.querySelector('input[name="assignment"]:checked').value, priority:els.priority.value, coordinate:els.coordinate.value.trim(), notes:els.notes.value.trim(), created:editingId?(state.records.find(r=>r.id===editingId)?.created||Date.now()):Date.now()}; if(!record.label){ els.label.focus(); return; } if(editingId){ const i=state.records.findIndex(r=>r.id===editingId); if(i>=0) state.records[i]=record; } else state.records.push(record); saveState(); resetForm(); render(); toast(wasEditing?'Changes saved':'Record staged'); });
+$('cancelBtn').addEventListener('click',resetForm);
+els.body.addEventListener('click',e=>{ const b=e.target.closest('button[data-action]'); if(!b)return; const {action,id}=b.dataset; if(action==='edit')editRecord(id); if(action==='delete')deleteRecord(id); if(action==='move')cycleAssignment(id); });
+[els.search,els.missionFilter,els.categoryFilter].forEach(el=>el.addEventListener(el===els.search?'input':'change',()=>{renderTable(); renderMeters();}));
+$('clearBtn').addEventListener('click',()=>{ if(!state.records.length)return; if(confirm(`Delete all ${state.records.length} staged records?`)){ state.records=[]; resetForm(); saveState(); render(); toast('Desk cleared'); }});
+$('namesBtn').addEventListener('click',()=>{ $('nameA').value=state.names.A; $('nameB').value=state.names.B; $('namesDialog').showModal(); });
+$('saveNames').addEventListener('click',e=>{ e.preventDefault(); state.names.A=$('nameA').value.trim()||'Primary AO'; state.names.B=$('nameB').value.trim()||'Contingency AO'; saveState(); render(); $('namesDialog').close(); toast('Mission names saved'); });
+$('handoffBtn').addEventListener('click',()=>{ $('handoffText').value=generateHandoff(); $('handoffDialog').showModal(); });
+$('closeHandoff').addEventListener('click',()=>$('handoffDialog').close()); $('doneHandoff').addEventListener('click',()=>$('handoffDialog').close());
+$('copyHandoff').addEventListener('click',async()=>{ try { await navigator.clipboard.writeText($('handoffText').value); toast('Handoff copied'); } catch(_) { $('handoffText').select(); document.execCommand('copy'); toast('Handoff copied'); }});
+$('exportBtn').addEventListener('click',exportJSON); $('importBtn').addEventListener('click',()=>$('fileInput').click()); $('fileInput').addEventListener('change',e=>{ if(e.target.files[0])importJSON(e.target.files[0]); e.target.value=''; }); $('printBtn').addEventListener('click',()=>window.print());
+render();
+})();
+</script>
+</body>
+</html>

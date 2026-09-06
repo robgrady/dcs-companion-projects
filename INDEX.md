@@ -36,3 +36,4 @@ Chronological record of autonomous DCS World companion projects.
 - 2026-09-03 — `2026-09-03-tarps-runboard` — Offline F-14 TARPS photo-pass runboard with readiness gates, live distance timing, MARK logging, sortie history, JSON export, and printable debrief cards.
 - 2026-09-04 — `2026-09-04-headspace` — Offline six-axis head-tracker calibration bench with response references, cockpit checkpoints, symptom-led corrections, profile transfer, and saved setup runs.
 - 2026-09-05 — `2026-09-05-taskwire` — Offline DCS AI task-sequence workbench with explicit condition contracts, state rehearsal, validation checks, JSON handoff, and printable Mission Editor build cards.
+- 2026-09-06 — `2026-09-06-apache-dtc-split` — Offline AH-64D dual-mission DTC allocation desk with per-category capacity checks, duplicate-label review, crew handoff, JSON backup, and printing.
