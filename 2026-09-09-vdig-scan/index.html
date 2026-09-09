@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#101513">
+<title>VDIG Scan — F-14B(U) HUD Trainer</title>
+<style>
+:root{
+  --bg:#0d1210;--panel:#151c18;--panel-2:#1b241f;--line:#344139;--ink:#edf1e9;
+  --muted:#9ba99f;--hud:#a7ef9a;--hud-dim:#6ba86a;--amber:#efbd69;--danger:#ef8b72;
+  --ok:#8fd7a1;--r:8px;--shadow:0 18px 50px rgba(0,0,0,.3);
+  --sans:"Avenir Next","Segoe UI",Arial,sans-serif;--mono:"SFMono-Regular",Consolas,"Liberation Mono",monospace;
+}
+*{box-sizing:border-box}html{color-scheme:dark}body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);min-height:100vh}
+button,input{font:inherit}button{color:inherit}.shell{min-height:100vh;display:grid;grid-template-rows:auto 1fr auto}
+header{height:62px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:18px;padding:0 22px;background:#111713}
+.brand{font-weight:750;letter-spacing:.14em;font-size:.9rem}.brand b{color:var(--hud)}.subtitle{color:var(--muted);font-size:.82rem;border-left:1px solid var(--line);padding-left:18px}.status{margin-left:auto;display:flex;gap:8px;align-items:center;color:var(--muted);font:12px var(--mono)}
+.status-dot{width:7px;height:7px;border-radius:50%;background:var(--ok);box-shadow:0 0 10px var(--ok)}
+main{display:grid;grid-template-columns:210px minmax(440px,1fr) 340px;min-height:0}
+.mode-rail,.inspect{padding:20px;background:var(--panel);overflow:auto}.mode-rail{border-right:1px solid var(--line)}.inspect{border-left:1px solid var(--line)}
+.kicker{font:700 10px var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--amber);margin:0 0 11px}.mode-list{display:grid;gap:6px}.mode-btn{min-height:48px;text-align:left;border:1px solid transparent;background:transparent;border-radius:var(--r);padding:8px 10px;cursor:pointer}.mode-btn:hover{background:var(--panel-2)}.mode-btn[aria-pressed="true"]{border-color:var(--hud-dim);background:#1a281e}.mode-btn strong{display:block;font-size:.84rem}.mode-btn small{display:block;color:var(--muted);font:10px var(--mono);margin-top:3px}
+.keyline{border-top:1px solid var(--line);margin-top:20px;padding-top:16px}.keyline p{margin:0 0 8px;color:var(--muted);font-size:.76rem;line-height:1.45}.key{display:inline-grid;place-items:center;min-width:22px;height:22px;border:1px solid var(--line);border-bottom-width:2px;border-radius:4px;font:10px var(--mono);color:var(--ink);margin-right:5px}
+.workspace{padding:22px;overflow:auto;background:radial-gradient(circle at 50% 35%,#18221c 0,#0d1210 65%)}.work-head{display:flex;align-items:end;justify-content:space-between;gap:20px;margin-bottom:14px}.work-head h1{font-size:1.35rem;letter-spacing:.02em;margin:0}.work-head p{color:var(--muted);font-size:.79rem;margin:4px 0 0}.mode-chip{font:11px var(--mono);color:var(--hud);border:1px solid var(--hud-dim);padding:6px 8px;border-radius:4px}
+.hud-frame{max-width:760px;margin:auto;aspect-ratio:1.12/1;border:1px solid #46584c;background:#070b08;box-shadow:inset 0 0 80px #18321d55,var(--shadow);position:relative;overflow:hidden;clip-path:polygon(13% 0,87% 0,100% 100%,0 100%)}
+.hud-frame:before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent 0 3px,rgba(167,239,154,.018) 3px 4px);pointer-events:none}.hud{position:absolute;inset:6% 10% 5%;font:clamp(9px,1.2vw,15px) var(--mono);color:var(--hud);text-shadow:0 0 8px #6feb70aa}.hud button{font:inherit;color:inherit;text-shadow:inherit}
+.hotspot{position:absolute;background:transparent;border:1px solid transparent;border-radius:4px;cursor:pointer;padding:3px}.hotspot:hover,.hotspot:focus-visible,.hotspot.active{border-color:var(--amber);color:#d6ffca;outline:none;background:#24312488}.hotspot:after{content:"";position:absolute;inset:-7px}
+.heading{top:2%;left:31%;width:38%;text-align:center;letter-spacing:.36em}.mode-readout{top:15%;left:4%}.weapon{top:15%;right:3%;font-weight:700}.ownship{bottom:17%;left:2%;line-height:1.45}.target-info{top:25%;right:1%;line-height:1.45;text-align:left}.steering{left:47%;top:42%;font-size:1.35em}.td1{left:59%;top:29%}.td2{left:29%;top:38%}.rwr{left:14%;top:22%;font-size:1.1em}.angle{left:38%;top:8%}.fpole{left:62%;top:6%;font-weight:800}.notch{left:72%;top:6%;font-weight:800}.arm-line{position:absolute;left:50%;top:22%;bottom:21%;border-left:1px solid var(--hud-dim);opacity:.8}.horizon{position:absolute;left:21%;right:21%;top:57%;border-top:1px solid var(--hud-dim)}.horizon:before,.horizon:after{content:"10";position:absolute;top:-18px}.horizon:before{left:-22px}.horizon:after{right:-22px}.cdm{left:45%;top:52%;font-size:1.4em}.lrd{right:9%;bottom:20%;width:76px;height:76px;border:1px dashed var(--hud-dim);border-radius:50%}.lrd span{position:absolute}.lrd .rmax{left:30px;bottom:-15px}.lrd .ropt{right:-31px;bottom:17px}.lrd .rmin{right:-29px;top:8px}.sidewinder-ring{position:absolute;width:34px;height:34px;border:2px solid var(--hud);border-radius:50%;left:45%;top:37%;display:none}.gun-ring{position:absolute;width:120px;height:120px;border:1px solid var(--hud);border-radius:50%;left:39%;top:33%;display:none}.gun-ring:after{content:"";position:absolute;left:50%;top:0;bottom:0;border-left:1px solid var(--hud-dim)}.landing-cue{display:none;position:absolute;left:44%;top:38%;font-size:2rem}.landing-cue:after{content:"]";position:absolute;left:44px;color:var(--hud)}
+.hud-frame[data-mode="sidewinder"] .sidewinder-ring,.hud-frame[data-mode="gun"] .gun-ring,.hud-frame[data-mode="landing"] .landing-cue{display:block}.hud-frame[data-mode="gun"] .lrd,.hud-frame[data-mode="landing"] .lrd,.hud-frame[data-mode="landing"] .td1,.hud-frame[data-mode="landing"] .td2,.hud-frame[data-mode="landing"] .target-info,.hud-frame[data-mode="landing"] .rwr,.hud-frame[data-mode="landing"] .steering,.hud-frame[data-mode="landing"] .fpole,.hud-frame[data-mode="landing"] .notch{display:none}
+.legend-note{max-width:760px;margin:12px auto 0;color:var(--muted);font-size:.72rem;display:flex;justify-content:space-between;gap:12px}.legend-note strong{color:var(--amber);font-weight:600}
+.inspect h2{font-size:1.05rem;margin:0 0 6px}.inspect-copy{color:var(--muted);font-size:.8rem;line-height:1.55;margin:0 0 16px}.fact{background:#111713;border:1px solid var(--line);border-radius:var(--r);padding:14px;margin-bottom:18px}.fact h3{font:700 12px var(--mono);color:var(--hud);margin:0 0 8px}.fact p{margin:0;color:#cbd4cd;font-size:.78rem;line-height:1.55}.fact .why{border-top:1px solid var(--line);padding-top:8px;margin-top:8px;color:var(--amber)}
+.scan-list{display:grid;gap:7px}.scan-item{display:flex;gap:9px;align-items:flex-start;border:1px solid var(--line);border-radius:6px;padding:9px;background:#111713;font-size:.75rem;line-height:1.35}.scan-item input{accent-color:var(--hud);width:18px;height:18px;flex:0 0 auto}.scan-item.done{color:var(--muted);text-decoration:line-through}
+.drill{border-top:1px solid var(--line);margin-top:18px;padding-top:18px}.drill-head{display:flex;justify-content:space-between;align-items:center}.score{font:11px var(--mono);color:var(--amber)}.question{font-size:.82rem;line-height:1.45;margin:10px 0}.answers{display:grid;gap:7px}.answer{min-height:44px;border:1px solid var(--line);background:#111713;border-radius:6px;text-align:left;padding:8px 10px;cursor:pointer;font-size:.76rem}.answer:hover{border-color:var(--muted)}.answer.correct{border-color:var(--ok);background:#17291d}.answer.wrong{border-color:var(--danger);background:#2d1b18}.answer:disabled{cursor:default}.drill-actions{display:flex;gap:8px;margin-top:10px}.primary,.ghost{min-height:42px;border-radius:6px;padding:0 12px;cursor:pointer;font-weight:650;font-size:.76rem}.primary{background:var(--hud);color:#102012;border:0}.ghost{background:transparent;border:1px solid var(--line)}button:focus-visible,input:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
+footer{min-height:34px;border-top:1px solid var(--line);padding:9px 22px;color:var(--muted);font:10px var(--mono);display:flex;justify-content:space-between;gap:15px}.toast{position:fixed;left:50%;bottom:46px;transform:translate(-50%,12px);background:var(--ink);color:#121713;padding:9px 13px;border-radius:5px;font-size:.75rem;opacity:0;pointer-events:none;transition:.18s}.toast.show{opacity:1;transform:translate(-50%,0)}
+@media(max-width:1050px){main{grid-template-columns:170px minmax(400px,1fr)}.inspect{grid-column:1/-1;border-left:0;border-top:1px solid var(--line);display:grid;grid-template-columns:1fr 1fr;gap:20px}.drill{border-top:0;margin-top:0;padding-top:0}}
+@media(max-width:720px){header{height:auto;min-height:62px;flex-wrap:wrap;padding:12px 16px}.subtitle{display:none}main{display:block}.mode-rail{border-right:0;border-bottom:1px solid var(--line);padding:12px 16px}.mode-list{grid-template-columns:repeat(5,minmax(120px,1fr));overflow-x:auto}.keyline{display:none}.workspace{padding:16px 8px}.work-head{padding:0 8px}.hud-frame{width:100%}.inspect{display:block;padding:18px 16px}.drill{border-top:1px solid var(--line);margin-top:18px;padding-top:18px}.legend-note{padding:0 8px}footer{display:block;line-height:1.5}.status span:last-child{display:none}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}.toast{transition:none}}
+</style>
+</head>
+<body>
+<div class="shell">
+<header><div class="brand"><b>VDIG</b> SCAN</div><div class="subtitle">F-14B(U) pilot display interpretation trainer</div><div class="status"><span class="status-dot"></span><span>OFFLINE / STATE SAVED</span></div></header>
+<main>
+<nav class="mode-rail" aria-label="Display formats">
+  <p class="kicker">Display format</p>
+  <div class="mode-list" id="modeList"></div>
+  <div class="keyline"><p><span class="key">1–5</span>switch format</p><p><span class="key">N</span>next drill</p><p><span class="key">R</span>reset scan gates</p></div>
+</nav>
+<section class="workspace" aria-labelledby="screenTitle">
+  <div class="work-head"><div><h1 id="screenTitle">TWS / AIM-54 scan</h1><p id="screenSub">Prioritize track identity, launch order, range and steering.</p></div><div class="mode-chip" id="modeChip">A/A · TWSA · PH</div></div>
+  <div class="hud-frame" id="hudFrame" data-mode="phoenix" aria-label="Interactive training schematic of the VDIG-R head-up display">
+    <div class="hud">
+      <button class="hotspot heading" data-fact="heading">33&nbsp;&nbsp;35&nbsp;&nbsp;37</button>
+      <button class="hotspot angle" data-fact="angle">◀ 24°</button>
+      <button class="hotspot fpole" data-fact="fpole">│</button><button class="hotspot notch" data-fact="notch">‖</button>
+      <button class="hotspot mode-readout" data-fact="radar">DEST<br>TWSA</button>
+      <button class="hotspot weapon" data-fact="weapon">PH4</button>
+      <button class="hotspot rwr" data-fact="rwr">△ 29</button>
+      <button class="hotspot td1" data-fact="td">─[ ]─ 1<br>SHOOT</button>
+      <button class="hotspot td2" data-fact="outside">┄[ ]┄ 3</button>
+      <button class="hotspot target-info" data-fact="info">BT 042/36<br>VC 820&nbsp; VR 410<br>ALT 24.0<br>RNG 31.25<br>BRG 018</button>
+      <button class="hotspot steering" data-fact="steering">⊥</button>
+      <button class="hotspot ownship" data-fact="ownship">BA 221/18<br>WP 08&nbsp; 42.1<br>14:32:18Z</button>
+      <div class="arm-line"></div><div class="horizon"></div><button class="hotspot cdm" data-fact="cdm">◯<br>┴</button>
+      <button class="hotspot lrd" data-fact="lrd"><span class="rmax">RMAX</span><span class="ropt">ROPT</span><span class="rmin">RMIN</span></button>
+      <div class="sidewinder-ring"></div><div class="gun-ring"></div><div class="landing-cue">•</div>
+    </div>
+  </div>
+  <div class="legend-note"><span><strong>Training schematic</strong> — positions are representative, not a cockpit substitute.</span><span>Click any green cue to inspect it.</span></div>
+</section>
+<aside class="inspect" aria-label="Cue inspector and drills">
+  <div>
+    <p class="kicker">Cue inspector</p><h2 id="factTitle">Select a HUD cue</h2><p class="inspect-copy">Tap a symbol in the display. The explanation stays tied to the current scan instead of becoming a wall of manual text.</p>
+    <div class="fact" aria-live="polite"><h3 id="factLabel">READY</h3><p id="factBody">Start with the mode and weapon legends, then identify the track, range state and steering command.</p><p class="why" id="factWhy">Operational read: know what the display is asking before reacting to one bright cue.</p></div>
+    <p class="kicker">Five-second scan</p><div class="scan-list" id="scanList"></div>
+  </div>
+  <div class="drill">
+    <div class="drill-head"><p class="kicker" style="margin:0">Recognition drill</p><span class="score" id="score">0 / 0</span></div>
+    <p class="question" id="question"></p><div class="answers" id="answers"></div>
+    <div class="drill-actions"><button class="primary" id="nextBtn">Next cue</button><button class="ghost" id="resetBtn">Reset progress</button></div>
+  </div>
+</aside>
+</main>
+<footer><span>F-14B(U) VDIG-R · DCS reference aid only · Not for real-world aviation</span><span>Data stored only in this browser</span></footer>
+<div class="toast" id="toast" role="status"></div>
+</div>
+<script>
+(()=>{
+'use strict';
+const modes=[
+ {id:'phoenix',name:'TWS / AIM-54',key:'1',chip:'A/A · TWSA · PH',title:'TWS / AIM-54 scan',sub:'Prioritize track identity, launch order, range and steering.',steps:['Confirm TWSA/TWSM and PH quantity','Find hooked track: whiskers','Read FONO; 1 is next launch target','Check LRD and SHOOT state','Center steering T within the LRD']},
+ {id:'sparrow',name:'STT / AIM-7',key:'2',chip:'A/A · PDSTT · SP',title:'STT / AIM-7 scan',sub:'Verify lock mode, target data, launch zone and post-launch time.',steps:['Confirm PDSTT and SP quantity','Verify hooked TD box','Check target range and closure','Place steering T against LRD','After launch, monitor TTI at TD box']},
+ {id:'sidewinder',name:'STT / AIM-9',key:'3',chip:'A/A · PDSTT · SW',title:'STT / AIM-9 scan',sub:'Separate radar track, seeker position and launch-zone cues.',steps:['Confirm PDSTT and SW quantity','Find hooked TD box','Locate seeker-head circle','Check LRD / SHOOT state','Confirm geometry before trigger']},
+ {id:'gun',name:'Gun director',key:'4',chip:'A/A · PSTT · G',title:'Director gunsight scan',sub:'Read target range through the reticle, then stabilize the solution.',steps:['Confirm GUN and rounds hundreds','Verify valid radar track','Read range tape on director reticle','Check gun in-range diamond','Stabilize pipper before firing']},
+ {id:'landing',name:'Landing / AWL',key:'5',chip:'LDG · AWL',title:'Landing / AWL scan',sub:'Fly path and guidance; keep altitude sources and sink rate explicit.',steps:['Confirm LDG and AWL','Cross-check HUD and cockpit baro settings','Acquire E-bracket and flight-path cue','Read ILS / ACL steering','Honor Breakaway / Waveoff X']}
+];
+const facts={
+ heading:['HEADING SCALE','Magnetic heading scale; A/A uses 20-degree major divisions while other listed modes use 10-degree divisions.','Use it to name the turn, not to replace the steering cue.'],
+ angle:['ANGLE OFF NOSE','Relative bearing to the hooked A/A track. The arrow gives turn direction and the number gives degrees.','A fast way to recover a hooked track outside the HUD field of view.'],
+ fpole:['F-POLE CUE','A single vertical bar cues heading for maximum slant range between fighter and target at missile impact. Displayed in PDSTT and TWSA.','Use only as a geometry cue; it is not the primary steering T.'],
+ notch:['NOTCH CUE','A double vertical bar in PDSTT cues the target beam. After a PDSTT break, stored information can keep it displayed for 15 seconds.','Recognize the double bar before treating it as a turn command.'],
+ radar:['MODE LEGENDS','The lower-left area reports selected steering and the RIO-commanded radar mode.','Read mode first; the same-looking target cue can imply a different contract in TWS versus STT.'],
+ weapon:['ARMAMENT LEGEND','Shows selected A/A weapon and quantity; gun quantity is hundreds of rounds. A large X means Master Arm is OFF or TNG.','Confirm the jet is configured for the intended shot.'],
+ rwr:['ALR-67 HUD CUE','RWR symbols can be integrated into the A/A HUD; category shape and emitter code identify the reported threat.','Maintain threat awareness without abandoning the tactical scan.'],
+ td:['TARGET DESIGNATE BOX','Represents STT line of sight or each AWG-9 TWS track. Whiskers mean the track is hooked; classification changes box shape.','Hook state determines which target data populates the information box.'],
+ outside:['OUTSIDE IFOV','Any TD box becomes dashed when its track is outside the HUD instantaneous field of view.','Do not interpret dashes as track loss; pair them with the angle-off-nose and locator line.'],
+ info:['TRACK INFORMATION','For the hooked track: bullseye, closure, radial velocity, altitude, range and bearing. A plus sign marks extrapolated data.','Say range, altitude and closure aloud before committing.'],
+ steering:['STEERING T','With a weapon selected, compare the steering T with the launch range designator for allowable steering error. In TWS AUTO it steers toward a weighted target centroid.','Centering it supports the weapon solution; know whether it references one target or a TWS centroid.'],
+ ownship:['OWN-SHIP / NAV','BA is bullseye-to-aircraft. Waypoint, distance, UTC, TTG and ETA support navigation and timing.','Keep tactical and navigation references distinct.'],
+ cdm:['CDM / FPM','The caged HUD uses the Climb Dive Marker as a stabilized flight-path reference; a one-third-size FPM can show lateral difference.','Fly the correct reference, especially when wind or sideslip separates the cues.'],
+ lrd:['LAUNCH RANGE DESIGNATOR','Circular normalized range display marking Rmax at 6 o’clock, Rmin near 2:30 and calculated Ropt between them.','Range permission and steering quality are separate checks.']
+};
+const quiz=[
+ ['What do whiskers on a target-designate box mean?',['The track is hooked','The track is hostile','The track is extrapolated'],0],
+ ['What does a dashed TD box indicate?',['Master Arm is safe','Track is outside HUD IFOV','Missile is active'],1],
+ ['In AIM-54 TWS, which FONO is next to launch?',['Highest number','Number 1','RIO-hooked number only'],1],
+ ['What does ACT report?',['AIM-54C active parameters met','Target lock acquired','ACM cover raised'],0],
+ ['Which cue is the double vertical bar?',['F-pole cue','Steering T','Notch cue'],2],
+ ['A plus sign after target data means…',['Data is extrapolated','Friendly classification','Positive closure'],0],
+ ['When does the gun quantity number indicate?',['Rounds remaining in hundreds','Seconds of firing time','Gun elevation in mils'],0],
+ ['What does the LRD combine?',['Only target range','Normalized range limits and steering reference','Bullseye and closure'],1],
+ ['With the HUD caged, which stabilized reference is shown?',['CDM','Manual reticle','TLL'],0],
+ ['The HUD and cockpit altimeter settings are…',['Automatically synchronized','Independent and both must be updated','Linked only in LDG mode'],1],
+ ['Pilot target-designate Forward with ACM cover down does what after cycling?',['Selects a track for information display','Commands PAL','Drops all TWS tracks'],0],
+ ['In TWS AUTO, the steering T can point toward…',['The nearest RWR emitter','A weighted centroid of TWS targets','The TACAN station'],1]
+];
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const state=JSON.parse(localStorage.getItem('vdigScanState')||'{}'); state.mode=state.mode||'phoenix'; state.correct=state.correct||0; state.total=state.total||0; state.q=Number.isInteger(state.q)?state.q:0; state.gates=state.gates||{};
+function save(){localStorage.setItem('vdigScanState',JSON.stringify(state))}
+function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove('show'),1300)}
+function renderModes(){ $('#modeList').innerHTML=modes.map(m=>`<button class="mode-btn" data-mode="${m.id}" aria-pressed="${state.mode===m.id}"><strong>${m.key}. ${m.name}</strong><small>${m.chip}</small></button>`).join(''); }
+function setMode(id){state.mode=id;save();const m=modes.find(x=>x.id===id);$('#hudFrame').dataset.mode=id;$('#screenTitle').textContent=m.title;$('#screenSub').textContent=m.sub;$('#modeChip').textContent=m.chip;$$('.mode-btn').forEach(b=>b.setAttribute('aria-pressed',b.dataset.mode===id));
+ const radar=$('[data-fact="radar"]'),weapon=$('[data-fact="weapon"]'); radar.innerHTML=id==='phoenix'?'DEST<br>TWSA':id==='landing'?'AWL<br>LDG':id==='gun'?'DEST<br>PSTT':`DEST<br>PDSTT`; weapon.textContent=id==='phoenix'?'PH4':id==='sparrow'?'SP2':id==='sidewinder'?'SW2':id==='gun'?'G 06':'BARO 29.92'; renderGates();
+}
+function renderGates(){const m=modes.find(x=>x.id===state.mode),done=state.gates[state.mode]||[];$('#scanList').innerHTML=m.steps.map((s,i)=>`<label class="scan-item ${done.includes(i)?'done':''}"><input type="checkbox" data-gate="${i}" ${done.includes(i)?'checked':''}><span>${i+1}. ${s}</span></label>`).join('')}
+function showFact(key,el){const f=facts[key];$('#factLabel').textContent=f[0];$('#factTitle').textContent=f[0].replaceAll(' / ',' + ');$('#factBody').textContent=f[1];$('#factWhy').textContent='Operational read: '+f[2];$$('.hotspot').forEach(x=>x.classList.remove('active'));el.classList.add('active')}
+function renderQuiz(){const q=quiz[state.q%quiz.length];$('#question').textContent=q[0];$('#answers').innerHTML=q[1].map((a,i)=>`<button class="answer" data-answer="${i}">${a}</button>`).join('');$('#score').textContent=`${state.correct} / ${state.total}`}
+function answer(i){const q=quiz[state.q%quiz.length];state.total++;const ok=i===q[2];if(ok)state.correct++;save();$$('.answer').forEach((b,n)=>{b.disabled=true;if(n===q[2])b.classList.add('correct');else if(n===i)b.classList.add('wrong')});$('#score').textContent=`${state.correct} / ${state.total}`;toast(ok?'Correct — cue recognized':'Review the highlighted answer')}
+function next(){state.q=(state.q+1)%quiz.length;save();renderQuiz()}
+renderModes();setMode(state.mode);renderQuiz();
+$('#modeList').addEventListener('click',e=>{const b=e.target.closest('[data-mode]');if(b)setMode(b.dataset.mode)});
+$('#hudFrame').addEventListener('click',e=>{const b=e.target.closest('[data-fact]');if(b)showFact(b.dataset.fact,b)});
+$('#scanList').addEventListener('change',e=>{if(!e.target.matches('[data-gate]'))return;const i=+e.target.dataset.gate,arr=state.gates[state.mode]||[];state.gates[state.mode]=e.target.checked?[...new Set([...arr,i])]:arr.filter(x=>x!==i);save();renderGates();if(state.gates[state.mode].length===5)toast('Scan contract complete')});
+$('#answers').addEventListener('click',e=>{const b=e.target.closest('[data-answer]');if(b&&!b.disabled)answer(+b.dataset.answer)});$('#nextBtn').addEventListener('click',next);
+$('#resetBtn').addEventListener('click',()=>{if(confirm('Reset drill score and all scan gates?')){state.correct=0;state.total=0;state.q=0;state.gates={};save();renderQuiz();renderGates();toast('Progress reset')}});
+document.addEventListener('keydown',e=>{if(e.target.matches('button,input'))return;const m=modes.find(x=>x.key===e.key);if(m)setMode(m.id);if(e.key.toLowerCase()==='n')next();if(e.key.toLowerCase()==='r'){state.gates[state.mode]=[];save();renderGates();toast('Current scan reset')}});
+})();
+</script>
+</body>
+</html>
