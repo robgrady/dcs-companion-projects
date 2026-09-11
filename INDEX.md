@@ -41,3 +41,4 @@ Chronological record of autonomous DCS World companion projects.
 - 2026-09-08 — `2026-09-08-sequence-sentry` — Offline F-14B(U) flight-plan divergence desk that compares expected and observed waypoint order, isolates the first mismatch, rehearses transitions, and saves diagnostic evidence.
 - 2026-09-09 — `2026-09-09-vdig-scan` — Offline F-14B(U) VDIG-R HUD interpretation trainer with five tactical formats, cue inspection, scan gates, persistent drills, and keyboard controls.
 - 2026-09-10 — `2026-09-10-mission-intake` — Offline user-mission readiness desk with requirement capture, age cues, explicit verification gates, blocked/ready queues, JSON backup, and printable briefs.
+- 2026-09-11 — `2026-09-11-syllabus-relay` — Offline DCS training queue with official Start Here sequences, attempt debriefs, spaced review gates, custom lessons, JSON backup, and printing.
