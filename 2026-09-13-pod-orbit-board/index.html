@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#171b17">
+<title>Pod Orbit Board — DCS F-14B(U)</title>
+<style>
+:root{--bg:#10130f;--panel:#191e18;--panel2:#20271f;--ink:#f2eddd;--muted:#aaa995;--line:#3b4338;--amber:#f0a536;--amber2:#ffd18a;--green:#99c47a;--red:#e06f58;--paper:#e9e1cc;--black:#151914;--radius:5px;--shadow:0 16px 44px #0007}
+*{box-sizing:border-box}html{color-scheme:dark}body{margin:0;background:var(--bg);color:var(--ink);font-family:Verdana,"Trebuchet MS",sans-serif;font-size:14px;line-height:1.45}button,input,select{font:inherit}button,input,select{outline:none}button:focus-visible,input:focus-visible,select:focus-visible{box-shadow:0 0 0 3px #10130f,0 0 0 5px var(--amber)}button{min-height:44px;border:1px solid var(--line);border-radius:var(--radius);background:var(--panel2);color:var(--ink);padding:.65rem .85rem;cursor:pointer;font-weight:700;letter-spacing:.02em}button:hover{border-color:var(--amber2);background:#293126}button.primary{background:var(--amber);border-color:var(--amber);color:#18130a}button.primary:hover{background:var(--amber2)}button.danger{color:#ffc2b5}button:disabled{opacity:.42;cursor:not-allowed}input,select{width:100%;min-height:44px;background:#111510;border:1px solid var(--line);border-radius:var(--radius);color:var(--ink);padding:.62rem .7rem}label{display:grid;gap:.35rem;color:var(--muted);font-size:.78rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase}.shell{min-height:100vh;display:grid;grid-template-rows:auto 1fr}.topbar{min-height:64px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:.75rem clamp(1rem,3vw,2.5rem);background:#151914}.brand{display:flex;align-items:baseline;gap:.8rem}.brand b{font-family:Georgia,serif;font-size:1.35rem;letter-spacing:.015em}.brand span,.kicker{color:var(--amber);font:700 .72rem/1 Verdana,sans-serif;letter-spacing:.16em;text-transform:uppercase}.statusline{display:flex;align-items:center;gap:.7rem;color:var(--muted);font-size:.78rem}.lamp{width:9px;height:9px;border-radius:50%;background:var(--green);box-shadow:0 0 0 3px #99c47a22}.layout{display:grid;grid-template-columns:minmax(260px,320px) minmax(440px,1fr) minmax(280px,360px);gap:1px;background:var(--line);min-height:0}.rail,.main,.right{background:var(--bg);padding:1rem;min-width:0}.rail,.right{background:#141814}.section-title{display:flex;align-items:center;justify-content:space-between;gap:.7rem;margin:0 0 .8rem;padding-bottom:.55rem;border-bottom:1px solid var(--line)}h1,h2,h3,p{margin-top:0}h1{font:700 1.2rem/1.2 Georgia,serif;margin:0}h2{font:700 1rem/1.25 Georgia,serif;margin:0}h3{font-size:.8rem;letter-spacing:.09em;text-transform:uppercase}.fields{display:grid;grid-template-columns:1fr 1fr;gap:.75rem}.field-wide{grid-column:1/-1}.micro{color:var(--muted);font-size:.76rem}.contract{margin-top:1rem;border-top:1px solid var(--line);padding-top:1rem}.checkrow{display:flex;gap:.7rem;align-items:flex-start;margin:.6rem 0;color:var(--ink);font-size:.82rem}.checkrow input{appearance:none;flex:0 0 20px;width:20px;min-height:20px;height:20px;padding:0;border-radius:3px;margin-top:1px}.checkrow input:checked{background:var(--green);border-color:var(--green);box-shadow:inset 0 0 0 4px #151914}.actions{display:flex;flex-wrap:wrap;gap:.55rem;margin-top:.8rem}.main{display:grid;grid-template-rows:auto minmax(370px,1fr) auto;gap:1rem}.telemetry{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid var(--line);background:var(--panel)}.readout{padding:.65rem .8rem;border-right:1px solid var(--line)}.readout:last-child{border:0}.readout span{display:block;color:var(--muted);font-size:.64rem;letter-spacing:.11em;text-transform:uppercase}.readout strong{display:block;font:700 1.25rem/1.4 Georgia,serif;font-variant-numeric:tabular-nums}.plot{position:relative;border:1px solid var(--line);background:#121711;overflow:hidden;min-height:370px}.plot canvas{display:block;width:100%;height:100%;min-height:370px}.plot-key{position:absolute;left:.8rem;bottom:.75rem;display:flex;gap:1rem;color:var(--muted);font-size:.68rem;background:#10130fd9;padding:.4rem .55rem;border:1px solid var(--line)}.plot-key i{display:inline-block;width:12px;height:2px;margin-right:.35rem;vertical-align:middle;background:var(--amber)}.plot-key i.target{background:var(--red)}.timeline{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:.8rem}.time{font:700 2rem/1 Georgia,serif;font-variant-numeric:tabular-nums;min-width:100px}.bar{height:10px;background:var(--panel);border:1px solid var(--line);overflow:hidden}.bar>i{display:block;height:100%;width:0;background:var(--amber)}.right{display:flex;flex-direction:column;gap:1rem}.gate{border:1px solid var(--line);background:var(--panel);padding:.9rem}.gate-head{display:flex;justify-content:space-between;gap:.8rem;align-items:start}.gate-state{color:var(--amber2);font-weight:700}.gate-copy{color:var(--muted);font-size:.8rem;margin:.5rem 0 .85rem}.crew-path{display:grid;grid-template-columns:repeat(4,1fr);gap:3px;margin:.8rem 0}.crew-path span{height:5px;background:var(--line)}.crew-path span.on{background:var(--amber)}.drill{border-top:1px solid var(--line);padding-top:1rem}.scenario{min-height:92px;background:#111510;border:1px solid var(--line);padding:.85rem;margin:.7rem 0}.scenario b{display:block;margin-bottom:.3rem;color:var(--amber2)}.answer-grid{display:grid;grid-template-columns:1fr 1fr;gap:.5rem}.answer-grid button{font-size:.76rem}.feedback{min-height:42px;margin-top:.65rem;padding:.55rem;border:1px solid transparent;color:var(--muted);font-size:.78rem}.feedback.good{border-color:#587448;color:#ccebb7;background:#182116}.feedback.bad{border-color:#7a4035;color:#ffc3b6;background:#271714}.log{border-top:1px solid var(--line);padding-top:1rem}.log-list{list-style:none;padding:0;margin:.6rem 0 0;display:grid;gap:.35rem;max-height:170px;overflow:auto}.log-list li{display:flex;justify-content:space-between;gap:.7rem;border-bottom:1px dotted var(--line);padding:.35rem 0;color:var(--muted);font-size:.72rem}.log-list strong{color:var(--ink)}.notice{margin-top:.8rem;padding:.65rem;background:#1b2119;border:1px solid var(--line);color:var(--muted);font-size:.72rem}.warning{color:#ffc3b6}.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}@media(max-width:1050px){.layout{grid-template-columns:280px 1fr}.right{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr}.log{border-top:0;padding-top:0}.main{min-height:650px}}@media(max-width:720px){.topbar{align-items:flex-start}.statusline{display:none}.layout{display:block}.rail,.main,.right{border-bottom:1px solid var(--line)}.right{display:flex}.telemetry{grid-template-columns:1fr 1fr}.readout:nth-child(2){border-right:0}.readout:nth-child(-n+2){border-bottom:1px solid var(--line)}.main{grid-template-rows:auto 390px auto;min-height:0}.timeline{grid-template-columns:1fr auto}.bar{grid-column:1/-1;grid-row:2}.fields{grid-template-columns:1fr 1fr}}@media(max-width:420px){.brand span{display:none}.fields,.answer-grid{grid-template-columns:1fr}.field-wide{grid-column:auto}.crew-path{grid-template-columns:repeat(4,1fr)}}@media print{html{color-scheme:light}body{background:white;color:#111}.topbar{background:white;border-color:#777}.layout{display:grid;grid-template-columns:250px 1fr;background:white}.rail,.main,.right{background:white;color:#111}.right{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr}.plot{background:#eef0e9;min-height:350px}.actions,.drill,.log{display:none!important}input,select{color:#111;background:white;border-color:#777}.micro,.checkrow label,.gate-copy,.readout span{color:#444}.gate,.telemetry,.notice{background:white;border-color:#777}.main{grid-template-rows:auto 350px auto}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<div class="shell">
+<header class="topbar"><div class="brand"><b>Pod Orbit Board</b><span>F-14B(U) crew rehearsal</span></div><div class="statusline"><i class="lamp"></i><span id="saveState">Local plan ready</span></div></header>
+<div class="layout">
+<aside class="rail" aria-labelledby="setupTitle">
+<div class="section-title"><h1 id="setupTitle">Orbit contract</h1><span class="kicker">01 / Set</span></div>
+<div class="fields">
+<label>True airspeed<input id="speed" type="number" min="120" max="650" step="5" value="320"><span class="micro">knots</span></label>
+<label>Bank angle<input id="bank" type="number" min="5" max="60" step="1" value="25"><span class="micro">degrees</span></label>
+<label>Orbit side<select id="side"><option value="left">Target left</option><option value="right">Target right</option></select></label>
+<label>Start heading<input id="heading" type="number" min="0" max="359" step="1" value="090"><span class="micro">degrees true</span></label>
+<label class="field-wide">Target label<input id="targetName" maxlength="32" value="TARGET ALPHA"></label>
+</div>
+<div class="actions"><button class="primary" id="apply">Apply contract</button><button id="print">Print card</button></div>
+<div class="contract">
+<h3>Before the turn</h3>
+<label class="checkrow"><input type="checkbox" data-check="mode"><span>A/G mode and pod presentation confirmed</span></label>
+<label class="checkrow"><input type="checkbox" data-check="visual"><span>Target or search area positively identified</span></label>
+<label class="checkrow"><input type="checkbox" data-check="clear"><span>Turn direction and airspace are clear</span></label>
+<label class="checkrow"><input type="checkbox" data-check="crew"><span>Pilot–RIO/Jester intent is explicit</span></label>
+<div id="advisory" class="notice" role="status">Computed geometry is a planning estimate, not an aircraft or sensor limit.</div>
+</div>
+</aside>
+<main class="main" aria-labelledby="plotTitle">
+<div class="telemetry" aria-label="Computed orbit telemetry">
+<div class="readout"><span>Turn radius</span><strong id="radiusOut">—</strong></div>
+<div class="readout"><span>Orbit period</span><strong id="periodOut">—</strong></div>
+<div class="readout"><span>Turn rate</span><strong id="rateOut">—</strong></div>
+<div class="readout"><span>Target clock</span><strong id="clockOut">—</strong></div>
+</div>
+<section class="plot" aria-labelledby="plotTitle"><h2 id="plotTitle" class="sr-only">Top-down orbit plot</h2><canvas id="canvas" aria-label="Top-down aircraft orbit around a target"></canvas><div class="plot-key"><span><i></i>planned track</span><span><i class="target"></i>target</span></div></section>
+<div class="timeline"><div class="time" id="timer">00:00</div><div class="bar" aria-hidden="true"><i id="progress"></i></div><div class="actions"><button class="primary" id="run">Start orbit</button><button id="resetRun">Reset</button></div></div>
+</main>
+<aside class="right" aria-label="Crew and drill panel">
+<section class="gate" aria-labelledby="gateTitle">
+<div class="gate-head"><div><span class="kicker">02 / Work</span><h2 id="gateTitle">Context contract</h2></div><span class="gate-state" id="gateState">SEARCH</span></div>
+<div class="crew-path" aria-hidden="true"><span class="on"></span><span></span><span></span><span></span></div>
+<p class="gate-copy" id="gateCopy">Establish a stable orbit and put the desired scene in view before asking for a track transition.</p>
+<div class="actions"><button class="primary" id="contextTap">Context tap</button><button id="gateBack">Step back</button><button id="gateReset">Reset</button></div>
+<div class="notice">Training abstraction: SEARCH → AREA → POINT → DESIGNATE. Verify the live cue and current manual; context behavior is situational.</div>
+</section>
+<section class="drill" aria-labelledby="drillTitle">
+<div class="section-title"><h2 id="drillTitle">Cue drill</h2><span class="kicker">03 / Read</span></div>
+<div class="scenario" id="scenario"><b>Ready</b>Start a cue set when the orbit contract is configured.</div>
+<div class="answer-grid">
+<button data-answer="hold">Hold orbit</button><button data-answer="tap">Tap context</button><button data-answer="reset">Reset track</button><button data-answer="abort">Abort turn</button>
+</div>
+<div id="feedback" class="feedback" aria-live="polite">No drill scored.</div>
+<div class="actions"><button class="primary" id="newDrill">New cue</button><button id="logRun">Log rehearsal</button></div>
+</section>
+<section class="log" aria-labelledby="logTitle">
+<div class="section-title"><h2 id="logTitle">Rehearsal wire</h2><span class="kicker" id="score">0 / 0</span></div>
+<ul class="log-list" id="logList"><li><span>No runs logged</span><strong>—</strong></li></ul>
+<div class="actions"><button id="export">Export JSON</button><button class="danger" id="clear">Clear local data</button></div>
+</section>
+</aside>
+</div>
+</div>
+<script>
+(()=>{'use strict';
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const KEY='podOrbitBoard.v1';
+const defaults={speed:320,bank:25,side:'left',heading:90,targetName:'TARGET ALPHA',checks:{},logs:[],score:{correct:0,total:0}};
+let data=load(), running=false, elapsed=0, last=0, raf=0, drill=null, gate=0;
+const gateNames=['SEARCH','AREA','POINT','DESIGNATE'];
+const gateCopy=['Establish a stable orbit and put the desired scene in view before asking for a track transition.','Area track established. Refine the scene and confirm the intended object before the next command.','Point track indicated. Confirm the object and attack contract before designation.','Designation called. Maintain geometry, monitor track quality, and avoid unbriefed extra inputs.'];
+const drills=[
+{title:'Scene in view; no stable track yet',copy:'The aircraft is settled, the search area is visible, and the crew is ready to begin tracking.',answer:'tap',why:'A context tap advances the rehearsal from search toward an area track.'},
+{title:'Point track is steady on the wrong vehicle',copy:'The pod is tracking cleanly, but identification does not match the briefed target.',answer:'reset',why:'Do not designate the wrong object. Reset the track contract and reacquire.'},
+{title:'Target drifts toward the display edge',copy:'Track remains valid, but increasing bank is driving the scene toward the edge.',answer:'hold',why:'Preserve a smooth, predictable orbit; avoid stacking a command onto unstable geometry.'},
+{title:'Traffic conflict inside the turn',copy:'A friendly call places crossing traffic through your planned orbit.',answer:'abort',why:'Airspace takes priority over the sensor workflow. Abort the turn and rebuild.'},
+{title:'Area track centered; object resolved',copy:'The intended object is now distinct and the orbit is stable.',answer:'tap',why:'Advance deliberately toward point track, then verify the resulting cue.'},
+{title:'Designation complete and track stable',copy:'The crew has the intended target designated with no geometry warning.',answer:'hold',why:'Avoid unnecessary context inputs; maintain geometry and monitor.'}
+];
+function load(){try{return {...defaults,...JSON.parse(localStorage.getItem(KEY)||'{}')}}catch(e){return structuredClone(defaults)}}
+function save(){localStorage.setItem(KEY,JSON.stringify(data));$('#saveState').textContent='Saved locally · '+new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});}
+function num(id){return Number($('#'+id).value)}
+function hydrate(){['speed','bank','side','heading','targetName'].forEach(k=>$('#'+k).value=data[k]);$$('[data-check]').forEach(c=>c.checked=!!data.checks[c.dataset.check]);renderLog();renderScore();compute();}
+function compute(){
+ const speed=Math.min(650,Math.max(120,num('speed')||320)), bank=Math.min(60,Math.max(5,num('bank')||25));
+ const v=speed*.514444, r=v*v/(9.80665*Math.tan(bank*Math.PI/180)), nm=r/1852, rate=(v/r)*180/Math.PI, period=2*Math.PI*r/v;
+ data={...data,speed,bank,side:$('#side').value,heading:((num('heading')||0)%360+360)%360,targetName:$('#targetName').value.trim()||'TARGET'};
+ $('#radiusOut').textContent=nm.toFixed(2)+' NM'; $('#periodOut').textContent=formatTime(period); $('#rateOut').textContent=rate.toFixed(1)+'°/s'; $('#clockOut').textContent=data.side==='left'?'9 o’clock':'3 o’clock';
+ let msg='Computed geometry is a planning estimate, not an aircraft or sensor limit.';
+ if(bank>45)msg='High bank setting: prioritize aircraft control and track stability; this board does not model pod gimbal limits.';
+ else if(bank<15)msg='Shallow bank produces a wide orbit and long period; verify that it fits the tactical area.';
+ $('#advisory').textContent=msg; $('#advisory').classList.toggle('warning',bank>45);
+ save(); draw(); return {r,nm,rate,period};
+}
+function formatTime(s){s=Math.max(0,Math.round(s));return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0')}
+function resize(){const c=$('#canvas'),box=c.getBoundingClientRect(),dpr=Math.min(devicePixelRatio||1,2);c.width=Math.round(box.width*dpr);c.height=Math.round(box.height*dpr);draw();}
+function draw(){
+ const c=$('#canvas'),ctx=c.getContext('2d'),dpr=c.width/Math.max(1,c.getBoundingClientRect().width),w=c.width/dpr,h=c.height/dpr;if(!w||!h)return;ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,w,h);
+ const cx=w/2,cy=h/2,R=Math.min(w,h)*.32;ctx.strokeStyle='#293328';ctx.lineWidth=1;for(let i=1;i<5;i++){ctx.beginPath();ctx.arc(cx,cy,R*i/4,0,Math.PI*2);ctx.stroke()}ctx.setLineDash([7,7]);ctx.strokeStyle='#f0a536';ctx.lineWidth=2;ctx.beginPath();ctx.arc(cx,cy,R,0,Math.PI*2);ctx.stroke();ctx.setLineDash([]);
+ ctx.strokeStyle='#3b4338';ctx.beginPath();ctx.moveTo(cx-R-35,cy);ctx.lineTo(cx+R+35,cy);ctx.moveTo(cx,cy-R-35);ctx.lineTo(cx,cy+R+35);ctx.stroke();
+ ctx.fillStyle='#e06f58';ctx.beginPath();ctx.arc(cx,cy,7,0,Math.PI*2);ctx.fill();ctx.fillStyle='#f2eddd';ctx.font='700 11px Verdana';ctx.textAlign='center';ctx.fillText((data.targetName||'TARGET').toUpperCase(),cx,cy+25);
+ const geo=geometry(),dir=data.side==='left'?-1:1,ang=(data.heading-90)*Math.PI/180+dir*(elapsed/geo.period)*Math.PI*2,x=cx+Math.cos(ang)*R,y=cy+Math.sin(ang)*R,tangent=ang+dir*Math.PI/2;
+ ctx.save();ctx.translate(x,y);ctx.rotate(tangent);ctx.fillStyle='#f2eddd';ctx.beginPath();ctx.moveTo(16,0);ctx.lineTo(-10,-7);ctx.lineTo(-5,0);ctx.lineTo(-10,7);ctx.closePath();ctx.fill();ctx.restore();
+ ctx.strokeStyle='#f0a53688';ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(cx,cy);ctx.stroke();ctx.fillStyle='#aaa995';ctx.textAlign='left';ctx.font='10px Verdana';ctx.fillText(data.side==='left'?'LEFT-HAND ORBIT':'RIGHT-HAND ORBIT',16,22);
+}
+function geometry(){const v=data.speed*.514444,r=v*v/(9.80665*Math.tan(data.bank*Math.PI/180));return{r,period:2*Math.PI*r/v}}
+function tick(t){if(!running)return;if(!last)last=t;elapsed+=(t-last)/1000;last=t;const p=geometry().period;$('#timer').textContent=formatTime(elapsed);$('#progress').style.width=((elapsed%p)/p*100).toFixed(1)+'%';draw();raf=requestAnimationFrame(tick)}
+function toggleRun(){running=!running;$('#run').textContent=running?'Pause orbit':'Start orbit';last=0;if(running)raf=requestAnimationFrame(tick);else cancelAnimationFrame(raf)}
+function resetRun(){running=false;cancelAnimationFrame(raf);elapsed=0;last=0;$('#run').textContent='Start orbit';$('#timer').textContent='00:00';$('#progress').style.width='0';draw()}
+function renderGate(){gate=Math.max(0,Math.min(3,gate));$('#gateState').textContent=gateNames[gate];$('#gateCopy').textContent=gateCopy[gate];$$('.crew-path span').forEach((s,i)=>s.classList.toggle('on',i<=gate));$('#contextTap').disabled=gate===3;$('#gateBack').disabled=gate===0;}
+function newDrill(){drill=drills[Math.floor(Math.random()*drills.length)];$('#scenario').innerHTML='<b>'+drill.title+'</b>'+drill.copy;$('#feedback').className='feedback';$('#feedback').textContent='Choose the next best crew action.';$$('[data-answer]').forEach(b=>b.disabled=false)}
+function answer(a){if(!drill)return;data.score.total++;const good=a===drill.answer;if(good)data.score.correct++;$('#feedback').className='feedback '+(good?'good':'bad');$('#feedback').textContent=(good?'Correct. ':'Not this time. ')+drill.why;$$('[data-answer]').forEach(b=>b.disabled=true);renderScore();save()}
+function renderScore(){$('#score').textContent=data.score.correct+' / '+data.score.total}
+function logRun(){const geo=geometry(),passed=Object.values(data.checks).filter(Boolean).length===4;data.logs.unshift({at:new Date().toISOString(),target:data.targetName,speed:data.speed,bank:data.bank,side:data.side,radiusNM:(geo.r/1852).toFixed(2),elapsed:Math.round(elapsed),gates:gateNames[gate],ready:passed});data.logs=data.logs.slice(0,12);save();renderLog();$('#feedback').className='feedback '+(passed?'good':'bad');$('#feedback').textContent=passed?'Rehearsal logged with all four pre-turn checks.':'Logged, but the pre-turn contract is incomplete.'}
+function renderLog(){const list=$('#logList');if(!data.logs.length){list.innerHTML='<li><span>No runs logged</span><strong>—</strong></li>';return}list.innerHTML=data.logs.map(x=>'<li><span>'+new Date(x.at).toLocaleString([], {month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'})+' · '+escapeHTML(x.target)+'</span><strong>'+(x.ready?'READY':'OPEN')+' · '+x.gates+'</strong></li>').join('')}
+function escapeHTML(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+function exportData(){const blob=new Blob([JSON.stringify({app:'Pod Orbit Board',version:1,exported:new Date().toISOString(),data},null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='pod-orbit-board-'+new Date().toISOString().slice(0,10)+'.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
+$('#apply').addEventListener('click',()=>{compute();resetRun()});$('#run').addEventListener('click',toggleRun);$('#resetRun').addEventListener('click',resetRun);$('#print').addEventListener('click',()=>window.print());$('#contextTap').addEventListener('click',()=>{gate++;renderGate()});$('#gateBack').addEventListener('click',()=>{gate--;renderGate()});$('#gateReset').addEventListener('click',()=>{gate=0;renderGate()});$('#newDrill').addEventListener('click',newDrill);$$('[data-answer]').forEach(b=>b.addEventListener('click',()=>answer(b.dataset.answer)));$$('[data-check]').forEach(c=>c.addEventListener('change',()=>{data.checks[c.dataset.check]=c.checked;save()}));$('#logRun').addEventListener('click',logRun);$('#export').addEventListener('click',exportData);$('#clear').addEventListener('click',()=>{if(confirm('Clear saved contract, checks, score, and rehearsal wire?')){localStorage.removeItem(KEY);data=structuredClone(defaults);resetRun();gate=0;renderGate();hydrate()}});window.addEventListener('resize',resize);document.addEventListener('visibilitychange',()=>{if(document.hidden&&running)toggleRun()});
+hydrate();renderGate();newDrill();requestAnimationFrame(resize);
+})();
+</script>
+</body>
+</html>
