@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Load Balance — DCS loadout mass &amp; asymmetry desk</title>
+<style>
+:root{--paper:#f2efe6;--panel:#fffdf7;--ink:#17201c;--muted:#667069;--line:#cbc8bc;--deep:#173f35;--accent:#c65a2e;--ok:#28764d;--warn:#a96712;--bad:#a53a32;--shadow:0 10px 30px rgba(24,38,31,.08);--radius:10px;--mono:"SFMono-Regular",Consolas,"Liberation Mono",monospace;--sans:"Avenir Next",Avenir,"Gill Sans",Candara,sans-serif;--display:Georgia,"Times New Roman",serif}
+*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:15px}button,input,select,textarea{font:inherit}button,input,select{min-height:44px}button{cursor:pointer}.shell{max-width:1500px;margin:auto;padding:22px}.topbar{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;padding:8px 2px 20px;border-bottom:2px solid var(--ink)}.eyebrow,.label{font:700 11px/1.2 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}h1{font:700 clamp(30px,5vw,54px)/.95 var(--display);margin:5px 0 0;letter-spacing:-.03em}.mission{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.mission input{width:220px}.btn{border:1px solid var(--ink);background:transparent;color:var(--ink);border-radius:6px;padding:9px 13px;font-weight:700}.btn:hover{background:#e2ded3}.btn.primary{background:var(--deep);color:white;border-color:var(--deep)}.btn.primary:hover{background:#0e3028}.btn.danger{color:var(--bad);border-color:var(--bad)}.btn.small{min-height:36px;padding:6px 10px;font-size:13px}.grid{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(320px,.65fr);gap:18px;margin-top:18px}.panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}.setup{padding:18px}.section-head{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin-bottom:14px}.section-head h2{margin:0;font:700 23px/1 var(--display)}.section-head p{margin:3px 0 0;color:var(--muted);font-size:13px}.fields{display:grid;grid-template-columns:repeat(4,minmax(130px,1fr));gap:12px}.field{display:grid;gap:5px}.field span{font:700 11px var(--mono);text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}input,select,textarea{width:100%;border:1px solid #aaa99f;background:#fffefa;color:var(--ink);border-radius:5px;padding:9px 10px}input:focus,select:focus,textarea:focus,button:focus-visible{outline:3px solid rgba(198,90,46,.28);outline-offset:2px;border-color:var(--accent)}.hint{color:var(--muted);font-size:12px;line-height:1.35}.stations{margin-top:18px;overflow:hidden}.stations-head{display:flex;justify-content:space-between;align-items:center;padding:16px 18px;border-bottom:1px solid var(--line)}.stations-head h2{margin:0;font:700 23px var(--display)}.table-wrap{overflow:auto}table{width:100%;border-collapse:collapse;min-width:940px}th{padding:10px 8px;text-align:left;background:#e8e5db;font:700 10px var(--mono);letter-spacing:.07em;text-transform:uppercase;color:#505952;border-bottom:1px solid var(--line)}td{padding:7px 5px;border-bottom:1px solid #e2dfd5;vertical-align:middle}td:first-child,th:first-child{padding-left:16px}td:last-child,th:last-child{padding-right:16px}.station-name{min-width:120px}.store-name{min-width:160px}.num{width:88px;text-align:right;font-family:var(--mono)}.side{width:92px}.recover{text-align:center}.recover input{width:20px;min-height:20px;accent-color:var(--deep)}.row-mass{font-family:var(--mono);text-align:right;white-space:nowrap}.icon-btn{width:38px;min-height:38px;border:0;background:transparent;border-radius:5px;color:var(--bad);font-weight:800}.icon-btn:hover{background:#f3ded8}.actions{display:flex;gap:8px;flex-wrap:wrap;padding:14px 18px}.sidecol{display:grid;gap:18px;align-content:start;position:sticky;top:14px}.readout{padding:18px}.gate{display:flex;align-items:center;gap:12px;padding:12px;border:1px solid var(--line);border-radius:8px;margin-bottom:10px}.lamp{width:12px;height:12px;border-radius:50%;background:var(--muted);box-shadow:0 0 0 4px #ece9df;flex:0 0 auto}.gate.ok .lamp{background:var(--ok)}.gate.warn .lamp{background:var(--warn)}.gate.bad .lamp{background:var(--bad)}.gate strong{display:block}.gate small{display:block;color:var(--muted);margin-top:2px}.numbers{display:grid;grid-template-columns:1fr 1fr;border-top:1px solid var(--line);margin-top:14px}.metric{padding:14px 8px 9px;border-bottom:1px solid var(--line)}.metric:nth-child(odd){border-right:1px solid var(--line)}.metric b{display:block;font:700 24px/1 var(--mono);letter-spacing:-.05em}.metric span{display:block;color:var(--muted);font-size:11px;text-transform:uppercase;margin-top:6px}.balance-bar{height:16px;background:#dfddd4;border-radius:4px;position:relative;margin:18px 0 7px;overflow:hidden}.balance-bar:before{content:"";position:absolute;left:50%;top:0;bottom:0;width:2px;background:var(--ink);z-index:2}.needle{position:absolute;left:50%;top:2px;width:10px;height:12px;background:var(--accent);border-radius:2px;transform:translateX(-50%);transition:left .25s ease}.balance-scale{display:flex;justify-content:space-between;font:11px var(--mono);color:var(--muted)}.brief{padding:18px}.brief textarea{height:120px;resize:vertical;margin-top:10px}.utility{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.status-line{font:12px var(--mono);color:var(--muted);min-height:16px;margin-top:9px}.warning{padding:12px 14px;background:#f6eadc;border:1px solid #dec09e;border-radius:6px;color:#684119;font-size:12px;line-height:1.45;margin-top:14px}.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+@media(max-width:980px){.grid{grid-template-columns:1fr}.sidecol{position:static;grid-template-columns:1fr 1fr}.fields{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:650px){.shell{padding:12px}.topbar{align-items:flex-start;flex-direction:column}.mission{width:100%}.mission input{flex:1;min-width:0}.sidecol{grid-template-columns:1fr}.fields{grid-template-columns:1fr 1fr}.setup,.readout,.brief{padding:14px}.stations-head{align-items:flex-start;flex-direction:column}.actions .btn{flex:1}.metric b{font-size:20px}}
+@media print{body{background:#fff}.shell{max-width:none;padding:0}.panel{box-shadow:none}.topbar .btn,.actions,.utility,.icon-btn,.warning{display:none!important}.grid{display:block}.sidecol{position:static;display:grid;grid-template-columns:1fr 1fr;margin-top:14px}.stations{break-inside:avoid}.panel{margin-bottom:12px}.table-wrap{overflow:visible}table{min-width:0}input,select,textarea{border:0;padding:2px;background:transparent}.topbar{padding-top:0}.brief textarea{height:80px}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}.needle{transition:none}}
+</style>
+</head>
+<body>
+<main class="shell">
+<header class="topbar">
+  <div><div class="eyebrow">DCS sortie desk · offline</div><h1>Load Balance</h1></div>
+  <div class="mission"><label class="sr-only" for="mission">Mission or callsign</label><input id="mission" placeholder="Mission / callsign" autocomplete="off"><button class="btn primary" id="printBtn">Print card</button></div>
+</header>
+<div class="grid">
+  <div>
+    <section class="panel setup" aria-labelledby="setupTitle">
+      <div class="section-head"><div><h2 id="setupTitle">Aircraft contract</h2><p>Enter values from your module's current manual or mission loadout screen.</p></div><span class="label" id="saveState">Saved locally</span></div>
+      <div class="fields">
+        <label class="field"><span>Aircraft / profile</span><input id="aircraft" value="Custom aircraft"></label>
+        <label class="field"><span>Empty + fixed mass (lb)</span><input id="emptyMass" type="number" min="0" step="1" value="0"></label>
+        <label class="field"><span>Launch fuel (lb)</span><input id="launchFuel" type="number" min="0" step="1" value="0"></label>
+        <label class="field"><span>Recovery fuel (lb)</span><input id="recoveryFuel" type="number" min="0" step="1" value="0"></label>
+        <label class="field"><span>Max launch mass (lb)</span><input id="launchLimit" type="number" min="0" step="1" value="0"></label>
+        <label class="field"><span>Max recovery mass (lb)</span><input id="recoveryLimit" type="number" min="0" step="1" value="0"></label>
+        <label class="field"><span>Lateral moment limit (lb·in)</span><input id="momentLimit" type="number" min="0" step="100" value="0"></label>
+        <label class="field"><span>Other recovery change (lb)</span><input id="recoveryDelta" type="number" step="1" value="0"><small class="hint">Crew/cargo/consumables change; negative reduces recovery mass.</small></label>
+      </div>
+      <div class="warning"><strong>Planning aid, not certified data.</strong> No aircraft limits or store weights are assumed. Use current DCS/module documentation; verify the in-game loadout and operational procedures before flight.</div>
+    </section>
+
+    <section class="panel stations" aria-labelledby="storesTitle">
+      <div class="stations-head"><div><h2 id="storesTitle">Station ledger</h2><div class="hint">Arm is lateral distance from centerline. Center stores should use 0.</div></div><button class="btn small" id="addRow">+ Add station</button></div>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Station</th><th>Store / adapter</th><th>Side</th><th>Qty</th><th>Each lb</th><th>Arm in</th><th>Returns</th><th>Mass</th><th><span class="sr-only">Remove</span></th></tr></thead>
+        <tbody id="rows"></tbody>
+      </table></div>
+      <div class="actions"><button class="btn small" id="mirrorBtn">Mirror left → right</button><button class="btn small" id="clearStores">Clear stores</button><button class="btn small" id="exampleBtn">Load worked example</button></div>
+    </section>
+  </div>
+
+  <aside class="sidecol" aria-label="Loadout results">
+    <section class="panel readout" aria-labelledby="statusTitle">
+      <div class="section-head"><div><h2 id="statusTitle">Decision gates</h2><p>Blank limits remain unverified.</p></div></div>
+      <div id="launchGate" class="gate warn"><i class="lamp" aria-hidden="true"></i><div><strong>Launch · LIMIT NEEDED</strong><small>Enter an approved maximum.</small></div></div>
+      <div id="recoverGate" class="gate warn"><i class="lamp" aria-hidden="true"></i><div><strong>Recovery · LIMIT NEEDED</strong><small>Enter an approved maximum.</small></div></div>
+      <div id="balanceGate" class="gate warn"><i class="lamp" aria-hidden="true"></i><div><strong>Balance · LIMIT NEEDED</strong><small>Enter an approved lateral moment limit.</small></div></div>
+      <div class="numbers">
+        <div class="metric"><b id="launchGross">0</b><span>Launch gross · lb</span></div>
+        <div class="metric"><b id="recoveryGross">0</b><span>Recovery gross · lb</span></div>
+        <div class="metric"><b id="leftMass">0</b><span>Left stores · lb</span></div>
+        <div class="metric"><b id="rightMass">0</b><span>Right stores · lb</span></div>
+        <div class="metric"><b id="imbalance">0</b><span>Mass difference · lb</span></div>
+        <div class="metric"><b id="moment">0</b><span>Net moment · lb·in</span></div>
+      </div>
+      <div class="balance-bar" aria-label="Lateral balance visualization"><div class="needle" id="needle"></div></div><div class="balance-scale"><span>LEFT HEAVY</span><span>LEVEL</span><span>RIGHT HEAVY</span></div>
+    </section>
+
+    <section class="panel brief" aria-labelledby="briefTitle">
+      <div class="section-head"><div><h2 id="briefTitle">Crew note</h2><p>Capture the decision, not just the arithmetic.</p></div></div>
+      <label class="field"><span>Loadout / recovery note</span><textarea id="notes" placeholder="Example: retain tank; recovery margin requires planned jettison only if directed."></textarea></label>
+      <div class="utility"><button class="btn small" id="copyBtn">Copy summary</button><button class="btn small" id="exportBtn">Export JSON</button><button class="btn small" id="importBtn">Import JSON</button><button class="btn small danger" id="resetBtn">Reset all</button><input class="sr-only" type="file" id="fileInput" accept="application/json,.json"></div>
+      <div class="status-line" id="message" role="status" aria-live="polite"></div>
+    </section>
+  </aside>
+</div>
+</main>
+<script>
+(()=>{
+'use strict';
+const KEY='dcs-load-balance-v1';
+const $=s=>document.querySelector(s), fmt=n=>Math.round(Number(n)||0).toLocaleString('en-US');
+const fieldIds=['mission','aircraft','emptyMass','launchFuel','recoveryFuel','launchLimit','recoveryLimit','momentLimit','recoveryDelta','notes'];
+const defaultRows=()=>Array.from({length:5},(_,i)=>({station:`Station ${i+1}`,store:'',side:i<2?'L':i===2?'C':'R',qty:1,weight:0,arm:i===2?0:(i<2?72-(i*24):48+((i-3)*24)),returns:true}));
+let state={fields:{mission:'',aircraft:'Custom aircraft',emptyMass:0,launchFuel:0,recoveryFuel:0,launchLimit:0,recoveryLimit:0,momentLimit:0,recoveryDelta:0,notes:''},rows:defaultRows()};
+function safeNum(v){const n=Number(v);return Number.isFinite(n)?n:0}
+function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function renderRows(){
+ const body=$('#rows');body.innerHTML=state.rows.map((r,i)=>`<tr data-i="${i}">
+ <td><input class="station-name" data-k="station" aria-label="Station name ${i+1}" value="${esc(r.station)}"></td>
+ <td><input class="store-name" data-k="store" aria-label="Store name ${i+1}" value="${esc(r.store)}" placeholder="Store or adapter"></td>
+ <td><select class="side" data-k="side" aria-label="Side ${i+1}"><option value="L" ${r.side==='L'?'selected':''}>Left</option><option value="C" ${r.side==='C'?'selected':''}>Center</option><option value="R" ${r.side==='R'?'selected':''}>Right</option></select></td>
+ <td><input class="num" data-k="qty" aria-label="Quantity ${i+1}" type="number" min="0" step="1" value="${safeNum(r.qty)}"></td>
+ <td><input class="num" data-k="weight" aria-label="Unit weight ${i+1}" type="number" min="0" step="1" value="${safeNum(r.weight)}"></td>
+ <td><input class="num" data-k="arm" aria-label="Lateral arm ${i+1}" type="number" min="0" step="1" value="${safeNum(r.arm)}" ${r.side==='C'?'disabled':''}></td>
+ <td class="recover"><input data-k="returns" aria-label="Store returns ${i+1}" type="checkbox" ${r.returns?'checked':''}></td>
+ <td class="row-mass">${fmt(safeNum(r.qty)*safeNum(r.weight))}</td>
+ <td><button class="icon-btn remove" aria-label="Remove ${esc(r.station)}">×</button></td></tr>`).join('');
+}
+function syncFields(){fieldIds.forEach(id=>{const el=$('#'+id);el.value=state.fields[id]??''})}
+function calc(){
+ const f=state.fields;let launchStores=0,recoveryStores=0,left=0,right=0,netMoment=0;
+ state.rows.forEach(r=>{const mass=Math.max(0,safeNum(r.qty))*Math.max(0,safeNum(r.weight));launchStores+=mass;if(r.returns)recoveryStores+=mass;if(r.side==='L'){left+=mass;netMoment-=mass*Math.abs(safeNum(r.arm))}if(r.side==='R'){right+=mass;netMoment+=mass*Math.abs(safeNum(r.arm))}});
+ const launch=safeNum(f.emptyMass)+safeNum(f.launchFuel)+launchStores;
+ const recovery=safeNum(f.emptyMass)+safeNum(f.recoveryFuel)+recoveryStores+safeNum(f.recoveryDelta);
+ return{launch,recovery,left,right,imbalance:Math.abs(left-right),moment:netMoment};
+}
+function setGate(id,label,value,limit){const el=$(id),strong=el.querySelector('strong'),small=el.querySelector('small');el.className='gate '+(!limit?'warn':value<=limit?'ok':'bad');strong.textContent=`${label} · ${!limit?'LIMIT NEEDED':value<=limit?'WITHIN LIMIT':'EXCEEDS LIMIT'}`;small.textContent=!limit?'Enter an approved maximum.':`${fmt(Math.abs(limit-value))} ${label==='Balance'?'lb·in':'lb'} ${value<=limit?'margin':'over'}.`}
+function update(){
+ const c=calc();$('#launchGross').textContent=fmt(c.launch);$('#recoveryGross').textContent=fmt(c.recovery);$('#leftMass').textContent=fmt(c.left);$('#rightMass').textContent=fmt(c.right);$('#imbalance').textContent=fmt(c.imbalance);$('#moment').textContent=(c.moment<0?'L ':'R ')+fmt(Math.abs(c.moment));
+ setGate('#launchGate','Launch',c.launch,safeNum(state.fields.launchLimit));setGate('#recoverGate','Recovery',c.recovery,safeNum(state.fields.recoveryLimit));setGate('#balanceGate','Balance',Math.abs(c.moment),safeNum(state.fields.momentLimit));
+ const lim=safeNum(state.fields.momentLimit)||Math.max(Math.abs(c.moment),1),pct=Math.max(-1,Math.min(1,c.moment/lim));$('#needle').style.left=(50+pct*48)+'%';
+ document.querySelectorAll('#rows tr').forEach((tr,i)=>{const r=state.rows[i];tr.querySelector('.row-mass').textContent=fmt(safeNum(r.qty)*safeNum(r.weight))});
+ save();
+}
+let saveTimer;function save(){clearTimeout(saveTimer);$('#saveState').textContent='Saving…';saveTimer=setTimeout(()=>{localStorage.setItem(KEY,JSON.stringify(state));$('#saveState').textContent='Saved locally'},120)}
+function load(){try{const parsed=JSON.parse(localStorage.getItem(KEY));if(parsed&&parsed.fields&&Array.isArray(parsed.rows))state=parsed}catch(e){localStorage.removeItem(KEY)}syncFields();renderRows();update()}
+function message(t){$('#message').textContent=t;setTimeout(()=>{if($('#message').textContent===t)$('#message').textContent=''},3500)}
+fieldIds.forEach(id=>$('#'+id).addEventListener('input',e=>{state.fields[id]=e.target.type==='number'?safeNum(e.target.value):e.target.value;update()}));
+$('#rows').addEventListener('input',e=>{const tr=e.target.closest('tr');if(!tr||!e.target.dataset.k)return;const i=+tr.dataset.i,k=e.target.dataset.k;state.rows[i][k]=e.target.type==='checkbox'?e.target.checked:(e.target.type==='number'?safeNum(e.target.value):e.target.value);if(k==='side'&&e.target.value==='C')state.rows[i].arm=0;renderRows();update()});
+$('#rows').addEventListener('change',e=>{if(e.target.matches('select,[type=checkbox]'))e.target.dispatchEvent(new Event('input',{bubbles:true}))});
+$('#rows').addEventListener('click',e=>{const b=e.target.closest('.remove');if(!b)return;state.rows.splice(+b.closest('tr').dataset.i,1);renderRows();update()});
+$('#addRow').onclick=()=>{state.rows.push({station:`Station ${state.rows.length+1}`,store:'',side:'C',qty:1,weight:0,arm:0,returns:true});renderRows();update()};
+$('#clearStores').onclick=()=>{state.rows=defaultRows();renderRows();update();message('Store ledger cleared.')};
+$('#exampleBtn').onclick=()=>{state.fields={...state.fields,aircraft:'Worked example — replace with module data',emptyMass:24000,launchFuel:9000,recoveryFuel:3500,launchLimit:51000,recoveryLimit:39000,momentLimit:120000,recoveryDelta:0};state.rows=[{station:'Outboard L',store:'Training store',side:'L',qty:1,weight:500,arm:180,returns:false},{station:'Inboard L',store:'Tank',side:'L',qty:1,weight:2200,arm:72,returns:true},{station:'Center',store:'Pod',side:'C',qty:1,weight:900,arm:0,returns:true},{station:'Inboard R',store:'Tank',side:'R',qty:1,weight:2200,arm:72,returns:true},{station:'Outboard R',store:'Training store',side:'R',qty:1,weight:500,arm:180,returns:true}];syncFields();renderRows();update();message('Illustrative values loaded — replace before operational use.')};
+$('#mirrorBtn').onclick=()=>{const left=state.rows.filter(r=>r.side==='L');if(!left.length){message('No left-side rows to mirror.');return}const centers=state.rows.filter(r=>r.side==='C'),right=left.map(r=>({...r,station:r.station.replace(/left|\bL\b/ig,m=>m.toLowerCase()==='left'?'Right':'R'),side:'R'}));state.rows=[...left,...centers,...right];renderRows();update();message('Right side rebuilt from left-side rows.')};
+function summary(){const c=calc(),f=state.fields;return `${f.mission||'DCS LOAD PLAN'}\n${f.aircraft||'Custom aircraft'}\nLaunch: ${fmt(c.launch)} lb${safeNum(f.launchLimit)?` / ${fmt(f.launchLimit)} (${c.launch<=f.launchLimit?'GO':'NO-GO'})`: ' / limit unverified'}\nRecovery: ${fmt(c.recovery)} lb${safeNum(f.recoveryLimit)?` / ${fmt(f.recoveryLimit)} (${c.recovery<=f.recoveryLimit?'GO':'NO-GO'})`:' / limit unverified'}\nL/R stores: ${fmt(c.left)} / ${fmt(c.right)} lb\nNet lateral moment: ${c.moment<0?'LEFT':'RIGHT'} ${fmt(Math.abs(c.moment))} lb·in${safeNum(f.momentLimit)?` / ${fmt(f.momentLimit)} (${Math.abs(c.moment)<=f.momentLimit?'GO':'NO-GO'})`:' / limit unverified'}\nNote: ${f.notes||'—'}\nPlanning aid; verify against current module data.`}
+$('#copyBtn').onclick=async()=>{try{await navigator.clipboard.writeText(summary());message('Summary copied.')}catch(e){const ta=document.createElement('textarea');ta.value=summary();document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove();message('Summary copied.')}};
+$('#exportBtn').onclick=()=>{const blob=new Blob([JSON.stringify({...state,exportedAt:new Date().toISOString()},null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`load-balance-${(state.fields.mission||'plan').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')||'plan'}.json`;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);message('JSON exported.')};
+$('#importBtn').onclick=()=>$('#fileInput').click();$('#fileInput').onchange=e=>{const file=e.target.files[0];if(!file)return;const reader=new FileReader();reader.onload=()=>{try{const p=JSON.parse(reader.result);if(!p.fields||!Array.isArray(p.rows))throw Error();state={fields:{...state.fields,...p.fields},rows:p.rows};syncFields();renderRows();update();message('Plan imported.')}catch(err){message('Import failed: invalid Load Balance JSON.')}};reader.readAsText(file);e.target.value=''};
+$('#resetBtn').onclick=()=>{if(!confirm('Reset the entire load plan?'))return;localStorage.removeItem(KEY);state={fields:{mission:'',aircraft:'Custom aircraft',emptyMass:0,launchFuel:0,recoveryFuel:0,launchLimit:0,recoveryLimit:0,momentLimit:0,recoveryDelta:0,notes:''},rows:defaultRows()};syncFields();renderRows();update();message('Plan reset.')};
+$('#printBtn').onclick=()=>window.print();load();
+})();
+</script>
+</body>
+</html>
