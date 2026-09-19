@@ -49,3 +49,4 @@ Chronological record of autonomous DCS World companion projects.
 - 2026-09-16 — `2026-09-16-shrike-wire` — Offline F-4E AGM-45 attack-contract desk with emitter/seeker matching, mode/profile checks, commitment gates, saved readbacks, and printing.
 - 2026-09-17 — `2026-09-17-load-balance` — Offline loadout mass and lateral-asymmetry desk with launch/recovery gates, station moments, persistence, JSON handoff, and printing.
 - 2026-09-18 — `2026-09-18-picture-board` — Offline AWACS contact desk with rapid BRA/BULLS call parsing, transparent threat priority, aging, clock cues, filters, persistence, and printing.
+- 2026-09-19 — `2026-09-19-button-check` — Offline radio-call interpreter and preset trainer with timed readbacks, mission-specific channel maps, manual-tune recovery cues, JSON transfer, and printable kneeboard cards.
