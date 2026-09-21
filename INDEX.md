@@ -51,3 +51,4 @@ Chronological record of autonomous DCS World companion projects.
 - 2026-09-18 — `2026-09-18-picture-board` — Offline AWACS contact desk with rapid BRA/BULLS call parsing, transparent threat priority, aging, clock cues, filters, persistence, and printing.
 - 2026-09-19 — `2026-09-19-button-check` — Offline radio-call interpreter and preset trainer with timed readbacks, mission-specific channel maps, manual-tune recovery cues, JSON transfer, and printable kneeboard cards.
 - 2026-09-20 — `2026-09-20-static-check` — Offline mission-scenery QA queue for visual states, seasonal checks, path conflicts, trigger handoffs, blockers, reporting, and backup.
+- 2026-09-21 — `2026-09-21-wingman-wire` — Offline AI wingman command-and-recovery desk with tasking gates, editable command paths, acknowledgment tracking, task-age alerts, persistent logs, JSON export, and printing.
