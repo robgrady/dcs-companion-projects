@@ -53,3 +53,4 @@ Chronological record of autonomous DCS World companion projects.
 - 2026-09-20 — `2026-09-20-static-check` — Offline mission-scenery QA queue for visual states, seasonal checks, path conflicts, trigger handoffs, blockers, reporting, and backup.
 - 2026-09-21 — `2026-09-21-wingman-wire` — Offline AI wingman command-and-recovery desk with tasking gates, editable command paths, acknowledgment tracking, task-age alerts, persistent logs, JSON export, and printing.
 - 2026-09-22 — `2026-09-22-log-scope` — Offline DCS log-triage workbench with local parsing, evidence signals, context inspection, privacy redaction, persistent case notes, and incident-brief export.
+- 2026-09-23 — `2026-09-23-tower-chair` — Offline towered-pattern communications trainer with configurable circuits, clearance-element scoring, optional spoken calls, persistent results, glossary, transcript export, and printing.
