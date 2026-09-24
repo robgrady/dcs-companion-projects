@@ -10,12 +10,12 @@ Sortie Thread takes a deliberately different position from automatic telemetry t
 
 Sources reviewed on **2026-09-24**:
 
-- Reddit / r/dcsworld, “DCS Flight Log” (2026-06-06): https://www.reddit.com/r/dcsworld/comments/1tyvz07/dcs_flight_log/
+- Reddit / r/dcsworld, “I built a flight ops companion app for DCS (and MSFS)” (2026-02-24): https://www.reddit.com/r/dcsworld/comments/1rdu2qe/i_built_a_flight_ops_companion_app_for_dcs_and/
+- Reddit / r/hoggit, “[Utility] Flight Log” (2026-06-28): https://www.reddit.com/r/hoggit/comments/1uhqmzm/utility_flight_log/
 - Reddit / r/dcsworld, “Flight Log for DCS” (2026-06-26): https://www.reddit.com/r/dcsworld/comments/1uggzk8/flight_log_for_dcs/
 - Reddit / r/dcsworld, “Flight hours” (2026-05-18): https://www.reddit.com/r/dcsworld/comments/1tgm485/flight_hours/
 - Eagle Dynamics forums, “Displaying Accumulated Playtime” (2025-07-09): https://forum.dcs.world/topic/376127-displaying-accumulated-playtime/
 - Eagle Dynamics forums, “Pilot logbook for Multiplayer” (2025-02-07): https://forum.dcs.world/topic/368931-pilot-logbook-for-multiplayer/
-- Eagle Dynamics forums, “Expand Pilot Profile to Focus More on the Pilot — Not Just the Aircraft” (2025): https://forum.dcs.world/topic/377310-expand-pilot-profile-to-focus-more-on-the-pilot-not-just-the-aircraft/
 
 ## Use
 
