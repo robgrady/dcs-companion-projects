@@ -18,17 +18,17 @@ Saved plans use browser `localStorage`. Clearing browser site data can remove th
 
 ## Why this project
 
-Recent community discussion shows a recurring time-to-reward problem. Players describe DCS as difficult to fit around work and family because preparation, startup, transit, and recovery can consume most of a limited session. A September 2026 r/hoggit discussion asks directly about the lack of meaningful progress and poor use of limited free time. Other recent discussions contrast full-procedure play with shortcuts, suggest deliberately brief sessions, and describe skipping startup or choosing faster training formats when available time is short.
+Current and recurring community discussion shows a time-to-reward problem. A July 2026 r/dcsworld guide is explicitly aimed at players with limited time and energy, while a February 2026 r/hoggit discussion criticizes single-player missions for consuming limited time through long setup, fragile triggers, and repetition. Earlier threads ask what meaningful DCS activity fits into 15–40 minutes and recommend deliberately scoped practice, hot or air starts, nearby objectives, and reusable short missions.
 
 Sortie Window does not try to make DCS simpler. It makes the trade visible before the player commits: preserve a worthwhile objective, budget the supporting phases honestly, and define a smaller fallback while there is still time to choose it.
 
 Sources reviewed on **2026-09-26**:
 
-- Reddit / r/hoggit, “DCS - Best combat flight sim on the market! Yet nobody actually plays it...” (2026-09-24) — the author describes limited free time, large preparation overhead, and weak time-to-reward as barriers to regular play: https://www.reddit.com/r/hoggit/comments/1wmxmi4/dcs_best_combat_flight_sim_on_the_market_yet/
-- Reddit / r/hoggit, “Am I getting too old for DCS?” (2025-11-25) — players discuss DCS feeling like a second job, using auto-start, and choosing shorter modules or simpler sessions when time and energy are constrained: https://www.reddit.com/r/hoggit/comments/1p6e1aq/am_i_getting_too_old_for_dcs/
-- Reddit / r/hoggit, “Less is more—I'm embracing short sessions” (2025-12-18) — a player reports that explicitly short sessions reduced avoidance and made practice more consistent: https://www.reddit.com/r/hoggit/comments/1pprtjj/less_is_more_im_embracing_short_sessions/
-- Reddit / r/hoggit, “1 hour a day of DCS, time wasted or a good start?” (2021-04-28) — discussion centers on whether useful learning and flying can fit into a one-hour daily window: https://www.reddit.com/r/hoggit/comments/n0ig62/1_hour_a_day_of_dcs_time_wasted_or_a_good_start/
-- Eagle Dynamics Forums, “HOT START/Autostart” (2021-12-19) — users debate hot starts and auto-start as ways to focus limited simulator time on the part of the sortie they want to practice: https://forum.dcs.world/topic/289158-hot-startautostart/
+- Reddit / r/dcsworld, “Learning DCS Without Feeling Overwhelmed (or why DCS Isn't as Hard as It Looks)” (2026-07-29) — a current learning guide addresses players who have limited time or energy and want to avoid wasted effort and lost motivation: https://www.reddit.com/r/dcsworld/comments/1v9xvtl/learning_dcs_without_feeling_overwhelmed_or_why/
+- Reddit / r/hoggit, “DCS has a problem with Single Player Missions” (2026-02-12) — discussion describes long planning, unreliable mission logic, repeated attempts, and single-player content that can be disrespectful of limited time: https://www.reddit.com/r/hoggit/comments/1r2tjag/dcs_has_a_problem_with_single_player_missions/
+- Reddit / r/hoggit, “What can you do in DCS for ~30-40 minutes?” (2024-06-06) — players recommend focused repetitions, short mission types, hot or air starts, and quick-task servers when a full sortie does not fit: https://www.reddit.com/r/hoggit/comments/1d94eez/what_can_you_do_in_dcs_for_3040_minutes/
+- Reddit / r/hoggit, “What do you all do if you only have 15-20 min to play?” (2022-10-30) — the thread asks how to get value from a very short window; replies describe small reusable practice missions with ready-to-fly and cold-start slots: https://www.reddit.com/r/hoggit/comments/yhghas/what_do_you_all_do_if_you_only_have_1520_min_to/
+- Eagle Dynamics Forums, “Frustration venting - Cold start on multiplayer servers” (2021-12-10) — a player with limited game time describes repeated startup and alignment waits as consuming the part of the session intended for flying: https://forum.dcs.world/topic/288562-frustration-venting-cold-start-on-multiplayer-servers/
 
 ## Assumptions and boundaries
 
