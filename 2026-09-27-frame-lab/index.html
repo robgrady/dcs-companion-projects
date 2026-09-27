@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark">
+<title>Frame Lab — DCS Performance Test Desk</title>
+<style>
+:root{
+  --bg:#11130f;--panel:#191c17;--panel-2:#20241d;--ink:#f2f0e7;--muted:#a9ad9d;
+  --line:#3a4035;--line-strong:#626b58;--signal:#e8b84a;--good:#8fcf8a;--bad:#e47762;
+  --info:#78b9c7;--focus:#ffd873;--shadow:0 16px 40px rgba(0,0,0,.28);
+  --r:5px;--mono:"SFMono-Regular",Consolas,"Liberation Mono",monospace;
+  --sans:Avenir,"Avenir Next",Futura,"Trebuchet MS",sans-serif;
+  --serif:Georgia,"Times New Roman",serif;
+}
+*{box-sizing:border-box}html{background:var(--bg);color:var(--ink);font-family:var(--sans)}
+body{margin:0;min-height:100vh;background:linear-gradient(90deg,transparent 0 49.9%,rgba(255,255,255,.012) 50%,transparent 50.1%),var(--bg)}
+button,input,select,textarea{font:inherit}button,input,select,textarea{outline:none}
+:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+button{min-height:44px;border:1px solid var(--line-strong);border-radius:var(--r);background:var(--panel-2);color:var(--ink);padding:.65rem .9rem;cursor:pointer;font-weight:700;letter-spacing:.01em}
+button:hover{border-color:var(--signal);background:#292d24}button.primary{background:var(--signal);color:#17150e;border-color:var(--signal)}
+button.primary:hover{background:#f3c75e}button.danger{color:#ffb2a4;border-color:#7d463d}button.quiet{border-color:transparent;background:transparent;color:var(--muted)}
+button.small{min-height:36px;padding:.42rem .66rem;font-size:.82rem}
+input,select,textarea{width:100%;min-height:44px;border:1px solid var(--line);border-radius:var(--r);background:#11140f;color:var(--ink);padding:.65rem .7rem}
+textarea{min-height:76px;resize:vertical}input:disabled,select:disabled,textarea:disabled{opacity:.72;background:#171914;color:#d0d2c7}
+label{display:grid;gap:.35rem;color:var(--muted);font-size:.78rem;font-weight:800;letter-spacing:.075em;text-transform:uppercase}
+.header{border-bottom:1px solid var(--line);padding:1rem clamp(1rem,3vw,2.5rem);display:flex;align-items:flex-end;justify-content:space-between;gap:1rem;background:#141712}
+.brand-kicker{font:700 .72rem var(--mono);letter-spacing:.18em;color:var(--signal);text-transform:uppercase}
+h1{margin:.15rem 0 0;font:700 clamp(1.8rem,4vw,3rem)/.95 var(--serif);letter-spacing:-.04em}.subtitle{margin:.5rem 0 0;color:var(--muted);max-width:60ch}
+.header-actions,.row-actions{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center}
+.shell{display:grid;grid-template-columns:minmax(250px,320px) minmax(0,1fr);min-height:calc(100vh - 104px)}
+.sidebar{border-right:1px solid var(--line);padding:1rem;background:#151813}.main{padding:clamp(1rem,2.5vw,2rem);min-width:0}
+.section-title{display:flex;justify-content:space-between;align-items:center;gap:1rem;margin-bottom:.75rem}.section-title h2,.section-title h3{margin:0}
+h2{font:700 1.35rem var(--serif)}h3{font-size:.9rem;text-transform:uppercase;letter-spacing:.08em}.eyebrow{font:700 .68rem var(--mono);color:var(--muted);text-transform:uppercase;letter-spacing:.12em}
+.history{display:grid;gap:.55rem;max-height:calc(100vh - 240px);overflow:auto;padding-right:.2rem}.history-item{width:100%;text-align:left;display:grid;gap:.3rem;min-height:64px;border-color:var(--line)}
+.history-item.active{border-color:var(--signal);background:#28271d}.history-item strong{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.history-meta{font:600 .68rem var(--mono);color:var(--muted);text-transform:uppercase}
+.empty{padding:1.25rem;border:1px dashed var(--line);color:var(--muted);font:italic .9rem var(--serif)}
+.status-strip{display:grid;grid-template-columns:1fr auto;align-items:center;gap:1rem;border:1px solid var(--line);background:var(--panel);padding:.85rem 1rem;margin-bottom:1rem;box-shadow:var(--shadow)}
+.status-line{display:flex;gap:.75rem;align-items:center;min-width:0}.status-dot{width:11px;height:11px;border-radius:50%;background:var(--muted);box-shadow:0 0 0 4px rgba(255,255,255,.04)}
+.status-dot.ready{background:var(--good)}.status-dot.warn{background:var(--signal)}.status-dot.bad{background:var(--bad)}.status-copy{min-width:0}.status-copy strong{display:block}.status-copy span{color:var(--muted);font-size:.85rem}
+.tabs{display:flex;gap:.35rem;border-bottom:1px solid var(--line);margin-bottom:1rem;overflow-x:auto}.tab{border:0;border-bottom:3px solid transparent;border-radius:0;background:transparent;color:var(--muted);padding:.7rem .9rem;white-space:nowrap}.tab[aria-selected="true"]{color:var(--ink);border-color:var(--signal)}
+.view{display:none}.view.active{display:block}.panel{border:1px solid var(--line);background:var(--panel);padding:1rem;border-radius:var(--r);box-shadow:var(--shadow)}
+.grid{display:grid;gap:.8rem}.context-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.span-2{grid-column:span 2}.span-3{grid-column:1/-1}.panel + .panel{margin-top:1rem}
+.protocol{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.55rem}.check{display:flex;align-items:flex-start;gap:.55rem;padding:.7rem;border:1px solid var(--line);background:#151813;border-radius:var(--r);color:var(--ink);font-size:.88rem;text-transform:none;letter-spacing:0;font-weight:600}
+.check input{width:20px;height:20px;min-height:0;margin:0;accent-color:var(--signal);flex:0 0 auto}.check small{display:block;color:var(--muted);font-weight:400;margin-top:.2rem}
+.progress{height:6px;background:#0e100d;border-radius:5px;overflow:hidden;margin-top:.75rem}.progress span{display:block;height:100%;background:var(--signal);width:0;transition:width .2s ease}
+.ab-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}.variant{border-top:4px solid var(--line-strong)}.variant.candidate{border-top-color:var(--signal)}
+.variant-head{display:flex;justify-content:space-between;gap:1rem;align-items:baseline;margin-bottom:.8rem}.variant-letter{font:800 1.55rem var(--mono);color:var(--signal)}
+.metric-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.55rem}.metric-grid label{font-size:.68rem}.metric-grid .wide{grid-column:1/-1}
+.samples{margin-top:.85rem;display:grid;gap:.45rem}.sample{display:grid;grid-template-columns:32px repeat(4,1fr) 36px;align-items:center;gap:.45rem;padding:.55rem;background:#121510;border:1px solid #30352c;font:700 .73rem var(--mono)}.sample span{white-space:nowrap}.sample .muted{color:var(--muted);font-weight:500}.sample button{min-height:32px;padding:0;border-color:transparent}
+.callout{padding:.85rem 1rem;background:#141711;border:1px solid var(--line);color:var(--muted);font-size:.9rem}.callout strong{color:var(--ink)}
+.analysis-grid{display:grid;grid-template-columns:1.1fr 1fr;gap:1rem}.verdict{display:grid;gap:.8rem}.verdict-mark{font:800 clamp(2rem,5vw,4.6rem)/.9 var(--serif);letter-spacing:-.05em}.verdict-mark.good{color:var(--good)}.verdict-mark.bad{color:var(--bad)}.verdict-mark.mixed{color:var(--signal)}
+.compare-list{display:grid;gap:.55rem}.compare-row{display:grid;grid-template-columns:1fr auto auto auto;gap:.7rem;align-items:baseline;padding-bottom:.5rem;border-bottom:1px solid var(--line)}.compare-row:last-child{border:0}.compare-row b,.compare-row em{font-family:var(--mono);font-style:normal}.delta.good{color:var(--good)}.delta.bad{color:var(--bad)}.delta.neutral{color:var(--muted)}
+.notes{margin-top:1rem}.footer-note{margin-top:1rem;color:var(--muted);font-size:.78rem}.badge{display:inline-flex;align-items:center;min-height:26px;padding:.25rem .5rem;border:1px solid var(--line-strong);border-radius:99px;font:800 .67rem var(--mono);text-transform:uppercase;letter-spacing:.06em}.badge.locked{color:var(--good);border-color:#50734c}.badge.open{color:var(--signal);border-color:#7c6838}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.toast{position:fixed;right:1rem;bottom:1rem;max-width:340px;padding:.8rem 1rem;background:#f2f0e7;color:#151713;border-radius:var(--r);box-shadow:var(--shadow);font-weight:800;transform:translateY(140%);transition:transform .2s ease;z-index:20}.toast.show{transform:translateY(0)}
+@media(max-width:900px){.shell{grid-template-columns:1fr}.sidebar{border-right:0;border-bottom:1px solid var(--line)}.history{max-height:220px}.context-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.span-3{grid-column:1/-1}.ab-grid,.analysis-grid{grid-template-columns:1fr}}
+@media(max-width:620px){.header{align-items:flex-start;flex-direction:column}.header-actions{width:100%}.header-actions button{flex:1}.context-grid,.protocol,.metric-grid{grid-template-columns:1fr}.span-2,.span-3,.metric-grid .wide{grid-column:auto}.status-strip{grid-template-columns:1fr}.sample{grid-template-columns:28px repeat(2,1fr) 34px}.sample .hide-mobile{display:none}.compare-row{grid-template-columns:1fr auto}.compare-row .base,.compare-row .cand{display:none}.main{padding:.8rem}.panel{padding:.8rem}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+@media print{body{background:white;color:#111}.header,.sidebar,.tabs,.header-actions,.row-actions,.toast,.status-strip button,.sample button{display:none!important}.shell{display:block}.main{padding:0}.view{display:none!important}#analysisView{display:block!important}.panel{box-shadow:none;border-color:#888;background:white}.callout,.sample{background:white;color:#111}.compare-row{border-color:#aaa}.verdict-mark,.delta{color:#111!important}.footer-note{color:#444}}
+</style>
+</head>
+<body>
+<header class="header">
+  <div><div class="brand-kicker">DCS / controlled test desk</div><h1>Frame Lab</h1><p class="subtitle">Stop changing five settings at once. Lock the sortie, test one change, and keep the evidence.</p></div>
+  <div class="header-actions"><button id="exportBtn">Export JSON</button><button id="importBtn">Import</button><button class="primary" id="newBtn">New test</button><input class="sr-only" id="importFile" type="file" accept="application/json,.json"></div>
+</header>
+<div class="shell">
+  <aside class="sidebar">
+    <div class="section-title"><h2>Test log</h2><span class="eyebrow" id="testCount">0 tests</span></div>
+    <div id="history" class="history"></div>
+  </aside>
+  <main class="main">
+    <div class="status-strip">
+      <div class="status-line"><span id="statusDot" class="status-dot warn"></span><div class="status-copy"><strong id="statusTitle">Protocol open</strong><span id="statusDetail">Define the scenario and complete the control checks.</span></div></div>
+      <button id="lockBtn">Lock scenario</button>
+    </div>
+    <nav class="tabs" aria-label="Test workflow">
+      <button class="tab" data-tab="setup" aria-selected="true">1 / Setup</button>
+      <button class="tab" data-tab="runs" aria-selected="false">2 / Runs</button>
+      <button class="tab" data-tab="analysis" aria-selected="false">3 / Decision</button>
+    </nav>
+
+    <section id="setupView" class="view active" aria-labelledby="setupHeading">
+      <div class="panel">
+        <div class="section-title"><div><div class="eyebrow">Fixed conditions</div><h2 id="setupHeading">Scenario contract</h2></div><span id="lockBadge" class="badge open">Open</span></div>
+        <div class="grid context-grid">
+          <label>Test title<input id="title" data-context maxlength="80" value="Multiplayer performance check"></label>
+          <label>Display mode<select id="displayMode" data-context><option>2D monitor</option><option>VR headset</option></select></label>
+          <label>DCS build<input id="build" data-context maxlength="40" aria-describedby="buildHelp"></label>
+          <label>Mission / server<input id="scenario" data-context maxlength="80"></label>
+          <label>Map<input id="map" data-context maxlength="50"></label>
+          <label>Aircraft / seat<input id="aircraft" data-context maxlength="50"></label>
+          <label>Resolution / headset mode<input id="resolution" data-context maxlength="60"></label>
+          <label>Sample duration (minutes)<input id="duration" data-context type="number" min="1" max="60" step="1" value="2"></label>
+          <label>Material-change threshold (%)<input id="threshold" data-context type="number" min="1" max="30" step="1" value="5"></label>
+          <label class="span-3">One change under test<input id="change" data-context maxlength="140" aria-describedby="changeHelp"><span id="changeHelp">Name one setting, driver, peripheral, background app, or DCS state change—never a bundle.</span></label>
+          <label class="span-3">Conditions note<textarea id="conditions" data-context maxlength="500"></textarea></label>
+        </div>
+        <p id="buildHelp" class="footer-note">Record the exact build shown by DCS so results remain interpretable after updates.</p>
+      </div>
+      <div class="panel">
+        <div class="section-title"><div><div class="eyebrow">Repeatability</div><h2>Control checks</h2></div><strong id="protocolScore">0 / 6</strong></div>
+        <div class="protocol" id="protocolChecks">
+          <label class="check"><input type="checkbox" data-check="route"><span>Same route and camera work<small>Use the same start point, path, altitude, and head movement.</small></span></label>
+          <label class="check"><input type="checkbox" data-check="state"><span>Same mission state<small>Match unit count, weather, time, and scripted activity.</small></span></label>
+          <label class="check"><input type="checkbox" data-check="server"><span>Comparable server load<small>Record a similar player band, ping, and server population.</small></span></label>
+          <label class="check"><input type="checkbox" data-check="apps"><span>Background apps held constant<small>Keep capture, overlays, monitoring, and browsers unchanged.</small></span></label>
+          <label class="check"><input type="checkbox" data-check="warmup"><span>Warm-up method matched<small>Use the same first-run or warmed-cache condition.</small></span></label>
+          <label class="check"><input type="checkbox" data-check="measure"><span>Measurement method matched<small>Use the same counter and sample duration for A and B.</small></span></label>
+        </div>
+        <div class="progress" aria-hidden="true"><span id="protocolBar"></span></div>
+      </div>
+    </section>
+
+    <section id="runsView" class="view" aria-labelledby="runsHeading">
+      <div class="callout"><strong>Run order:</strong> collect at least three comparable samples for A and B. Alternate A/B when practical to reduce time-of-day, server-load, and thermal drift.</div>
+      <div class="ab-grid" style="margin-top:1rem">
+        <section class="panel variant" aria-labelledby="baselineHeading">
+          <div class="variant-head"><div><div class="eyebrow">Baseline</div><h2 id="baselineHeading"><span class="variant-letter">A</span> Current state</h2></div><span class="badge">Control</span></div>
+          <form id="formA" class="metric-grid">
+            <label>Average FPS<input name="avg" type="number" min="1" max="1000" step="0.1" required></label>
+            <label>1% low FPS<input name="low" type="number" min="0" max="1000" step="0.1"></label>
+            <label>Stutters / run<input name="stutters" type="number" min="0" max="999" step="1" required></label>
+            <label>Worst frametime ms<input name="frame" type="number" min="0" max="10000" step="0.1"></label>
+            <label>Load time sec<input name="load" type="number" min="0" max="9999" step="1"></label>
+            <label>Player count<input name="players" type="number" min="0" max="999" step="1"></label>
+            <label class="wide">Run note<input name="note" maxlength="120"></label>
+            <button class="primary wide" type="submit">Add baseline sample</button>
+          </form>
+          <div id="samplesA" class="samples"></div>
+        </section>
+        <section class="panel variant candidate" aria-labelledby="candidateHeading">
+          <div class="variant-head"><div><div class="eyebrow">Candidate</div><h2 id="candidateHeading"><span class="variant-letter">B</span> One change</h2></div><span class="badge">Test</span></div>
+          <div id="changeReadout" class="callout">Define the one change on Setup.</div>
+          <form id="formB" class="metric-grid" style="margin-top:.8rem">
+            <label>Average FPS<input name="avg" type="number" min="1" max="1000" step="0.1" required></label>
+            <label>1% low FPS<input name="low" type="number" min="0" max="1000" step="0.1"></label>
+            <label>Stutters / run<input name="stutters" type="number" min="0" max="999" step="1" required></label>
+            <label>Worst frametime ms<input name="frame" type="number" min="0" max="10000" step="0.1"></label>
+            <label>Load time sec<input name="load" type="number" min="0" max="9999" step="1"></label>
+            <label>Player count<input name="players" type="number" min="0" max="999" step="1"></label>
+            <label class="wide">Run note<input name="note" maxlength="120"></label>
+            <button class="primary wide" type="submit">Add candidate sample</button>
+          </form>
+          <div id="samplesB" class="samples"></div>
+        </section>
+      </div>
+    </section>
+
+    <section id="analysisView" class="view" aria-labelledby="analysisHeading">
+      <div class="analysis-grid">
+        <section class="panel verdict">
+          <div><div class="eyebrow">Evidence call</div><h2 id="analysisHeading">Decision</h2></div>
+          <div id="verdictMark" class="verdict-mark mixed">Need runs</div>
+          <p id="verdictText">Add at least three baseline and three candidate samples before making a call.</p>
+          <div id="confidence" class="callout"><strong>Protocol confidence:</strong> incomplete.</div>
+          <div class="row-actions"><button id="decisionBtn" class="primary">Record decision</button><button id="printBtn">Print report</button><button id="csvBtn">Export CSV</button></div>
+        </section>
+        <section class="panel">
+          <div class="section-title"><div><div class="eyebrow">Median comparison</div><h2>A versus B</h2></div><span class="eyebrow">B − A</span></div>
+          <div id="compareList" class="compare-list"></div>
+          <p class="footer-note">Medians resist one unusually good or bad run. Blank optional metrics are excluded rather than treated as zero.</p>
+        </section>
+      </div>
+      <section class="panel notes">
+        <div class="section-title"><div><div class="eyebrow">Interpretation</div><h2>Decision record</h2></div><span id="savedDecision" class="badge open">Unrecorded</span></div>
+        <div class="grid context-grid">
+          <label>Disposition<select id="disposition"><option value="">Choose after review</option><option>Adopt candidate</option><option>Keep baseline</option><option>Repeat test</option><option>Inconclusive / archive</option></select></label>
+          <label class="span-2">Reason<textarea id="decisionReason" maxlength="500"></textarea></label>
+        </div>
+        <p class="footer-note">Frame Lab compares only what you enter. It does not inspect DCS, Windows, drivers, hardware, or logs and does not diagnose a cause.</p>
+      </section>
+    </section>
+  </main>
+</div>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+<script>
+(()=>{
+'use strict';
+const KEY='dcs-frame-lab-v1';
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const contextIds=['title','displayMode','build','scenario','map','aircraft','resolution','duration','threshold','change','conditions'];
+let store=loadStore();
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7)}
+function fresh(){return {id:uid(),created:new Date().toISOString(),updated:new Date().toISOString(),locked:false,context:{title:'Multiplayer performance check',displayMode:'2D monitor',build:'',scenario:'',map:'',aircraft:'',resolution:'',duration:'2',threshold:'5',change:'',conditions:''},checks:{route:false,state:false,server:false,apps:false,warmup:false,measure:false},runs:{A:[],B:[]},decision:{disposition:'',reason:'',recorded:false}}}
+function loadStore(){try{const raw=JSON.parse(localStorage.getItem(KEY));if(raw&&Array.isArray(raw.tests)&&raw.tests.length)return raw}catch(e){}const t=fresh();return {active:t.id,tests:[t]}}
+function save(){localStorage.setItem(KEY,JSON.stringify(store))}
+function current(){return store.tests.find(t=>t.id===store.active)||store.tests[0]}
+function esc(v){return String(v??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]))}
+function toast(msg){const el=$('#toast');el.textContent=msg;el.classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(()=>el.classList.remove('show'),2400)}
+function median(values){const a=values.filter(v=>Number.isFinite(v)).sort((x,y)=>x-y);if(!a.length)return null;const m=Math.floor(a.length/2);return a.length%2?a[m]:(a[m-1]+a[m])/2}
+function metric(t,side,key){return median(t.runs[side].map(r=>r[key]).filter(v=>v!==null))}
+function fmt(v,d=1){return v===null?'—':Number(v).toFixed(d).replace(/\.0$/,'')}
+function pct(a,b){return a===null||b===null||a===0?null:((b-a)/a)*100}
+function update(mutate){const t=current();mutate(t);t.updated=new Date().toISOString();save();render()}
+function render(){const t=current();
+  contextIds.forEach(id=>{const el=$('#'+id);el.value=t.context[id]??'';el.disabled=t.locked});
+  $$('[data-check]').forEach(el=>{el.checked=!!t.checks[el.dataset.check];el.disabled=t.locked});
+  $('#disposition').value=t.decision.disposition||'';$('#decisionReason').value=t.decision.reason||'';
+  renderHistory();renderStatus();renderSamples('A');renderSamples('B');renderAnalysis();
+  $('#changeReadout').textContent=t.context.change||'Define the one change on Setup.';
+}
+function renderHistory(){const h=$('#history');$('#testCount').textContent=`${store.tests.length} test${store.tests.length===1?'':'s'}`;
+  h.innerHTML=store.tests.map(t=>`<button class="history-item ${t.id===store.active?'active':''}" data-open="${t.id}"><strong>${esc(t.context.title||'Untitled test')}</strong><span class="history-meta">${new Date(t.created).toLocaleDateString()} · A${t.runs.A.length}/B${t.runs.B.length} · ${esc(t.decision.disposition||'Open')}</span></button>`).join('');
+  $$('[data-open]').forEach(b=>b.onclick=()=>{store.active=b.dataset.open;save();render()});
+}
+function renderStatus(){const t=current(),checked=Object.values(t.checks).filter(Boolean).length,required=t.context.scenario&&t.context.change&&t.context.build;
+  $('#protocolScore').textContent=`${checked} / 6`;$('#protocolBar').style.width=`${checked/6*100}%`;
+  const badge=$('#lockBadge');badge.textContent=t.locked?'Locked':'Open';badge.className='badge '+(t.locked?'locked':'open');
+  $('#lockBtn').textContent=t.locked?'Unlock scenario':'Lock scenario';
+  const dot=$('#statusDot'), title=$('#statusTitle'), detail=$('#statusDetail');dot.className='status-dot ';
+  if(t.decision.recorded){dot.classList.add('ready');title.textContent=t.decision.disposition;detail.textContent='Decision recorded with the test evidence.'}
+  else if(t.runs.A.length>=3&&t.runs.B.length>=3){dot.classList.add('ready');title.textContent='Comparison ready';detail.textContent='Review the median result and record a disposition.'}
+  else if(t.locked&&checked===6&&required){dot.classList.add('ready');title.textContent='Protocol locked';detail.textContent='Collect comparable A/B runs without changing the contract.'}
+  else {dot.classList.add(required?'warn':'bad');title.textContent=t.locked?'Protocol locked with gaps':'Protocol open';detail.textContent=required?'Complete the control checks, then lock the scenario.':'Add build, scenario, and one change under test.'}
+}
+function renderSamples(side){const t=current(),host=$('#samples'+side),runs=t.runs[side];
+  if(!runs.length){host.innerHTML='<div class="empty">No samples recorded.</div>';return}
+  host.innerHTML=runs.map((r,i)=>`<div class="sample"><strong>${i+1}</strong><span>${fmt(r.avg)} FPS</span><span>${r.low===null?'—':fmt(r.low)+' low'}</span><span class="hide-mobile">${r.stutters} stutters</span><span class="hide-mobile muted">${r.players===null?'—':r.players+' players'}</span><button class="quiet" data-del="${side}:${r.id}" aria-label="Delete ${side} sample ${i+1}">×</button></div>`).join('');
+  $$('[data-del]').forEach(b=>b.onclick=()=>{const [s,id]=b.dataset.del.split(':');update(t=>t.runs[s]=t.runs[s].filter(r=>r.id!==id))});
+}
+function renderAnalysis(){const t=current(),defs=[['Average FPS','avg',true],['1% low FPS','low',true],['Stutters / run','stutters',false],['Worst frametime','frame',false],['Load time','load',false],['Player count','players',null]];
+  $('#compareList').innerHTML=defs.map(([label,key,higher])=>{const a=metric(t,'A',key),b=metric(t,'B',key),d=pct(a,b);let cls='neutral',sign='';if(d!==null){sign=d>0?'+':'';if(higher===true)cls=Math.abs(d)<Number(t.context.threshold)?'neutral':d>0?'good':'bad';if(higher===false)cls=Math.abs(d)<Number(t.context.threshold)?'neutral':d<0?'good':'bad'}
+    const suffix=key==='frame'?' ms':key==='load'?' s':'';return `<div class="compare-row"><span>${label}</span><b class="base">A ${fmt(a)}${suffix}</b><b class="cand">B ${fmt(b)}${suffix}</b><em class="delta ${cls}">${d===null?'—':sign+fmt(d)+'%'}</em></div>`}).join('');
+  const mark=$('#verdictMark'),text=$('#verdictText'),enough=t.runs.A.length>=3&&t.runs.B.length>=3,thr=Number(t.context.threshold)||5;
+  let label='Need runs',cls='mixed',copy='Add at least three baseline and three candidate samples before making a call.';
+  if(enough){const primaryA=metric(t,'A','low')??metric(t,'A','avg'),primaryB=metric(t,'B','low')??metric(t,'B','avg'),perf=pct(primaryA,primaryB),stut=pct(metric(t,'A','stutters'),metric(t,'B','stutters'));
+    if(perf!==null&&perf>=thr&&(stut===null||stut<=thr)){label='Candidate leads';cls='good';copy=`The candidate improved the primary frame metric by ${fmt(perf)}% without a material stutter penalty in the recorded medians.`}
+    else if(perf!==null&&perf<=-thr){label='Baseline leads';cls='bad';copy=`The candidate reduced the primary frame metric by ${fmt(Math.abs(perf))}%. Keep the baseline unless another constraint outweighs it.`}
+    else if(stut!==null&&stut>=thr){label='Mixed result';cls='mixed';copy=`Frame-rate movement is below the threshold or incomplete, while recorded stutters increased by ${fmt(stut)}%. Repeat or keep the baseline.`}
+    else {label='No clear lead';cls='mixed';copy=`The measured difference is inside the ${thr}% material-change threshold. Repeat under tighter conditions or choose on a non-performance constraint.`}
+  }
+  mark.textContent=label;mark.className='verdict-mark '+cls;text.textContent=copy;
+  const checked=Object.values(t.checks).filter(Boolean).length;$('#confidence').innerHTML=`<strong>Protocol confidence:</strong> ${checked===6&&t.locked?'controlled — all checks complete and scenario locked.':checked+'/6 checks complete'+(t.locked?' with the scenario locked.':'; scenario is still editable.')}`;
+  $('#savedDecision').textContent=t.decision.recorded?'Recorded':'Unrecorded';$('#savedDecision').className='badge '+(t.decision.recorded?'locked':'open');
+}
+function makeRun(form){const fd=new FormData(form),n=k=>fd.get(k)===''?null:Number(fd.get(k));return {id:uid(),at:new Date().toISOString(),avg:n('avg'),low:n('low'),stutters:n('stutters'),frame:n('frame'),load:n('load'),players:n('players'),note:String(fd.get('note')||'').trim()}}
+function addRun(side,form){const t=current();if(!t.locked){toast('Lock the scenario before collecting runs.');return}const r=makeRun(form);if(!Number.isFinite(r.avg)||!Number.isFinite(r.stutters)){toast('Average FPS and stutter count are required.');return}update(t=>t.runs[side].push(r));form.reset();toast(`${side} sample added.`)}
+function download(name,type,text){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type}));a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500)}
+function slug(s){return (s||'frame-lab').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,50)}
+function csv(){const t=current(),rows=[['test','side','sample','timestamp','avg_fps','one_percent_low_fps','stutters','worst_frametime_ms','load_seconds','player_count','note']];['A','B'].forEach(side=>t.runs[side].forEach((r,i)=>rows.push([t.context.title,side,i+1,r.at,r.avg,r.low??'',r.stutters,r.frame??'',r.load??'',r.players??'',r.note])));return rows.map(row=>row.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\n')}
+$$('.tab').forEach(tab=>tab.onclick=()=>{$$('.tab').forEach(x=>x.setAttribute('aria-selected',x===tab?'true':'false'));$$('.view').forEach(v=>v.classList.remove('active'));$('#'+tab.dataset.tab+'View').classList.add('active')});
+$$('[data-context]').forEach(el=>el.addEventListener('input',()=>update(t=>{t.context[el.id]=el.value;t.decision.recorded=false})));
+$$('[data-check]').forEach(el=>el.addEventListener('change',()=>update(t=>{t.checks[el.dataset.check]=el.checked;t.decision.recorded=false})));
+$('#lockBtn').onclick=()=>{const t=current();if(!t.locked&&(!t.context.build.trim()||!t.context.scenario.trim()||!t.context.change.trim())){toast('Add build, mission/server, and one change first.');return}update(t=>t.locked=!t.locked)};
+$('#formA').onsubmit=e=>{e.preventDefault();addRun('A',e.currentTarget)};$('#formB').onsubmit=e=>{e.preventDefault();addRun('B',e.currentTarget)};
+$('#newBtn').onclick=()=>{const t=fresh();store.tests.unshift(t);store.active=t.id;save();render();toast('New test created.')};
+$('#decisionBtn').onclick=()=>{const t=current(),disp=$('#disposition').value,reason=$('#decisionReason').value.trim();if(!disp||!reason){toast('Choose a disposition and record the reason.');return}update(t=>t.decision={disposition:disp,reason,recorded:true});toast('Decision recorded.')};
+$('#disposition').onchange=e=>update(t=>{t.decision.disposition=e.target.value;t.decision.recorded=false});$('#decisionReason').oninput=e=>update(t=>{t.decision.reason=e.target.value;t.decision.recorded=false});
+$('#exportBtn').onclick=()=>download('frame-lab-backup.json','application/json',JSON.stringify(store,null,2));
+$('#importBtn').onclick=()=>$('#importFile').click();$('#importFile').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{const data=JSON.parse(await f.text());if(!data||!Array.isArray(data.tests)||!data.tests.length)throw Error();if(confirm('Replace the current Frame Lab library with this backup?')){store=data;save();render();toast('Backup imported.')}}catch(err){toast('That file is not a valid Frame Lab backup.')}e.target.value=''};
+$('#csvBtn').onclick=()=>download(slug(current().context.title)+'.csv','text/csv',csv());$('#printBtn').onclick=()=>window.print();
+render();
+})();
+</script>
+</body>
+</html>

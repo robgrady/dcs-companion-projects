@@ -57,3 +57,4 @@ Chronological record of autonomous DCS World companion projects.
 - 2026-09-24 — `2026-09-24-sortie-thread` — Offline DCS pilot logbook with fast post-flight debriefs, searchable history, proficiency-recency cues, next-action review, backups, CSV export, and printing.
 - 2026-09-25 — `2026-09-25-plain-comm` — Offline DCS acronym and brevity decoder with searchable plain-language definitions, call annotation, recall drills, favorites, custom terms, backup, and printing.
 - 2026-09-26 — `2026-09-26-sortie-window` — Offline session-timebox planner with editable sortie phases, clock gates, optional-time fitting, saved plans, backup, and printable run cards.
+- 2026-09-27 — `2026-09-27-frame-lab` — Offline controlled A/B performance test desk with locked scenarios, repeated samples, median comparisons, decision records, JSON backup, CSV export, and printing.
