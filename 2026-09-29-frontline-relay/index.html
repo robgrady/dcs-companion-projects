@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="dark">
+<title>Frontline Relay — DCS Campaign Turnboard</title>
+<style>
+:root{
+  --bg:#11130f;--panel:#1a1d17;--panel2:#20241c;--ink:#f0eedf;--muted:#aaa995;
+  --line:#3a3e32;--accent:#e7b34c;--accent2:#9fbc80;--blue:#6fa4bd;--red:#c67262;
+  --danger:#e18a78;--ok:#a9c98a;--radius:6px;--shadow:0 10px 30px rgba(0,0,0,.24);
+  --font:"Trebuchet MS","Segoe UI",sans-serif;--mono:"SFMono-Regular",Consolas,monospace;
+}
+*{box-sizing:border-box}html{background:var(--bg);color:var(--ink);font-family:var(--font);line-height:1.45}
+body{margin:0;min-height:100vh;background:linear-gradient(90deg,rgba(255,255,255,.015) 1px,transparent 1px),linear-gradient(rgba(255,255,255,.015) 1px,transparent 1px),var(--bg);background-size:32px 32px}
+button,input,select,textarea{font:inherit}button,input,select,textarea{border-radius:var(--radius)}
+button{min-height:44px;border:1px solid var(--line);background:#262a21;color:var(--ink);padding:.65rem .9rem;font-weight:700;cursor:pointer}
+button:hover{border-color:#777861;background:#2d3127}button:active{transform:translateY(1px)}
+button.primary{background:var(--accent);border-color:var(--accent);color:#17130a}button.primary:hover{background:#f0c262}
+button.danger{color:#ffd8d0;border-color:#73453b}button.ghost{background:transparent}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid #fff;outline-offset:2px}
+input,select,textarea{width:100%;background:#12140f;border:1px solid var(--line);color:var(--ink);padding:.68rem .72rem;min-height:44px}
+textarea{min-height:88px;resize:vertical}label{display:grid;gap:.35rem;color:var(--muted);font-size:.78rem;font-weight:800;letter-spacing:.07em;text-transform:uppercase}
+.app{max-width:1500px;margin:auto;padding:18px}
+header{display:flex;align-items:flex-start;justify-content:space-between;gap:20px;border-bottom:1px solid var(--line);padding:6px 0 16px;margin-bottom:16px}
+.brand{display:flex;gap:14px;align-items:center}.mark{width:46px;height:46px;border:2px solid var(--accent);display:grid;place-items:center;font:900 18px var(--mono);color:var(--accent);transform:rotate(-2deg)}
+h1{font-size:clamp(1.35rem,2.8vw,2.15rem);line-height:1;margin:.05rem 0 .35rem;letter-spacing:.015em}.subtitle{color:var(--muted);margin:0;font-size:.9rem}
+.header-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.statusbar{display:grid;grid-template-columns:1.4fr repeat(4,minmax(110px,.55fr));border:1px solid var(--line);background:var(--panel);box-shadow:var(--shadow);margin-bottom:16px}
+.statusbar>div{padding:12px 14px;border-right:1px solid var(--line)}.statusbar>div:last-child{border:0}.eyebrow{display:block;color:var(--muted);font:700 .68rem var(--mono);letter-spacing:.09em;text-transform:uppercase}.metric{font:800 1.05rem var(--mono);margin-top:4px;display:block}.metric.accent{color:var(--accent)}
+.layout{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(340px,.72fr);gap:16px}.stack{display:grid;gap:16px;align-content:start}
+.panel{background:var(--panel);border:1px solid var(--line);box-shadow:var(--shadow)}.panel-head{padding:13px 15px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:12px}.panel-head h2{font-size:.9rem;letter-spacing:.09em;text-transform:uppercase;margin:0}.panel-body{padding:15px}
+.theater-fields{display:grid;grid-template-columns:2fr 1fr 1fr;gap:10px}.sector-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.sector{background:var(--panel2);border:1px solid var(--line);padding:13px;position:relative}.sector[data-control="blue"]{border-top:3px solid var(--blue)}.sector[data-control="red"]{border-top:3px solid var(--red)}.sector[data-control="contested"]{border-top:3px solid var(--accent)}
+.sector-top{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px}.sector-name{font-weight:900;font-size:1.05rem}.control{font:800 .7rem var(--mono);text-transform:uppercase;letter-spacing:.08em;padding:.28rem .42rem;border:1px solid var(--line)}
+.sector[data-control="blue"] .control{color:#acd6e7}.sector[data-control="red"] .control{color:#f1a595}.sector[data-control="contested"] .control{color:#ffd378}
+.bars{display:grid;gap:9px}.bar-row{display:grid;grid-template-columns:76px 1fr 34px;gap:8px;align-items:center;font-size:.75rem;color:var(--muted)}.track{height:8px;background:#0d0f0b;border:1px solid #303329}.fill{height:100%;background:var(--accent2)}.pressure .fill{background:var(--red)}.bar-value{font:700 .72rem var(--mono);text-align:right;color:var(--ink)}
+.sector-actions{display:flex;gap:7px;margin-top:12px}.sector-actions button{flex:1;min-height:38px;padding:.45rem;font-size:.75rem}
+.generator{display:grid;gap:12px}.generator-fields{display:grid;grid-template-columns:1fr 1fr;gap:10px}.mission-card{border:1px solid #786439;background:#171810;padding:15px;display:grid;gap:12px}.mission-code{color:var(--accent);font:800 .75rem var(--mono);letter-spacing:.1em}.mission-title{font-size:1.35rem;margin:0;line-height:1.08}.mission-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.brief-block{border-top:1px solid var(--line);padding-top:9px}.brief-block b{display:block;color:var(--muted);font:800 .68rem var(--mono);letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px}.brief-block p{margin:0;font-size:.91rem}.mission-actions{display:flex;gap:8px;flex-wrap:wrap}.mission-actions>*{flex:1}
+.result-form{display:grid;grid-template-columns:1fr 1fr;gap:10px}.result-form .wide{grid-column:1/-1}.result-buttons{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.result-buttons button[data-result="success"]{border-color:#587044}.result-buttons button[data-result="partial"]{border-color:#806a3b}.result-buttons button[data-result="failure"]{border-color:#7e493f}
+.log{display:grid;gap:8px;max-height:430px;overflow:auto}.log-entry{display:grid;grid-template-columns:48px 1fr auto;gap:10px;padding:10px 0;border-bottom:1px solid var(--line);align-items:start}.turn{font:800 .7rem var(--mono);color:var(--accent)}.log-entry p{margin:0;font-size:.83rem}.log-entry time{color:var(--muted);font:700 .68rem var(--mono)}
+.empty{border:1px dashed #555849;color:var(--muted);padding:18px;text-align:center;font-size:.86rem}.help{color:var(--muted);font-size:.79rem;margin:.5rem 0 0}.kbd{font:700 .68rem var(--mono);border:1px solid var(--line);padding:.15rem .35rem;background:#10120e}
+.summary{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.summary div{background:#141611;border:1px solid var(--line);padding:10px}.summary strong{display:block;font:900 1.15rem var(--mono)}.summary span{color:var(--muted);font-size:.7rem;text-transform:uppercase;letter-spacing:.06em}
+.toast{position:fixed;right:18px;bottom:18px;background:#f0eedf;color:#161710;padding:11px 15px;border-radius:4px;font-weight:800;box-shadow:var(--shadow);opacity:0;transform:translateY(10px);pointer-events:none;transition:.18s}.toast.show{opacity:1;transform:none}
+.dialog-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.72);display:none;place-items:center;padding:18px;z-index:5}.dialog-backdrop.open{display:grid}.dialog{width:min(560px,100%);background:var(--panel);border:1px solid #777861;box-shadow:0 24px 80px #000;padding:18px}.dialog h2{margin-top:0}.dialog-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:14px}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+@media(max-width:980px){.layout{grid-template-columns:1fr}.statusbar{grid-template-columns:repeat(2,1fr)}.statusbar>div{border-bottom:1px solid var(--line)}.statusbar>div:first-child{grid-column:1/-1}.sector-grid{grid-template-columns:1fr}}
+@media(max-width:620px){.app{padding:10px}header{display:grid}.header-actions{justify-content:stretch}.header-actions button{flex:1}.theater-fields,.generator-fields,.mission-grid,.result-form{grid-template-columns:1fr}.result-form .wide{grid-column:auto}.statusbar{grid-template-columns:1fr 1fr}.statusbar>div:first-child{grid-column:1/-1}.summary{grid-template-columns:1fr}.result-buttons{grid-template-columns:1fr}.panel-body{padding:12px}}
+@media print{body{background:#fff;color:#111}.app{max-width:none;padding:0}.header-actions,.generator-fields,.mission-actions,.result-form,.sector-actions,.dialog-backdrop,.toast{display:none!important}.panel,.statusbar{box-shadow:none;background:#fff;border-color:#777}.layout{grid-template-columns:1fr}.panel{break-inside:avoid}.log{max-height:none}.sector{background:#fff}.subtitle,.eyebrow,.help,.bar-row,.log-entry time{color:#444}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="app">
+<header>
+  <div class="brand"><div class="mark" aria-hidden="true">FR</div><div><h1>Frontline Relay</h1><p class="subtitle">A manual campaign turnboard for sorties that should change tomorrow's war.</p></div></div>
+  <div class="header-actions"><button type="button" id="exportBtn">Export campaign</button><button type="button" id="importBtn">Import</button><button type="button" id="printBtn">Print brief</button><button type="button" id="resetBtn" class="danger">Reset</button></div>
+</header>
+<section class="statusbar" aria-label="Campaign status">
+  <div><span class="eyebrow">Campaign</span><span class="metric accent" id="campaignLabel">Operation Relay</span></div>
+  <div><span class="eyebrow">Turn</span><span class="metric" id="turnMetric">01</span></div>
+  <div><span class="eyebrow">Blue sectors</span><span class="metric" id="blueMetric">2 / 4</span></div>
+  <div><span class="eyebrow">Momentum</span><span class="metric" id="momentumMetric">Even</span></div>
+  <div><span class="eyebrow">Sorties logged</span><span class="metric" id="sortieMetric">0</span></div>
+</section>
+<div class="layout">
+  <main class="stack">
+    <section class="panel" aria-labelledby="theaterTitle">
+      <div class="panel-head"><h2 id="theaterTitle">Theater state</h2><button type="button" id="advanceBtn" class="primary">Advance turn</button></div>
+      <div class="panel-body stack">
+        <div class="theater-fields">
+          <label>Campaign name<input type="text" id="campaignName" maxlength="42" value="Operation Relay"></label>
+          <label>Map<select id="mapName"><option>Caucasus</option><option>Persian Gulf</option><option>Syria</option><option>Sinai</option><option>South Atlantic</option><option>Marianas</option><option>Afghanistan</option><option>Kola</option><option>Nevada</option><option>Normandy 2</option><option>Custom theater</option></select></label>
+          <label>Era<select id="era"><option>Modern</option><option>Cold War</option><option>World War II</option><option>Mixed / fictional</option></select></label>
+        </div>
+        <div class="sector-grid" id="sectorGrid" aria-live="polite"></div>
+        <p class="help">Sector values are an abstract campaign layer, not DCS telemetry. Edit them to match your mission result or server narrative.</p>
+      </div>
+    </section>
+    <section class="panel" aria-labelledby="missionTitle">
+      <div class="panel-head"><h2 id="missionTitle">Next sortie contract</h2><span class="eyebrow">Generated from current pressure</span></div>
+      <div class="panel-body generator">
+        <div class="generator-fields">
+          <label>Preferred role<select id="role"><option value="adaptive">Adaptive — highest need</option><option>CAP</option><option>Escort</option><option>SEAD</option><option>Strike</option><option>CAS</option><option>Interdiction</option><option>Recon</option><option>Logistics</option></select></label>
+          <label>Risk posture<select id="risk"><option value="balanced">Balanced</option><option value="cautious">Force preservation</option><option value="aggressive">High payoff</option></select></label>
+        </div>
+        <button type="button" id="generateBtn" class="primary">Generate next contract</button>
+        <div id="missionCard" class="mission-card" aria-live="polite"></div>
+      </div>
+    </section>
+  </main>
+  <aside class="stack">
+    <section class="panel" aria-labelledby="resolutionTitle">
+      <div class="panel-head"><h2 id="resolutionTitle">Resolve current sortie</h2><span class="eyebrow">Post-flight</span></div>
+      <div class="panel-body">
+        <div id="resultForm" class="result-form">
+          <label>Player losses<input id="losses" type="number" min="0" max="20" value="0"></label>
+          <label>Resource cost<select id="cost"><option value="light">Light</option><option value="standard" selected>Standard</option><option value="heavy">Heavy</option></select></label>
+          <label class="wide">Debrief note<textarea id="debrief" maxlength="280" placeholder="What changed, and what should the next flight know?"></textarea></label>
+          <div class="wide result-buttons"><button type="button" data-result="success">Mission success</button><button type="button" data-result="partial">Partial result</button><button type="button" data-result="failure">Mission failure</button></div>
+        </div>
+        <p class="help">Result changes the assigned sector's supply and pressure. Losses increase the penalty; heavy resource use reduces friendly supply.</p>
+      </div>
+    </section>
+    <section class="panel" aria-labelledby="summaryTitle">
+      <div class="panel-head"><h2 id="summaryTitle">Campaign balance</h2></div>
+      <div class="panel-body"><div class="summary"><div><strong id="supplySummary">0</strong><span>Blue supply</span></div><div><strong id="pressureSummary">0</strong><span>Enemy pressure</span></div><div><strong id="contestedSummary">0</strong><span>Contested</span></div></div></div>
+    </section>
+    <section class="panel" aria-labelledby="logTitle">
+      <div class="panel-head"><h2 id="logTitle">Turn log</h2><button type="button" id="clearLogBtn" class="ghost">Clear log</button></div>
+      <div class="panel-body"><div id="campaignLog" class="log"></div></div>
+    </section>
+  </aside>
+</div>
+</div>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+<div id="sectorDialog" class="dialog-backdrop" role="dialog" aria-modal="true" aria-labelledby="sectorDialogTitle">
+  <div class="dialog"><h2 id="sectorDialogTitle">Edit sector</h2><div class="stack">
+    <label>Sector name<input type="text" id="editName" maxlength="28"></label>
+    <label>Control<select id="editControl"><option value="blue">Blue</option><option value="contested">Contested</option><option value="red">Red</option></select></label>
+    <label>Friendly supply — <span id="editSupplyOut">50</span><input id="editSupply" type="range" min="0" max="100"></label>
+    <label>Enemy pressure — <span id="editPressureOut">50</span><input id="editPressure" type="range" min="0" max="100"></label>
+  </div><div class="dialog-actions"><button type="button" id="cancelSector">Cancel</button><button type="button" id="saveSector" class="primary">Save sector</button></div></div>
+</div>
+<input id="fileInput" class="sr-only" type="file" accept="application/json,.json">
+<script>
+(()=>{
+'use strict';
+const KEY='frontline-relay-v1';
+const defaults={campaignName:'Operation Relay',mapName:'Caucasus',era:'Modern',turn:1,sorties:0,sectors:[
+ {name:'Coastal Gate',control:'blue',supply:68,pressure:34},{name:'River Junction',control:'contested',supply:46,pressure:58},
+ {name:'Northern Ridge',control:'red',supply:28,pressure:76},{name:'Southern Corridor',control:'blue',supply:61,pressure:47}],
+ mission:null,log:[]};
+let state=load();let editIndex=-1;
+const $=s=>document.querySelector(s);const clamp=n=>Math.max(0,Math.min(100,Math.round(n)));
+function load(){try{const p=JSON.parse(localStorage.getItem(KEY));return valid(p)?p:structuredClone(defaults)}catch{return structuredClone(defaults)}}
+function valid(v){return v&&typeof v==='object'&&Array.isArray(v.sectors)&&v.sectors.length===4&&v.sectors.every(s=>typeof s.name==='string'&&['blue','red','contested'].includes(s.control)&&Number.isFinite(+s.supply)&&Number.isFinite(+s.pressure))}
+function save(){localStorage.setItem(KEY,JSON.stringify(state))}
+function escapeHTML(v){return String(v).replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]))}
+function momentum(){const delta=state.sectors.reduce((a,s)=>a+(s.supply-s.pressure),0);return delta>45?'Blue initiative':delta<-45?'Red initiative':'Contested'}
+function render(){
+ $('#campaignName').value=state.campaignName;$('#mapName').value=state.mapName;$('#era').value=state.era;
+ $('#campaignLabel').textContent=state.campaignName;$('#turnMetric').textContent=String(state.turn).padStart(2,'0');
+ const blue=state.sectors.filter(s=>s.control==='blue').length;$('#blueMetric').textContent=`${blue} / 4`;$('#momentumMetric').textContent=momentum();$('#sortieMetric').textContent=state.sorties;
+ $('#sectorGrid').innerHTML=state.sectors.map((s,i)=>`<article class="sector" data-control="${s.control}"><div class="sector-top"><span class="sector-name">${escapeHTML(s.name)}</span><span class="control">${s.control}</span></div><div class="bars"><div class="bar-row"><span>Supply</span><span class="track"><span class="fill" style="display:block;width:${s.supply}%"></span></span><span class="bar-value">${s.supply}</span></div><div class="bar-row pressure"><span>Pressure</span><span class="track"><span class="fill" style="display:block;width:${s.pressure}%"></span></span><span class="bar-value">${s.pressure}</span></div></div><div class="sector-actions"><button data-edit="${i}">Edit state</button><button data-focus="${i}">Target sector</button></div></article>`).join('');
+ renderMission();renderLog();
+ const supply=Math.round(state.sectors.reduce((a,s)=>a+s.supply,0)/4),pressure=Math.round(state.sectors.reduce((a,s)=>a+s.pressure,0)/4),contested=state.sectors.filter(s=>s.control==='contested').length;
+ $('#supplySummary').textContent=supply;$('#pressureSummary').textContent=pressure;$('#contestedSummary').textContent=contested;
+ save();
+}
+function generateMission(forcedIndex){
+ const role=$('#role').value,risk=$('#risk').value;
+ let idx=Number.isInteger(forcedIndex)?forcedIndex:state.sectors.map((s,i)=>({i,score:s.pressure-s.supply+(s.control==='red'?20:s.control==='contested'?10:0)})).sort((a,b)=>b.score-a.score)[0].i;
+ const sector=state.sectors[idx];let chosen=role;
+ if(role==='adaptive'){if(sector.supply<35)chosen='Logistics';else if(sector.pressure>72)chosen='SEAD';else if(sector.control==='red')chosen='Strike';else if(sector.control==='contested')chosen='CAS';else chosen='CAP'}
+ const profiles={
+ CAP:['Establish local air cover',`Deny hostile air access over ${sector.name} while the ground picture stabilizes.`,'Remain on station through the vulnerability window; no hostile strike aircraft reach the sector.'],
+ Escort:['Protect the support package',`Escort the campaign support flight through ${sector.name}; preserve the package over personal tally chasing.`,'Support package reaches its task area and exits with at least half strength.'],
+ SEAD:['Open a corridor',`Suppress the highest-risk air-defense axis affecting ${sector.name}; prioritize access over destruction.`,'Create one usable ingress and egress window and record surviving threats.'],
+ Strike:['Break the pressure node',`Attack a user-selected logistics, command, or infrastructure node feeding pressure into ${sector.name}.`,'Primary aimpoint is serviced and battle damage is recorded without unacceptable losses.'],
+ CAS:['Hold the sector line',`Support friendly ground forces in ${sector.name}; positively identify the engagement area before release.`,'Reduce immediate ground pressure and depart with a clear handoff for the next sortie.'],
+ Interdiction:['Cut the reinforcement route',`Interdict one route supplying hostile activity in ${sector.name}; avoid drifting into unrelated targets.`,'Delay or destroy the selected reinforcement element and report route status.'],
+ Recon:['Resolve the unknowns',`Collect visual or sensor evidence on force disposition in ${sector.name}; survival and reporting outrank weapons employment.`,'Return with three useful observations: threat, route, and target-state.'],
+ Logistics:['Restore combat endurance',`Move fuel, ammunition, or a user-defined support package into ${sector.name}.`,'Package arrives and the destination remains usable at mission end.']};
+ const p=profiles[chosen];const posture={cautious:'Abort if the planned escape route or support layer is lost.',balanced:'Continue while the primary success condition remains achievable.',aggressive:'Accept elevated exposure only for a decisive effect on the assigned objective.'}[risk];
+ state.mission={id:`T${String(state.turn).padStart(2,'0')}-${chosen.slice(0,3).toUpperCase()}-${idx+1}`,sectorIndex:idx,role:chosen,risk,title:p[0],objective:p[1],success:p[2],abort:posture};render();toast(`Contract assigned to ${sector.name}`)
+}
+function renderMission(){const m=state.mission;if(!m){$('#missionCard').innerHTML='<div class="empty">No active contract. Generate one from the current theater state.</div>';return}const s=state.sectors[m.sectorIndex];$('#missionCard').innerHTML=`<span class="mission-code">${escapeHTML(m.id)} · ${escapeHTML(state.mapName)} · ${escapeHTML(m.role)}</span><h3 class="mission-title">${escapeHTML(m.title)}</h3><div class="mission-grid"><div class="brief-block"><b>Assigned sector</b><p>${escapeHTML(s.name)} — ${s.control}, supply ${s.supply}, pressure ${s.pressure}</p></div><div class="brief-block"><b>Risk contract</b><p>${escapeHTML(m.risk)}</p></div><div class="brief-block"><b>Objective</b><p>${escapeHTML(m.objective)}</p></div><div class="brief-block"><b>Success condition</b><p>${escapeHTML(m.success)}</p></div></div><div class="brief-block"><b>Abort / continue rule</b><p>${escapeHTML(m.abort)}</p></div><div class="mission-actions"><button id="copyBrief">Copy kneeboard text</button><button id="reroll">Regenerate same sector</button></div>`;
+ $('#copyBrief').onclick=copyBrief;$('#reroll').onclick=()=>generateMission(m.sectorIndex)}
+function copyBrief(){if(!state.mission)return;const m=state.mission,s=state.sectors[m.sectorIndex];const text=`${state.campaignName} | TURN ${state.turn} | ${m.id}\nROLE: ${m.role}\nSECTOR: ${s.name} (${s.control}; SUP ${s.supply}; PRESS ${s.pressure})\nOBJECTIVE: ${m.objective}\nSUCCESS: ${m.success}\nRULE: ${m.abort}`;navigator.clipboard?.writeText(text).then(()=>toast('Brief copied')).catch(()=>fallbackCopy(text))}
+function fallbackCopy(text){const t=document.createElement('textarea');t.value=text;document.body.append(t);t.select();document.execCommand('copy');t.remove();toast('Brief copied')}
+function resolve(result){if(!state.mission){toast('Generate a contract first');return}const m=state.mission,s=state.sectors[m.sectorIndex],losses=Math.max(0,Math.min(20,+$('#losses').value||0)),cost=$('#cost').value,note=$('#debrief').value.trim();const costPenalty={light:3,standard:7,heavy:12}[cost];let supplyDelta=-costPenalty-losses*4,pressureDelta=0;
+ if(result==='success'){supplyDelta+=8;pressureDelta=-18}else if(result==='partial'){supplyDelta+=3;pressureDelta=-7}else{pressureDelta=13; supplyDelta-=5}
+ s.supply=clamp(s.supply+supplyDelta);s.pressure=clamp(s.pressure+pressureDelta);updateControl(s);state.sorties++;
+ state.log.unshift({turn:state.turn,time:new Date().toLocaleString(),text:`${m.id} ${result.toUpperCase()} in ${s.name}: supply ${supplyDelta>=0?'+':''}${supplyDelta}, pressure ${pressureDelta>=0?'+':''}${pressureDelta}.${note?' '+note:''}`});state.mission=null;$('#debrief').value='';$('#losses').value='0';render();toast(`Sortie logged: ${result}`)}
+function updateControl(s){const balance=s.supply-s.pressure;if(balance>=22)s.control='blue';else if(balance<=-22)s.control='red';else s.control='contested'}
+function advanceTurn(){state.turn++;state.sectors.forEach(s=>{const resupply=s.control==='blue'?8:s.control==='contested'?3:0;const enemy=s.control==='red'?8:s.control==='contested'?4:1;s.supply=clamp(s.supply+resupply-2);s.pressure=clamp(s.pressure+enemy-3);updateControl(s)});state.log.unshift({turn:state.turn,time:new Date().toLocaleString(),text:'Turn advanced. Abstract resupply and pressure applied according to sector control.'});state.mission=null;render();toast(`Turn ${state.turn} opened`)}
+function renderLog(){const el=$('#campaignLog');el.innerHTML=state.log.length?state.log.map(e=>`<div class="log-entry"><span class="turn">T${String(e.turn).padStart(2,'0')}</span><p>${escapeHTML(e.text)}</p><time>${escapeHTML(e.time)}</time></div>`).join(''):'<div class="empty">No sorties resolved yet. The campaign log will become your continuity record.</div>'}
+function openSector(i){editIndex=i;const s=state.sectors[i];$('#editName').value=s.name;$('#editControl').value=s.control;$('#editSupply').value=s.supply;$('#editPressure').value=s.pressure;rangeOut();$('#sectorDialog').classList.add('open');$('#editName').focus()}
+function rangeOut(){$('#editSupplyOut').textContent=$('#editSupply').value;$('#editPressureOut').textContent=$('#editPressure').value}
+function closeSector(){$('#sectorDialog').classList.remove('open');editIndex=-1}
+function exportCampaign(){const blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`frontline-relay-${state.campaignName.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')||'campaign'}.json`;a.click();URL.revokeObjectURL(a.href);toast('Campaign exported')}
+function importCampaign(file){const r=new FileReader();r.onload=()=>{try{const data=JSON.parse(r.result);if(!valid(data))throw Error();state={...structuredClone(defaults),...data};render();toast('Campaign imported')}catch{toast('Import rejected: invalid campaign file')}};r.readAsText(file)}
+function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('show');clearTimeout(toast.timer);toast.timer=setTimeout(()=>t.classList.remove('show'),2200)}
+$('#campaignName').addEventListener('input',e=>{state.campaignName=e.target.value||'Untitled campaign';$('#campaignLabel').textContent=state.campaignName;save()});
+$('#mapName').addEventListener('change',e=>{state.mapName=e.target.value;save();renderMission()});$('#era').addEventListener('change',e=>{state.era=e.target.value;save()});
+$('#sectorGrid').addEventListener('click',e=>{const edit=e.target.closest('[data-edit]'),focus=e.target.closest('[data-focus]');if(edit)openSector(+edit.dataset.edit);if(focus)generateMission(+focus.dataset.focus)});
+$('#editSupply').oninput=rangeOut;$('#editPressure').oninput=rangeOut;$('#cancelSector').onclick=closeSector;$('#sectorDialog').addEventListener('click',e=>{if(e.target.id==='sectorDialog')closeSector()});
+$('#saveSector').onclick=()=>{const s=state.sectors[editIndex];s.name=$('#editName').value.trim()||`Sector ${editIndex+1}`;s.control=$('#editControl').value;s.supply=+$('#editSupply').value;s.pressure=+$('#editPressure').value;closeSector();render();toast('Sector updated')};
+$('#generateBtn').onclick=()=>generateMission();$('#advanceBtn').onclick=advanceTurn;document.querySelectorAll('[data-result]').forEach(b=>b.onclick=()=>resolve(b.dataset.result));
+$('#exportBtn').onclick=exportCampaign;$('#importBtn').onclick=()=>$('#fileInput').click();$('#fileInput').onchange=e=>{if(e.target.files[0])importCampaign(e.target.files[0]);e.target.value=''};$('#printBtn').onclick=()=>window.print();
+$('#clearLogBtn').onclick=()=>{if(confirm('Clear only the campaign log? Theater state will remain.')){state.log=[];render();toast('Log cleared')}};
+$('#resetBtn').onclick=()=>{if(confirm('Reset the entire campaign to its starting state?')){state=structuredClone(defaults);render();toast('Campaign reset')}};
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeSector();if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='g'){e.preventDefault();generateMission()}});
+render();
+})();
+</script>
+</body>
+</html>
