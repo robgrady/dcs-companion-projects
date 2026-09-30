@@ -1,0 +1,718 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>MIZ Scout — DCS Mission Preflight</title>
+  <style>
+    :root {
+      --bg: #111513;
+      --panel: #171d1a;
+      --panel-2: #1c2420;
+      --ink: #edf1e9;
+      --muted: #9aa69e;
+      --line: #344039;
+      --line-strong: #506158;
+      --accent: #e9b44c;
+      --accent-ink: #251b08;
+      --good: #77c79b;
+      --warn: #efc66d;
+      --bad: #ef8f81;
+      --info: #8bb7d7;
+      --radius: 10px;
+      --shadow: 0 18px 50px rgba(0,0,0,.28);
+      --mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+      --sans: "Avenir Next", Avenir, "Helvetica Neue", Arial, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    html { background: var(--bg); }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: var(--sans);
+      line-height: 1.45;
+    }
+    button, input, textarea, select { font: inherit; }
+    button, [role="button"], input, textarea, select { min-height: 44px; }
+    button {
+      border: 1px solid var(--line-strong);
+      border-radius: 7px;
+      background: #202823;
+      color: var(--ink);
+      padding: .65rem .9rem;
+      cursor: pointer;
+      font-weight: 650;
+    }
+    button:hover { border-color: var(--accent); background: #273129; }
+    button:active { transform: translateY(1px); }
+    button.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+    button.primary:hover { background: #f1c66d; }
+    button.ghost { background: transparent; }
+    button.danger:hover { border-color: var(--bad); color: #ffd5cf; }
+    :focus-visible { outline: 3px solid #f0c86d; outline-offset: 3px; }
+    code, .mono { font-family: var(--mono); }
+    .appbar {
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 0 1.25rem;
+      border-bottom: 1px solid var(--line);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: rgba(17,21,19,.96);
+    }
+    .brand { display: flex; align-items: baseline; gap: .75rem; min-width: 0; }
+    .brand strong { font-size: 1.03rem; letter-spacing: .09em; }
+    .brand span { color: var(--muted); font-size: .78rem; letter-spacing: .04em; }
+    .app-actions { display: flex; gap: .5rem; }
+    .workspace {
+      display: grid;
+      grid-template-columns: minmax(250px, 310px) minmax(420px, 1fr) minmax(270px, 340px);
+      min-height: calc(100vh - 64px);
+    }
+    .rail, .inspector { background: var(--panel); }
+    .rail { border-right: 1px solid var(--line); }
+    .inspector { border-left: 1px solid var(--line); }
+    .column { padding: 1.15rem; min-width: 0; }
+    .section + .section { margin-top: 1.35rem; padding-top: 1.25rem; border-top: 1px solid var(--line); }
+    .eyebrow { margin: 0 0 .35rem; color: var(--accent); font: 700 .72rem/1.2 var(--mono); letter-spacing: .13em; text-transform: uppercase; }
+    h1, h2, h3, p { margin-top: 0; }
+    h1 { margin-bottom: .45rem; font-size: clamp(1.35rem, 2vw, 1.8rem); line-height: 1.1; letter-spacing: -.02em; }
+    h2 { margin-bottom: .8rem; font-size: .92rem; text-transform: uppercase; letter-spacing: .1em; }
+    h3 { margin-bottom: .45rem; font-size: .92rem; }
+    .lede, .hint { color: var(--muted); font-size: .88rem; }
+    .dropzone {
+      border: 1px dashed var(--line-strong);
+      border-radius: var(--radius);
+      padding: 1.1rem;
+      min-height: 154px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: center;
+      gap: .65rem;
+      background: #141916;
+      transition: border-color .15s ease, background .15s ease;
+    }
+    .dropzone.drag { border-color: var(--accent); background: #211e14; }
+    .dropzone strong { font-size: .98rem; }
+    #fileInput { position: absolute; inline-size: 1px; block-size: 1px; opacity: 0; pointer-events: none; }
+    .file-chip {
+      width: 100%;
+      display: none;
+      margin-top: .85rem;
+      padding: .7rem .75rem;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: var(--panel-2);
+      overflow-wrap: anywhere;
+    }
+    .file-chip.active { display: block; }
+    .file-chip b { display: block; font-size: .82rem; }
+    .file-chip span { color: var(--muted); font: .75rem var(--mono); }
+    .pastebox { width: 100%; min-height: 92px; resize: vertical; border: 1px solid var(--line); border-radius: 7px; padding: .75rem; background: #101512; color: var(--ink); font-family: var(--mono); font-size: .76rem; }
+    .button-row { display: flex; flex-wrap: wrap; gap: .55rem; }
+    .center { background: #131815; }
+    .center-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; margin-bottom: 1rem; }
+    .statusline { color: var(--muted); font: .76rem var(--mono); text-align: right; }
+    .empty {
+      min-height: 58vh;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background-color: #151a17;
+      background-image: linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
+      background-size: 26px 26px;
+      text-align: center;
+      padding: 2rem;
+    }
+    .empty-mark { font: 700 3.1rem/1 var(--mono); color: var(--line-strong); letter-spacing: -.13em; }
+    .empty p { max-width: 38ch; color: var(--muted); margin: .8rem auto 0; }
+    .results[hidden], .empty[hidden] { display: none; }
+    .summary-strip { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; margin-bottom: 1rem; }
+    .metric { padding: .85rem; background: var(--panel); min-width: 0; }
+    .metric + .metric { border-left: 1px solid var(--line); }
+    .metric span { display: block; color: var(--muted); font: .66rem var(--mono); text-transform: uppercase; letter-spacing: .08em; }
+    .metric strong { display: block; margin-top: .25rem; font-size: .95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .finding-list { border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+    .finding { display: grid; grid-template-columns: 82px 1fr auto; gap: .8rem; align-items: start; padding: .9rem; background: var(--panel); }
+    .finding + .finding { border-top: 1px solid var(--line); }
+    .severity { font: 700 .66rem var(--mono); letter-spacing: .08em; text-transform: uppercase; padding-top: .15rem; }
+    .severity.good { color: var(--good); }
+    .severity.warn { color: var(--warn); }
+    .severity.bad { color: var(--bad); }
+    .severity.info { color: var(--info); }
+    .finding p { margin: .18rem 0 0; color: var(--muted); font-size: .82rem; }
+    .finding code { color: #d6dfd8; font-size: .76rem; overflow-wrap: anywhere; }
+    .tabs { display: flex; gap: .25rem; border-bottom: 1px solid var(--line); margin: 1.25rem 0 .8rem; overflow-x: auto; }
+    .tab { border: 0; border-bottom: 2px solid transparent; border-radius: 0; background: transparent; color: var(--muted); white-space: nowrap; }
+    .tab[aria-selected="true"] { border-bottom-color: var(--accent); color: var(--ink); }
+    .tab-panel[hidden] { display: none; }
+    .data-list { list-style: none; padding: 0; margin: 0; border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+    .data-list li { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; padding: .68rem .8rem; background: var(--panel); font-size: .82rem; }
+    .data-list li + li { border-top: 1px solid var(--line); }
+    .data-list code { color: var(--muted); overflow-wrap: anywhere; text-align: right; }
+    .raw { width: 100%; max-height: 330px; overflow: auto; padding: .85rem; border: 1px solid var(--line); border-radius: var(--radius); background: #0e120f; color: #c9d2cb; white-space: pre-wrap; overflow-wrap: anywhere; font: .72rem/1.55 var(--mono); }
+    .dependency-list { display: grid; gap: .55rem; }
+    .dep {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: .65rem;
+      align-items: start;
+      padding: .72rem;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: var(--panel-2);
+    }
+    .dep input { min-height: 0; margin-top: .2rem; inline-size: 18px; block-size: 18px; accent-color: var(--good); }
+    .dep label { cursor: pointer; font-size: .82rem; overflow-wrap: anywhere; }
+    .dep small { display: block; color: var(--muted); margin-top: .18rem; }
+    .readiness {
+      padding: .85rem;
+      border: 1px solid var(--line-strong);
+      border-radius: var(--radius);
+      background: #121713;
+      margin-bottom: 1rem;
+    }
+    .readiness strong { display: block; font-size: 1.15rem; }
+    .readiness span { color: var(--muted); font-size: .78rem; }
+    .readiness.ready { border-color: #477e5d; }
+    .readiness.hold { border-color: #8a6930; }
+    .brief { width: 100%; min-height: 230px; resize: vertical; border: 1px solid var(--line); border-radius: 7px; padding: .8rem; background: #101512; color: var(--ink); font: .75rem/1.55 var(--mono); }
+    .note { color: var(--muted); font-size: .76rem; }
+    .toast { position: fixed; right: 1rem; bottom: 1rem; max-width: 320px; padding: .75rem .9rem; border-radius: 7px; background: #eff2eb; color: #121612; box-shadow: var(--shadow); font-weight: 700; opacity: 0; transform: translateY(12px); pointer-events: none; transition: .18s ease; z-index: 30; }
+    .toast.show { opacity: 1; transform: translateY(0); }
+    @media (max-width: 1100px) {
+      .workspace { grid-template-columns: 280px 1fr; }
+      .inspector { grid-column: 1 / -1; border-left: 0; border-top: 1px solid var(--line); display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; }
+      .inspector .section + .section { margin-top: 0; padding-top: 0; border-top: 0; }
+    }
+    @media (max-width: 760px) {
+      .appbar { height: auto; min-height: 64px; align-items: flex-start; padding-block: .8rem; }
+      .brand { flex-direction: column; gap: .1rem; }
+      .brand span { display: none; }
+      .workspace { display: block; }
+      .rail, .inspector { border: 0; border-bottom: 1px solid var(--line); }
+      .inspector { display: block; }
+      .inspector .section + .section { margin-top: 1.35rem; padding-top: 1.25rem; border-top: 1px solid var(--line); }
+      .summary-strip { grid-template-columns: 1fr 1fr; }
+      .metric:nth-child(3) { border-left: 0; border-top: 1px solid var(--line); }
+      .metric:nth-child(4) { border-top: 1px solid var(--line); }
+      .finding { grid-template-columns: 64px 1fr; }
+      .finding > :last-child { grid-column: 2; }
+    }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; } }
+    @media print {
+      :root { color-scheme: light; --bg:#fff; --panel:#fff; --panel-2:#fff; --ink:#111; --muted:#444; --line:#bbb; --line-strong:#777; }
+      .appbar, .rail, .tabs, .app-actions, .toast { display: none !important; }
+      .workspace { display: block; }
+      .center, .inspector { background: #fff; border: 0; }
+      .empty { display: none !important; }
+      .raw { max-height: none; }
+    }
+  </style>
+</head>
+<body>
+  <header class="appbar">
+    <div class="brand"><strong>MIZ SCOUT</strong><span>LOCAL DCS MISSION PREFLIGHT</span></div>
+    <div class="app-actions">
+      <button class="ghost" id="printBtn" type="button">Print report</button>
+      <button class="danger" id="resetBtn" type="button">Clear</button>
+    </div>
+  </header>
+
+  <main class="workspace">
+    <aside class="rail column" aria-label="Mission intake">
+      <section class="section">
+        <p class="eyebrow">01 / Intake</p>
+        <h1>Inspect before you launch.</h1>
+        <p class="lede">Read a <code>.miz</code> archive locally, expose its declared dependencies and package contents, then make a go/no-go handoff.</p>
+      </section>
+
+      <section class="section">
+        <div class="dropzone" id="dropzone" tabindex="0" role="button" aria-label="Choose or drop a DCS mission file">
+          <strong>Drop a .miz file here</strong>
+          <span class="hint">The file stays in this browser. Nothing is uploaded.</span>
+          <button class="primary" id="chooseBtn" type="button">Choose mission</button>
+          <input id="fileInput" type="file" accept=".miz,.zip,application/zip">
+        </div>
+        <div class="file-chip" id="fileChip" aria-live="polite"></div>
+      </section>
+
+      <section class="section">
+        <h2>Text fallback</h2>
+        <p class="hint">If your browser cannot decompress the archive, open the <code>mission</code> file inside the .miz and paste its Lua text here.</p>
+        <textarea class="pastebox" id="pasteInput" aria-label="Paste DCS mission Lua text" placeholder="mission = { ... }"></textarea>
+        <div class="button-row" style="margin-top:.55rem">
+          <button id="analyzePasteBtn" type="button">Analyze text</button>
+        </div>
+      </section>
+
+      <section class="section">
+        <h2>Scope</h2>
+        <p class="note">MIZ Scout is read-only. Findings are evidence cues, not a guarantee that DCS will accept or run a mission. It never rewrites the archive.</p>
+      </section>
+    </aside>
+
+    <section class="center column" aria-label="Analysis results">
+      <div class="center-head">
+        <div>
+          <p class="eyebrow">02 / Evidence</p>
+          <h1 id="resultTitle">Mission package</h1>
+        </div>
+        <div class="statusline" id="scanStatus">AWAITING FILE</div>
+      </div>
+
+      <div class="empty" id="emptyState">
+        <div>
+          <div class="empty-mark" aria-hidden="true">[ ]</div>
+          <p>Select a mission to inspect its archive structure, map declaration, player slots, scripts, media, and required-module block.</p>
+        </div>
+      </div>
+
+      <div class="results" id="results" hidden>
+        <div class="summary-strip" aria-label="Mission summary">
+          <div class="metric"><span>Map</span><strong id="metricMap">Unknown</strong></div>
+          <div class="metric"><span>Player slots</span><strong id="metricSlots">0</strong></div>
+          <div class="metric"><span>Dependencies</span><strong id="metricDeps">0</strong></div>
+          <div class="metric"><span>Package</span><strong id="metricSize">Text only</strong></div>
+        </div>
+
+        <div class="finding-list" id="findingList" aria-label="Preflight findings"></div>
+
+        <div class="tabs" role="tablist" aria-label="Mission evidence views">
+          <button class="tab" role="tab" aria-selected="true" aria-controls="tabInventory" id="tabInventoryBtn">Inventory</button>
+          <button class="tab" role="tab" aria-selected="false" aria-controls="tabSlots" id="tabSlotsBtn">Slots</button>
+          <button class="tab" role="tab" aria-selected="false" aria-controls="tabFiles" id="tabFilesBtn">Files</button>
+          <button class="tab" role="tab" aria-selected="false" aria-controls="tabRaw" id="tabRawBtn">Raw evidence</button>
+        </div>
+        <section class="tab-panel" role="tabpanel" id="tabInventory" aria-labelledby="tabInventoryBtn">
+          <ul class="data-list" id="inventoryList"></ul>
+        </section>
+        <section class="tab-panel" role="tabpanel" id="tabSlots" aria-labelledby="tabSlotsBtn" hidden>
+          <ul class="data-list" id="slotList"></ul>
+        </section>
+        <section class="tab-panel" role="tabpanel" id="tabFiles" aria-labelledby="tabFilesBtn" hidden>
+          <ul class="data-list" id="fileList"></ul>
+        </section>
+        <section class="tab-panel" role="tabpanel" id="tabRaw" aria-labelledby="tabRawBtn" hidden>
+          <pre class="raw" id="rawEvidence"></pre>
+        </section>
+      </div>
+    </section>
+
+    <aside class="inspector column" aria-label="Readiness handoff">
+      <section class="section">
+        <p class="eyebrow">03 / Readiness</p>
+        <div class="readiness hold" id="readinessBox" aria-live="polite">
+          <strong id="readinessTitle">No mission loaded</strong>
+          <span id="readinessDetail">Dependency checks will appear here.</span>
+        </div>
+        <h2>Declared needs</h2>
+        <div class="dependency-list" id="dependencyList">
+          <p class="hint">Analyze a mission to build the check-off list.</p>
+        </div>
+      </section>
+
+      <section class="section">
+        <h2>Handoff brief</h2>
+        <textarea class="brief" id="briefOutput" aria-label="Generated mission handoff brief" readonly>No mission analyzed.</textarea>
+        <div class="button-row" style="margin-top:.55rem">
+          <button id="copyBtn" type="button">Copy brief</button>
+          <button id="downloadBtn" type="button">Download .txt</button>
+        </div>
+      </section>
+    </aside>
+  </main>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+  (() => {
+    'use strict';
+    const $ = (id) => document.getElementById(id);
+    const state = { fileName: '', fileSize: 0, entries: [], texts: {}, report: null, checked: {} };
+    const CORE_NAMES = new Set(['mission','options','theatre','warehouses','dictionary','mapResource']);
+
+    function toast(message) {
+      $('toast').textContent = message;
+      $('toast').classList.add('show');
+      clearTimeout(toast.timer);
+      toast.timer = setTimeout(() => $('toast').classList.remove('show'), 2200);
+    }
+
+    function formatBytes(bytes) {
+      if (!Number.isFinite(bytes) || bytes <= 0) return 'Text only';
+      const units = ['B','KB','MB','GB'];
+      let i = 0, value = bytes;
+      while (value >= 1024 && i < units.length - 1) { value /= 1024; i++; }
+      return `${value.toFixed(value >= 10 || i === 0 ? 0 : 1)} ${units[i]}`;
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? '').replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
+    }
+
+    function decodeUtf8(bytes) {
+      try { return new TextDecoder('utf-8', { fatal: false }).decode(bytes); }
+      catch (_) { return Array.from(bytes, b => String.fromCharCode(b)).join(''); }
+    }
+
+    function findEndOfCentralDirectory(view) {
+      const min = Math.max(0, view.byteLength - 65557);
+      for (let i = view.byteLength - 22; i >= min; i--) {
+        if (view.getUint32(i, true) === 0x06054b50) return i;
+      }
+      return -1;
+    }
+
+    async function inflateRaw(bytes) {
+      if (!('DecompressionStream' in window)) throw new Error('This browser does not expose DecompressionStream. Use the text fallback.');
+      const stream = new Blob([bytes]).stream().pipeThrough(new DecompressionStream('deflate-raw'));
+      return new Uint8Array(await new Response(stream).arrayBuffer());
+    }
+
+    async function readZip(arrayBuffer) {
+      const view = new DataView(arrayBuffer);
+      const eocd = findEndOfCentralDirectory(view);
+      if (eocd < 0) throw new Error('No ZIP directory found. The file may be damaged or not a .miz archive.');
+      const count = view.getUint16(eocd + 10, true);
+      const centralOffset = view.getUint32(eocd + 16, true);
+      let cursor = centralOffset;
+      const entries = [];
+      for (let i = 0; i < count; i++) {
+        if (view.getUint32(cursor, true) !== 0x02014b50) throw new Error('Archive directory is malformed.');
+        const method = view.getUint16(cursor + 10, true);
+        const compressedSize = view.getUint32(cursor + 20, true);
+        const uncompressedSize = view.getUint32(cursor + 24, true);
+        const nameLength = view.getUint16(cursor + 28, true);
+        const extraLength = view.getUint16(cursor + 30, true);
+        const commentLength = view.getUint16(cursor + 32, true);
+        const localOffset = view.getUint32(cursor + 42, true);
+        const nameBytes = new Uint8Array(arrayBuffer, cursor + 46, nameLength);
+        const name = decodeUtf8(nameBytes);
+        entries.push({ name, method, compressedSize, uncompressedSize, localOffset, isDirectory: name.endsWith('/') });
+        cursor += 46 + nameLength + extraLength + commentLength;
+      }
+      return entries;
+    }
+
+    async function extractEntry(arrayBuffer, entry) {
+      const view = new DataView(arrayBuffer);
+      const offset = entry.localOffset;
+      if (view.getUint32(offset, true) !== 0x04034b50) throw new Error(`Cannot locate ${entry.name}.`);
+      const nameLength = view.getUint16(offset + 26, true);
+      const extraLength = view.getUint16(offset + 28, true);
+      const dataOffset = offset + 30 + nameLength + extraLength;
+      const compressed = new Uint8Array(arrayBuffer, dataOffset, entry.compressedSize);
+      if (entry.method === 0) return compressed.slice();
+      if (entry.method === 8) return inflateRaw(compressed);
+      throw new Error(`Unsupported compression method ${entry.method} for ${entry.name}.`);
+    }
+
+    function extractTable(text, key) {
+      const keyIndex = text.search(new RegExp(`\\[?['\"]?${key}['\"]?\\]?\\s*=\\s*\\{`, 'i'));
+      if (keyIndex < 0) return '';
+      const start = text.indexOf('{', keyIndex);
+      let depth = 0, quote = '', escaped = false;
+      for (let i = start; i < text.length; i++) {
+        const c = text[i];
+        if (quote) {
+          if (escaped) escaped = false;
+          else if (c === '\\') escaped = true;
+          else if (c === quote) quote = '';
+          continue;
+        }
+        if (c === '"' || c === "'") { quote = c; continue; }
+        if (c === '{') depth++;
+        else if (c === '}' && --depth === 0) return text.slice(start, i + 1);
+      }
+      return text.slice(start);
+    }
+
+    function quotedValues(text) {
+      const values = [];
+      const re = /["']([^"'\r\n]{1,160})["']/g;
+      let match;
+      while ((match = re.exec(text))) values.push(match[1]);
+      return values;
+    }
+
+    function unique(values) {
+      return [...new Set(values.map(v => v.trim()).filter(Boolean))];
+    }
+
+    function parseMission(missionText, theatreText = '', entries = []) {
+      const mapMatch = missionText.match(/\[?["']theatre["']\]?\s*=\s*["']([^"']+)["']/i);
+      const cleanTheatre = theatreText.replace(/[\0\r\n"']/g, '').trim();
+      const map = cleanTheatre || (mapMatch && mapMatch[1]) || 'Unknown';
+
+      const requiredBlock = extractTable(missionText, 'requiredModules');
+      let dependencies = [];
+      if (requiredBlock) {
+        const pairs = [...requiredBlock.matchAll(/\[\s*["']([^"']+)["']\s*\]\s*=\s*["']([^"']+)["']/g)];
+        dependencies = unique(pairs.length ? pairs.map(m => m[2]) : quotedValues(requiredBlock));
+      }
+
+      const slots = [];
+      const skillRe = /\[?["']skill["']\]?\s*=\s*["'](Client|Player)["']/gi;
+      let skill;
+      while ((skill = skillRe.exec(missionText))) {
+        const before = missionText.slice(Math.max(0, skill.index - 2600), skill.index);
+        const typeMatches = [...before.matchAll(/\[?["']type["']\]?\s*=\s*["']([^"']+)["']/gi)];
+        const nameMatches = [...before.matchAll(/\[?["'](?:name|unitName)["']\]?\s*=\s*["']([^"']+)["']/gi)];
+        const type = typeMatches.length ? typeMatches[typeMatches.length - 1][1] : 'Unknown aircraft';
+        const name = nameMatches.length ? nameMatches[nameMatches.length - 1][1] : `${skill[1]} slot`;
+        slots.push({ skill: skill[1], type, name });
+      }
+
+      const typeValues = [...missionText.matchAll(/\[?["']type["']\]?\s*=\s*["']([^"']+)["']/gi)].map(m => m[1]);
+      const typeCounts = {};
+      typeValues.forEach(type => typeCounts[type] = (typeCounts[type] || 0) + 1);
+      const topTypes = Object.entries(typeCounts).sort((a,b) => b[1] - a[1]).slice(0, 12);
+
+      const scriptRefs = unique([
+        ...[...missionText.matchAll(/["']([^"']+\.lua)["']/gi)].map(m => m[1]),
+        ...entries.filter(e => /\.lua$/i.test(e.name) && !CORE_NAMES.has(e.name)).map(e => e.name)
+      ]);
+      const mediaEntries = entries.filter(e => /\.(ogg|wav|mp3|png|jpe?g|dds)$/i.test(e.name));
+      const imageEntries = entries.filter(e => /\.(png|jpe?g|dds)$/i.test(e.name));
+      const audioEntries = entries.filter(e => /\.(ogg|wav|mp3)$/i.test(e.name));
+      const languages = unique(entries.map(e => (e.name.match(/^l10n\/([^/]+)\//i) || [])[1] || '').filter(Boolean));
+      const totalUnits = typeValues.length;
+
+      return { map, dependencies, slots, topTypes, scriptRefs, mediaEntries, imageEntries, audioEntries, languages, totalUnits };
+    }
+
+    function finding(level, title, detail, evidence = '') { return { level, title, detail, evidence }; }
+
+    function buildFindings(report, hasMission, archiveMode) {
+      const out = [];
+      if (!hasMission) out.push(finding('bad', 'Core mission file not read', 'The archive did not expose a readable root mission file. Use the text fallback or verify the .miz.', 'mission'));
+      else out.push(finding('good', 'Core mission text read', 'Mission structure is available for local inspection.', 'mission'));
+      if (report.map === 'Unknown') out.push(finding('warn', 'Terrain not identified', 'Confirm the map in DCS Mission Editor before assigning the sortie.', 'theatre'));
+      else out.push(finding('info', `Terrain: ${report.map}`, 'This is the mission-declared theatre; ownership is not verified automatically.', 'theatre'));
+      if (report.dependencies.length) out.push(finding('warn', `${report.dependencies.length} declared module need${report.dependencies.length === 1 ? '' : 's'}`, 'Check each declaration against the intended pilot/server install. Stale requiredModules entries can block a mission.', 'requiredModules'));
+      else out.push(finding('good', 'No requiredModules entries found', 'The mission text does not declare additional module dependencies. This does not rule out user-mod units referenced elsewhere.', 'requiredModules'));
+      if (!report.slots.length) out.push(finding('warn', 'No Client/Player slots detected', 'This may be an AI-only mission, a campaign stage, or a structure the heuristic could not resolve.', 'skill'));
+      else out.push(finding('good', `${report.slots.length} flyable slot${report.slots.length === 1 ? '' : 's'} detected`, 'Client and Player skill entries were found in mission text.', 'skill'));
+      if (report.scriptRefs.length) out.push(finding('info', `${report.scriptRefs.length} Lua reference${report.scriptRefs.length === 1 ? '' : 's'}`, 'Review script paths and companion frameworks when moving the mission between machines or servers.', report.scriptRefs[0]));
+      if (archiveMode && report.mediaEntries.length === 0) out.push(finding('info', 'No embedded media found', 'The package has no detected briefing images or audio assets.', 'l10n / media'));
+      if (archiveMode && report.totalUnits > 500) out.push(finding('warn', `Dense mission: ${report.totalUnits} typed objects`, 'Object count is only a rough complexity cue; test performance on the actual host.', 'type entries'));
+      return out;
+    }
+
+    function dependencyKey(name) { return `mizScout:have:${name.toLowerCase()}`; }
+
+    function loadChecks(dependencies, map) {
+      const all = [map !== 'Unknown' ? `Map: ${map}` : '', ...dependencies].filter(Boolean);
+      state.checked = {};
+      all.forEach(name => state.checked[name] = localStorage.getItem(dependencyKey(name)) === '1');
+      return all;
+    }
+
+    function renderDependencies() {
+      const report = state.report;
+      const names = loadChecks(report.dependencies, report.map);
+      const root = $('dependencyList');
+      if (!names.length) {
+        root.innerHTML = '<p class="hint">No declared terrain or module requirements were identified.</p>';
+        updateReadiness();
+        return;
+      }
+      root.innerHTML = names.map((name, i) => `
+        <div class="dep">
+          <input type="checkbox" id="dep${i}" data-dep="${escapeHtml(name)}" ${state.checked[name] ? 'checked' : ''}>
+          <label for="dep${i}">${escapeHtml(name)}<small>${name.startsWith('Map:') ? 'Terrain ownership / install check' : 'Declared requiredModules entry'}</small></label>
+        </div>`).join('');
+      root.querySelectorAll('input').forEach(input => input.addEventListener('change', () => {
+        const name = input.dataset.dep;
+        state.checked[name] = input.checked;
+        localStorage.setItem(dependencyKey(name), input.checked ? '1' : '0');
+        updateReadiness();
+      }));
+      updateReadiness();
+    }
+
+    function updateReadiness() {
+      if (!state.report) return;
+      const names = Object.keys(state.checked);
+      const remaining = names.filter(name => !state.checked[name]);
+      const box = $('readinessBox');
+      if (remaining.length === 0) {
+        box.className = 'readiness ready';
+        $('readinessTitle').textContent = 'CHECKED — READY TO TEST';
+        $('readinessDetail').textContent = names.length ? 'All identified declarations are acknowledged.' : 'No declared dependencies require acknowledgment.';
+      } else {
+        box.className = 'readiness hold';
+        $('readinessTitle').textContent = `HOLD — ${remaining.length} CHECK${remaining.length === 1 ? '' : 'S'} OPEN`;
+        $('readinessDetail').textContent = 'Acknowledge the terrain and module declarations before handoff.';
+      }
+      updateBrief();
+    }
+
+    function renderList(id, rows, emptyText) {
+      $(id).innerHTML = rows.length ? rows.map(([left,right]) => `<li><span>${escapeHtml(left)}</span><code>${escapeHtml(right)}</code></li>`).join('') : `<li><span>${escapeHtml(emptyText)}</span><code>—</code></li>`;
+    }
+
+    function updateBrief() {
+      if (!state.report) return;
+      const r = state.report;
+      const open = Object.keys(state.checked).filter(name => !state.checked[name]);
+      const lines = [
+        'MIZ SCOUT — MISSION HANDOFF',
+        `Mission: ${state.fileName || 'Pasted mission text'}`,
+        `Map: ${r.map}`,
+        `Player slots: ${r.slots.length}`,
+        `Typed objects (rough cue): ${r.totalUnits}`,
+        `Archive size: ${formatBytes(state.fileSize)}`,
+        '',
+        `Declared modules: ${r.dependencies.length ? r.dependencies.join('; ') : 'None found'}`,
+        `Open readiness checks: ${open.length ? open.join('; ') : 'None'}`,
+        `Lua references: ${r.scriptRefs.length ? r.scriptRefs.join('; ') : 'None found'}`,
+        `Embedded media: ${r.imageEntries.length} image(s), ${r.audioEntries.length} audio file(s)`,
+        `Localization folders: ${r.languages.length ? r.languages.join(', ') : 'None found'}`,
+        '',
+        open.length ? 'Status: HOLD — resolve/acknowledge open checks, then test in DCS.' : 'Status: DECLARATIONS CHECKED — proceed to an actual DCS load test.',
+        'Note: This local heuristic report does not certify mission compatibility or performance.'
+      ];
+      $('briefOutput').value = lines.join('\n');
+    }
+
+    function render(report, findings, rawText) {
+      state.report = report;
+      $('emptyState').hidden = true;
+      $('results').hidden = false;
+      $('resultTitle').textContent = state.fileName || 'Pasted mission text';
+      $('scanStatus').textContent = `SCAN COMPLETE · ${new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}`;
+      $('metricMap').textContent = report.map;
+      $('metricSlots').textContent = String(report.slots.length);
+      $('metricDeps').textContent = String(report.dependencies.length);
+      $('metricSize').textContent = formatBytes(state.fileSize);
+      $('findingList').innerHTML = findings.map(f => `
+        <article class="finding">
+          <div class="severity ${f.level}">${escapeHtml(f.level)}</div>
+          <div><h3>${escapeHtml(f.title)}</h3><p>${escapeHtml(f.detail)}</p></div>
+          <code>${escapeHtml(f.evidence)}</code>
+        </article>`).join('');
+
+      const inventory = [
+        ['Terrain', report.map],
+        ['Typed objects', String(report.totalUnits)],
+        ['Lua references', String(report.scriptRefs.length)],
+        ['Briefing/media images', String(report.imageEntries.length)],
+        ['Audio files', String(report.audioEntries.length)],
+        ['Localization folders', report.languages.join(', ') || 'None found'],
+        ...report.topTypes.map(([type,count]) => [`Object type · ${type}`, String(count)])
+      ];
+      renderList('inventoryList', inventory, 'No inventory evidence found');
+      renderList('slotList', report.slots.map(s => [s.name, `${s.type} · ${s.skill}`]), 'No Client/Player slots detected');
+      renderList('fileList', state.entries.filter(e => !e.isDirectory).map(e => [e.name, `${formatBytes(e.uncompressedSize)} · ${e.method === 0 ? 'stored' : e.method === 8 ? 'deflate' : 'method '+e.method}`]), 'Text fallback has no archive file list');
+      $('rawEvidence').textContent = rawText.slice(0, 180000) || 'No raw mission text available.';
+      renderDependencies();
+    }
+
+    async function analyzeFile(file) {
+      state.fileName = file.name;
+      state.fileSize = file.size;
+      state.entries = [];
+      state.texts = {};
+      $('scanStatus').textContent = 'READING ARCHIVE…';
+      $('fileChip').classList.add('active');
+      $('fileChip').innerHTML = `<b>${escapeHtml(file.name)}</b><span>${formatBytes(file.size)}</span>`;
+      try {
+        const buffer = await file.arrayBuffer();
+        state.entries = await readZip(buffer);
+        const wanted = state.entries.filter(e => !e.isDirectory && (CORE_NAMES.has(e.name) || /^l10n\/[^/]+\/(dictionary|mapResource)$/i.test(e.name)));
+        for (const entry of wanted) {
+          try {
+            const bytes = await extractEntry(buffer, entry);
+            state.texts[entry.name] = decodeUtf8(bytes);
+          } catch (error) {
+            state.texts[entry.name] = `/* unreadable: ${error.message} */`;
+          }
+        }
+        const missionText = state.texts.mission || '';
+        if (!missionText || missionText.startsWith('/* unreadable:')) throw new Error(missionText ? missionText.replace(/^\/\* | \*\/$/g,'') : 'The archive has no readable root mission entry.');
+        const report = parseMission(missionText, state.texts.theatre || '', state.entries);
+        render(report, buildFindings(report, true, true), missionText);
+        toast('Mission scan complete');
+      } catch (error) {
+        $('scanStatus').textContent = 'ARCHIVE READ INCOMPLETE';
+        const pasted = $('pasteInput').value.trim();
+        if (pasted) analyzeText(pasted);
+        else {
+          $('emptyState').hidden = false;
+          $('results').hidden = true;
+          $('emptyState').innerHTML = `<div><div class="empty-mark" aria-hidden="true">[!]</div><p>${escapeHtml(error.message)} Paste the archive's <code>mission</code> text in the fallback field.</p></div>`;
+          toast('Archive could not be fully read');
+        }
+      }
+    }
+
+    function analyzeText(text) {
+      if (!text.trim()) { toast('Paste mission Lua text first'); return; }
+      state.fileName = state.fileName || 'Pasted mission text';
+      state.fileSize = state.fileSize || 0;
+      state.entries = state.entries || [];
+      const report = parseMission(text, '', state.entries);
+      render(report, buildFindings(report, true, false), text);
+      toast('Mission text analyzed');
+    }
+
+    function clearAll() {
+      state.fileName = ''; state.fileSize = 0; state.entries = []; state.texts = {}; state.report = null; state.checked = {};
+      $('fileInput').value = '';
+      $('pasteInput').value = '';
+      $('fileChip').classList.remove('active');
+      $('fileChip').innerHTML = '';
+      $('results').hidden = true;
+      $('emptyState').hidden = false;
+      $('emptyState').innerHTML = '<div><div class="empty-mark" aria-hidden="true">[ ]</div><p>Select a mission to inspect its archive structure, map declaration, player slots, scripts, media, and required-module block.</p></div>';
+      $('resultTitle').textContent = 'Mission package';
+      $('scanStatus').textContent = 'AWAITING FILE';
+      $('readinessBox').className = 'readiness hold';
+      $('readinessTitle').textContent = 'No mission loaded';
+      $('readinessDetail').textContent = 'Dependency checks will appear here.';
+      $('dependencyList').innerHTML = '<p class="hint">Analyze a mission to build the check-off list.</p>';
+      $('briefOutput').value = 'No mission analyzed.';
+      toast('Workspace cleared');
+    }
+
+    $('chooseBtn').addEventListener('click', (event) => { event.stopPropagation(); $('fileInput').click(); });
+    $('dropzone').addEventListener('click', () => $('fileInput').click());
+    $('dropzone').addEventListener('keydown', event => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); $('fileInput').click(); } });
+    $('fileInput').addEventListener('change', () => { if ($('fileInput').files[0]) analyzeFile($('fileInput').files[0]); });
+    ['dragenter','dragover'].forEach(name => $('dropzone').addEventListener(name, event => { event.preventDefault(); $('dropzone').classList.add('drag'); }));
+    ['dragleave','drop'].forEach(name => $('dropzone').addEventListener(name, event => { event.preventDefault(); $('dropzone').classList.remove('drag'); }));
+    $('dropzone').addEventListener('drop', event => { const file = event.dataTransfer.files[0]; if (file) analyzeFile(file); });
+    $('analyzePasteBtn').addEventListener('click', () => analyzeText($('pasteInput').value));
+    $('resetBtn').addEventListener('click', clearAll);
+    $('printBtn').addEventListener('click', () => window.print());
+    $('copyBtn').addEventListener('click', async () => {
+      try { await navigator.clipboard.writeText($('briefOutput').value); toast('Brief copied'); }
+      catch (_) { $('briefOutput').select(); document.execCommand('copy'); toast('Brief copied'); }
+    });
+    $('downloadBtn').addEventListener('click', () => {
+      const blob = new Blob([$('briefOutput').value], {type:'text/plain'});
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = `${(state.fileName || 'mission').replace(/\.(miz|zip)$/i,'')}-miz-scout.txt`;
+      link.click();
+      setTimeout(() => URL.revokeObjectURL(link.href), 1000);
+    });
+
+    document.querySelectorAll('[role="tab"]').forEach(tab => tab.addEventListener('click', () => {
+      document.querySelectorAll('[role="tab"]').forEach(t => t.setAttribute('aria-selected', String(t === tab)));
+      document.querySelectorAll('[role="tabpanel"]').forEach(panel => panel.hidden = panel.id !== tab.getAttribute('aria-controls'));
+    }));
+  })();
+  </script>
+</body>
+</html>

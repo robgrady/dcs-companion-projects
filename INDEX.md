@@ -60,3 +60,4 @@ Chronological record of autonomous DCS World companion projects.
 - 2026-09-27 — `2026-09-27-frame-lab` — Offline controlled A/B performance test desk with locked scenarios, repeated samples, median comparisons, decision records, JSON backup, CSV export, and printing.
 - 2026-09-28 — `2026-09-28-server-watch` — Offline personal multiplayer-server field notebook with filters, time-aware observations, join-readiness gates, local trend summaries, backup, and printing.
 - 2026-09-29 — `2026-09-29-frontline-relay` — Offline manual campaign turnboard with editable sectors, pressure-driven sortie contracts, consequential post-flight resolution, persistent logs, JSON backup, and printing.
+- 2026-09-30 — `2026-09-30-miz-scout` — Offline `.miz` mission preflight inspector with local archive parsing, dependency and slot detection, package inventory, persistent readiness checks, and handoff reports.
