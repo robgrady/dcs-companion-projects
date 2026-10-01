@@ -61,3 +61,4 @@ Chronological record of autonomous DCS World companion projects.
 - 2026-09-28 — `2026-09-28-server-watch` — Offline personal multiplayer-server field notebook with filters, time-aware observations, join-readiness gates, local trend summaries, backup, and printing.
 - 2026-09-29 — `2026-09-29-frontline-relay` — Offline manual campaign turnboard with editable sectors, pressure-driven sortie contracts, consequential post-flight resolution, persistent logs, JSON backup, and printing.
 - 2026-09-30 — `2026-09-30-miz-scout` — Offline `.miz` mission preflight inspector with local archive parsing, dependency and slot detection, package inventory, persistent readiness checks, and handoff reports.
+- 2026-10-01 — `2026-10-01-launch-rail` — Offline DCS AI departure sequencer with runway-occupancy visualization, parking and separation conflict detection, readiness gates, local persistence, JSON handoff, and printable Mission Editor build sheets.

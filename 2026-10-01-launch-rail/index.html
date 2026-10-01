@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#111512">
+<title>Launch Rail — DCS AI Departure Sequencer</title>
+<style>
+:root{
+  color-scheme:dark;
+  --bg:#0b0e0c;--panel:#111512;--panel-2:#171c18;--panel-3:#1d231e;
+  --ink:#f0f1e9;--muted:#9ca69a;--faint:#6e786e;--line:#303831;
+  --amber:#e6b85c;--amber-2:#ffd98d;--green:#83c692;--red:#e17d70;--blue:#8fb8cc;
+  --radius:6px;--shadow:0 14px 36px rgba(0,0,0,.28);
+  --sans:"Avenir Next","Segoe UI",Arial,sans-serif;
+  --mono:"SFMono-Regular",Consolas,"Liberation Mono",monospace;
+}
+*{box-sizing:border-box}html{background:var(--bg)}body{margin:0;min-height:100vh;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.45}
+button,input,select,textarea{font:inherit}button{cursor:pointer}.mono,.time,input[type="time"],input[type="number"]{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.skip{position:fixed;left:12px;top:-60px;z-index:99;background:var(--amber);color:#17120a;padding:10px 14px;font-weight:800}.skip:focus{top:12px}
+:focus-visible{outline:3px solid var(--amber-2);outline-offset:2px}
+.appbar{position:sticky;top:0;z-index:20;border-bottom:1px solid var(--line);background:rgba(11,14,12,.96);backdrop-filter:blur(10px)}
+.appbar-inner{max-width:1540px;margin:auto;min-height:64px;padding:10px 22px;display:flex;align-items:center;gap:18px}
+.brand{display:flex;align-items:center;gap:12px;min-width:230px}.mark{width:31px;height:31px;border:1px solid var(--amber);display:grid;place-items:center;color:var(--amber);font:800 12px var(--mono);transform:rotate(45deg)}.mark span{transform:rotate(-45deg)}
+.brand h1{font-size:17px;letter-spacing:.16em;text-transform:uppercase;margin:0}.brand p{margin:1px 0 0;color:var(--muted);font-size:11px;letter-spacing:.08em;text-transform:uppercase}
+.status-strip{display:flex;gap:6px;margin-left:auto;align-items:center;flex-wrap:wrap;justify-content:flex-end}.status-pill{min-height:34px;border:1px solid var(--line);padding:7px 10px;background:var(--panel);color:var(--muted);font:700 11px var(--mono);letter-spacing:.06em;text-transform:uppercase}.status-pill strong{color:var(--ink)}.status-pill.ok{border-color:#355a3e;color:var(--green)}.status-pill.warn{border-color:#79504a;color:var(--red)}
+.shell{max-width:1540px;margin:auto;padding:22px;display:grid;grid-template-columns:minmax(270px,330px) minmax(560px,1fr) minmax(290px,360px);gap:16px;align-items:start}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}.panel-head{padding:13px 15px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:12px}.panel-head h2{font-size:12px;letter-spacing:.14em;text-transform:uppercase;margin:0}.eyebrow{color:var(--amber);font:700 10px var(--mono);letter-spacing:.12em;text-transform:uppercase}.panel-body{padding:15px}
+.field{display:grid;gap:6px;margin-bottom:13px}.field label,.field .label{font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}.field-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}.field-row.three{grid-template-columns:1fr 1fr 1fr}
+input,select,textarea{width:100%;border:1px solid var(--line);border-radius:4px;background:#0d110e;color:var(--ink);min-height:42px;padding:9px 10px}textarea{min-height:74px;resize:vertical}input:hover,select:hover,textarea:hover{border-color:#4b574d}input::placeholder,textarea::placeholder{color:#667068}
+.btn{min-height:42px;border:1px solid var(--line);border-radius:4px;background:var(--panel-2);color:var(--ink);padding:9px 12px;font-weight:800;font-size:12px;letter-spacing:.03em}.btn:hover{background:var(--panel-3);border-color:#586358}.btn.primary{background:var(--amber);border-color:var(--amber);color:#17130b}.btn.primary:hover{background:var(--amber-2)}.btn.danger{color:var(--red)}.btn.small{min-height:34px;padding:6px 9px;font-size:11px}.button-stack{display:grid;grid-template-columns:1fr 1fr;gap:8px}.button-stack .wide{grid-column:1/-1}
+.help{color:var(--faint);font-size:12px;margin:5px 0 0}.divider{height:1px;background:var(--line);margin:16px 0}
+.timeline-wrap{overflow:auto;min-height:470px}.timeline-ruler{position:relative;height:42px;border-bottom:1px solid var(--line);margin-left:132px;min-width:620px;background:repeating-linear-gradient(90deg,transparent 0,transparent calc(12.5% - 1px),#293029 calc(12.5% - 1px),#293029 12.5%)}.tick{position:absolute;bottom:6px;transform:translateX(-50%);font:10px var(--mono);color:var(--faint)}
+.lanes{min-width:752px}.lane{display:grid;grid-template-columns:132px minmax(620px,1fr);min-height:76px;border-bottom:1px solid #252b26}.lane-label{padding:13px 11px;border-right:1px solid var(--line);display:flex;flex-direction:column;gap:3px}.lane-label strong{font-size:13px}.lane-label span{font:10px var(--mono);color:var(--muted)}.track{position:relative;background:repeating-linear-gradient(90deg,transparent 0,transparent calc(12.5% - 1px),#222822 calc(12.5% - 1px),#222822 12.5%)}
+.bar{position:absolute;top:17px;height:41px;min-width:30px;border:1px solid #7b673e;background:#332b1b;color:var(--amber-2);padding:6px 9px;overflow:hidden;white-space:nowrap;border-radius:3px;font:700 11px var(--mono);box-shadow:0 4px 12px rgba(0,0,0,.26)}.bar.conflict{border-color:#a5574e;background:#3b211e;color:#ffc0b7}.bar.selected{outline:2px solid var(--ink);outline-offset:2px}.bar small{display:block;color:var(--muted);font-size:9px;margin-top:1px}.nowline{position:absolute;top:0;bottom:0;width:1px;background:var(--blue);opacity:.75;pointer-events:none}.nowline::before{content:"NOW";position:absolute;top:1px;left:4px;font:9px var(--mono);color:var(--blue)}
+.empty{padding:75px 24px;text-align:center;color:var(--muted)}.empty strong{display:block;color:var(--ink);font-size:18px;margin-bottom:7px}.empty p{max-width:430px;margin:0 auto 18px}.legend{display:flex;gap:14px;flex-wrap:wrap;color:var(--muted);font-size:11px}.legend i{display:inline-block;width:9px;height:9px;border:1px solid currentColor;margin-right:5px}.legend .safe{color:var(--amber)}.legend .bad{color:var(--red)}.legend .now{color:var(--blue)}
+.flight-list{display:grid;gap:8px;max-height:590px;overflow:auto}.flight-card{border:1px solid var(--line);background:var(--panel-2);border-radius:4px;padding:11px;display:grid;gap:9px}.flight-card.selected{border-color:var(--amber)}.flight-top{display:flex;align-items:start;gap:9px}.flight-top button.flight-select{flex:1;text-align:left;border:0;background:none;color:inherit;padding:0;min-height:44px}.flight-top strong{display:block;font-size:14px}.flight-top small{color:var(--muted);font:10px var(--mono)}.order-buttons{display:flex;gap:4px}.icon-btn{width:36px;height:36px;border:1px solid var(--line);background:#0e120f;color:var(--muted);border-radius:3px}.icon-btn:hover{color:var(--ink);border-color:#5c685d}.flight-meta{display:grid;grid-template-columns:repeat(3,1fr);gap:5px}.flight-meta span{border-top:1px solid #2c332d;padding-top:6px;font:10px var(--mono);color:var(--muted)}.flight-meta b{display:block;color:var(--ink);font-size:11px}
+.alerts{display:grid;gap:8px}.alert{border:1px solid #754941;background:#2c1c19;border-radius:4px;padding:10px 11px;color:#f0b1a7;font-size:12px}.alert strong{display:block;color:#ffd0c8;margin-bottom:2px}.clear-state{border:1px solid #35533c;background:#152018;padding:12px;color:var(--green);font-size:12px;border-radius:4px}
+.checks{display:grid;gap:7px}.check{display:flex;align-items:flex-start;gap:9px;padding:8px;border:1px solid var(--line);border-radius:4px;background:#0f130f}.check input{width:18px;height:18px;min-height:auto;margin-top:1px;accent-color:var(--amber)}.check span{font-size:12px}.check small{display:block;color:var(--muted);margin-top:2px}
+.drawer{position:fixed;inset:0;z-index:50;display:none}.drawer.open{display:block}.scrim{position:absolute;inset:0;background:rgba(0,0,0,.72)}.sheet{position:absolute;right:0;top:0;bottom:0;width:min(520px,100%);background:var(--panel);border-left:1px solid var(--line);overflow:auto;padding:22px}.sheet-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}.sheet h2{margin:0;font-size:19px}.sheet-actions{display:flex;gap:8px;margin-top:18px}.sheet-actions .btn{flex:1}
+.toast{position:fixed;left:50%;bottom:24px;z-index:80;transform:translate(-50%,20px);opacity:0;background:var(--ink);color:#111;padding:10px 14px;border-radius:4px;font-weight:800;font-size:12px;transition:.2s}.toast.show{transform:translate(-50%,0);opacity:1}
+.footer-note{grid-column:1/-1;color:var(--faint);font-size:11px;text-align:center;padding:2px 0 12px}
+@media(max-width:1120px){.shell{grid-template-columns:300px 1fr}.right-col{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:16px}.appbar-inner{align-items:flex-start}.status-strip{max-width:55%}}
+@media(max-width:760px){.appbar-inner{padding:10px 14px;flex-wrap:wrap}.brand{min-width:0}.status-strip{max-width:none;width:100%;justify-content:flex-start}.shell{display:block;padding:12px}.panel{margin-bottom:12px}.right-col{display:block}.field-row,.field-row.three{grid-template-columns:1fr}.button-stack{grid-template-columns:1fr}.timeline-ruler{margin-left:110px}.lane{grid-template-columns:110px minmax(620px,1fr)}.flight-meta{grid-template-columns:1fr 1fr 1fr}.status-pill{font-size:9px}.sheet{padding:17px}}
+@media print{body{background:#fff;color:#111}.appbar,.left-col,.right-col,.panel-head .btn,.footer-note{display:none!important}.shell{display:block;max-width:none;padding:0}.panel{border:0;box-shadow:none;background:#fff}.panel-head{display:flex;border-bottom:2px solid #111}.panel-head h2{font-size:16px}.timeline-wrap{overflow:visible}.lanes,.timeline-ruler{min-width:0}.track{background:repeating-linear-gradient(90deg,transparent 0,transparent calc(12.5% - 1px),#ddd calc(12.5% - 1px),#ddd 12.5%)}.bar{color:#111;background:#eee;border-color:#333;box-shadow:none}.lane-label span,.bar small,.tick{color:#444}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to launch board</a>
+<header class="appbar">
+  <div class="appbar-inner">
+    <div class="brand"><div class="mark"><span>LR</span></div><div><h1>Launch Rail</h1><p>DCS AI departure sequencer</p></div></div>
+    <div class="status-strip" aria-live="polite">
+      <div class="status-pill">Airfield <strong id="statusField">UNSET</strong></div>
+      <div class="status-pill">Window <strong id="statusWindow">00:00</strong></div>
+      <div class="status-pill" id="conflictPill">Conflicts <strong id="statusConflicts">0</strong></div>
+      <div class="status-pill" id="readyPill">Ready <strong id="statusReady">0/0</strong></div>
+    </div>
+  </div>
+</header>
+<main class="shell" id="main">
+  <aside class="left-col">
+    <section class="panel" aria-labelledby="airfield-heading">
+      <div class="panel-head"><div><div class="eyebrow">Mission setup</div><h2 id="airfield-heading">Airfield contract</h2></div></div>
+      <div class="panel-body">
+        <div class="field"><label for="airfield">Airfield / FARP</label><input id="airfield" placeholder="e.g. Kutaisi" autocomplete="off"></div>
+        <div class="field-row">
+          <div class="field"><label for="runway">Runway</label><input id="runway" placeholder="07" autocomplete="off"></div>
+          <div class="field"><label for="missionStart">Mission start</label><input id="missionStart" type="time" step="1" value="08:00:00"></div>
+        </div>
+        <div class="field-row">
+          <div class="field"><label for="separation">Min separation</label><input id="separation" type="number" min="15" max="600" step="5" value="60"><span class="help">seconds</span></div>
+          <div class="field"><label for="horizon">Board horizon</label><input id="horizon" type="number" min="10" max="120" step="5" value="30"><span class="help">minutes</span></div>
+        </div>
+        <div class="field"><label for="notes">Controller note</label><textarea id="notes" placeholder="Taxi restriction, active crossing, weather, or trigger dependency"></textarea></div>
+        <button class="btn primary" id="addFlight" type="button" style="width:100%">Add AI flight</button>
+        <div class="divider"></div>
+        <div class="button-stack">
+          <button class="btn" id="copySheet" type="button">Copy ME sheet</button>
+          <button class="btn" id="printBoard" type="button">Print board</button>
+          <button class="btn" id="exportPlan" type="button">Export JSON</button>
+          <button class="btn" id="importPlan" type="button">Import JSON</button>
+          <button class="btn danger wide" id="resetPlan" type="button">Reset this board</button>
+          <input id="importFile" type="file" accept="application/json,.json" hidden>
+        </div>
+      </div>
+    </section>
+  </aside>
+
+  <section class="panel center-col" aria-labelledby="timeline-heading">
+    <div class="panel-head"><div><div class="eyebrow">Departure picture</div><h2 id="timeline-heading">Runway occupancy rail</h2></div><button class="btn small" id="compactBtn" type="button">Compact schedule</button></div>
+    <div class="timeline-wrap" id="timelineWrap">
+      <div id="timeline"></div>
+    </div>
+    <div class="panel-body legend"><span class="safe"><i></i>planned occupancy</span><span class="bad"><i></i>separation conflict</span><span class="now"><i></i>mission clock</span></div>
+  </section>
+
+  <aside class="right-col">
+    <section class="panel" aria-labelledby="queue-heading">
+      <div class="panel-head"><div><div class="eyebrow">Execution order</div><h2 id="queue-heading">Flight queue</h2></div><span class="mono" id="flightCount">0</span></div>
+      <div class="panel-body"><div class="flight-list" id="flightList"></div></div>
+    </section>
+    <section class="panel" aria-labelledby="alerts-heading" style="margin-top:16px">
+      <div class="panel-head"><div><div class="eyebrow">Validation</div><h2 id="alerts-heading">Launch gate</h2></div></div>
+      <div class="panel-body"><div class="alerts" id="alerts"></div></div>
+    </section>
+  </aside>
+  <div class="footer-note">Planning aid only. Verify behavior in the current DCS build and test the mission from every affected client slot.</div>
+</main>
+
+<div class="drawer" id="drawer" aria-hidden="true">
+  <div class="scrim" data-close></div>
+  <section class="sheet" role="dialog" aria-modal="true" aria-labelledby="editorTitle">
+    <div class="sheet-head"><div><div class="eyebrow">Flight editor</div><h2 id="editorTitle">AI flight</h2></div><button class="icon-btn" type="button" data-close aria-label="Close editor">×</button></div>
+    <form id="flightForm">
+      <input id="flightId" type="hidden">
+      <div class="field-row">
+        <div class="field"><label for="callsign">Group / callsign</label><input id="callsign" required placeholder="Colt 1" autocomplete="off"></div>
+        <div class="field"><label for="aircraft">Aircraft</label><input id="aircraft" required placeholder="F-16C" autocomplete="off"></div>
+      </div>
+      <div class="field-row three">
+        <div class="field"><label for="count">Aircraft</label><input id="count" type="number" min="1" max="4" value="2" required></div>
+        <div class="field"><label for="ready">Ready T+</label><input id="ready" type="time" step="1" value="00:02:00" required></div>
+        <div class="field"><label for="occupancy">Occupancy</label><input id="occupancy" type="number" min="15" max="300" step="5" value="45" required><span class="help">seconds</span></div>
+      </div>
+      <div class="field-row">
+        <div class="field"><label for="startType">Start condition</label><select id="startType"><option>Cold ramp</option><option>Hot ramp</option><option>Runway</option><option>Air start</option></select></div>
+        <div class="field"><label for="lineup">Runway lineup</label><select id="lineup"><option value="Off">Off</option><option value="On">On — verify in mission</option></select></div>
+      </div>
+      <div class="field-row">
+        <div class="field"><label for="parking">Parking slots</label><input id="parking" placeholder="23, 24" autocomplete="off"></div>
+        <div class="field"><label for="trigger">Release trigger / condition</label><input id="trigger" placeholder="TIME MORE 120" autocomplete="off"></div>
+      </div>
+      <div class="field"><label for="route">Taxi / route note</label><textarea id="route" placeholder="North apron via taxiway B; hold short until lead clears"></textarea></div>
+      <div class="field"><span class="label">Readiness gates</span><div class="checks">
+        <label class="check"><input id="gateParking" type="checkbox"><span>Parking and start condition checked<small>No duplicate slots; correct ramp/runway state.</small></span></label>
+        <label class="check"><input id="gateTrigger" type="checkbox"><span>Trigger and activation path checked<small>Late activation, uncontrolled, or time gate behaves as intended.</small></span></label>
+        <label class="check"><input id="gateRoute" type="checkbox"><span>Taxi and runway path test-flown<small>AI clears parking, holds, lines up, and departs without blockage.</small></span></label>
+      </div></div>
+      <div class="sheet-actions"><button class="btn danger" id="deleteFlight" type="button">Delete</button><button class="btn primary" type="submit">Save flight</button></div>
+    </form>
+  </section>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script>
+(()=>{
+'use strict';
+const KEY='dcs-launch-rail-v1';
+const $=s=>document.querySelector(s);
+const els={airfield:$('#airfield'),runway:$('#runway'),missionStart:$('#missionStart'),separation:$('#separation'),horizon:$('#horizon'),notes:$('#notes'),timeline:$('#timeline'),flightList:$('#flightList'),alerts:$('#alerts'),drawer:$('#drawer'),form:$('#flightForm'),toast:$('#toast')};
+let state=load()||{airfield:'',runway:'',missionStart:'08:00:00',separation:60,horizon:30,notes:'',flights:[],selected:null};
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uid=()=>Math.random().toString(36).slice(2,10);
+function sec(t){const p=String(t||'0:0:0').split(':').map(Number);return (p.length===3?p[0]*3600+p[1]*60+p[2]:p[0]*60+p[1])||0}
+function hms(n){n=Math.max(0,Math.round(n));const h=Math.floor(n/3600),m=Math.floor(n%3600/60),s=n%60;return [h,m,s].map(v=>String(v).padStart(2,'0')).join(':')}
+function short(n){const m=Math.floor(n/60),s=n%60;return `T+${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`}
+function save(){localStorage.setItem(KEY,JSON.stringify(state))}
+function load(){try{return JSON.parse(localStorage.getItem(KEY))}catch{return null}}
+function syncHeader(){
+  $('#statusField').textContent=(state.airfield||'UNSET').toUpperCase()+(state.runway?` / ${state.runway}`:'');
+  const flights=state.flights;const end=flights.length?Math.max(...flights.map(f=>sec(f.ready)+Number(f.occupancy||0))):0;
+  $('#statusWindow').textContent=hms(end);
+  const conflicts=getConflicts();$('#statusConflicts').textContent=conflicts.length;$('#conflictPill').className='status-pill '+(conflicts.length?'warn':'ok');
+  const ready=flights.filter(f=>f.gates&&Object.values(f.gates).every(Boolean)).length;$('#statusReady').textContent=`${ready}/${flights.length}`;$('#readyPill').className='status-pill '+(flights.length&&ready===flights.length?'ok':'');
+}
+function hydrate(){['airfield','runway','missionStart','separation','horizon','notes'].forEach(k=>els[k].value=state[k]??'')}
+function pullSettings(){['airfield','runway','missionStart','notes'].forEach(k=>state[k]=els[k].value);state.separation=Math.max(15,Number(els.separation.value)||60);state.horizon=Math.max(10,Number(els.horizon.value)||30);save();render()}
+function sorted(){return [...state.flights].sort((a,b)=>sec(a.ready)-sec(b.ready)||a.order-b.order)}
+function getConflicts(){
+ const fs=sorted(),out=[];
+ for(let i=0;i<fs.length;i++)for(let j=i+1;j<fs.length;j++){
+   const a=fs[i],b=fs[j],ae=sec(a.ready)+Number(a.occupancy||0)+Number(state.separation||0),bs=sec(b.ready);
+   if(bs<ae)out.push({type:'runway',a,b,message:`${a.callsign} and ${b.callsign} are separated by only ${Math.max(0,bs-(sec(a.ready)+Number(a.occupancy||0)))} sec.`});
+   const ap=slots(a.parking),bp=slots(b.parking),dupe=ap.filter(x=>bp.includes(x));
+   if(dupe.length)out.push({type:'parking',a,b,message:`${a.callsign} and ${b.callsign} both use parking ${dupe.join(', ')}.`});
+ }
+ return out;
+}
+function slots(s){return String(s||'').split(/[,;\s]+/).map(x=>x.trim()).filter(Boolean)}
+function renderTimeline(){
+ const fs=sorted();if(!fs.length){els.timeline.innerHTML='<div class="empty"><strong>No flights on the rail</strong><p>Add each AI group, set its ready time and expected runway occupancy, then use the conflict gate to tighten the launch sequence.</p><button class="btn primary" type="button" id="emptyAdd">Add first flight</button></div>';$('#emptyAdd').onclick=openNew;return}
+ const horizon=Math.max(state.horizon*60,...fs.map(f=>sec(f.ready)+Number(f.occupancy||0)+120));
+ let ruler='<div class="timeline-ruler">';for(let i=0;i<=8;i++){const t=Math.round(horizon*i/8);ruler+=`<span class="tick" style="left:${i*12.5}%">${short(t)}</span>`}ruler+='</div>';
+ const badIds=new Set(getConflicts().filter(c=>c.type==='runway').flatMap(c=>[c.a.id,c.b.id]));
+ let lanes='<div class="lanes">';fs.forEach(f=>{const start=sec(f.ready),dur=Number(f.occupancy||45),left=start/horizon*100,width=dur/horizon*100;lanes+=`<div class="lane"><button class="lane-label" data-edit="${f.id}" type="button" style="color:inherit;background:none;border:0;text-align:left"><strong>${esc(f.callsign)}</strong><span>${esc(f.aircraft)} × ${f.count}</span><span>${esc(f.startType)}</span></button><div class="track"><button type="button" data-edit="${f.id}" class="bar ${badIds.has(f.id)?'conflict':''} ${state.selected===f.id?'selected':''}" style="left:${left}%;width:${Math.max(width,2.8)}%" title="Edit ${esc(f.callsign)}">${short(start)}<small>${dur}s / ${esc(f.lineup)}</small></button></div></div>`});lanes+='</div>';
+ els.timeline.innerHTML=ruler+lanes;els.timeline.querySelectorAll('[data-edit]').forEach(b=>b.onclick=()=>openEdit(b.dataset.edit));
+}
+function renderFlights(){
+ const fs=sorted();$('#flightCount').textContent=fs.length;
+ if(!fs.length){els.flightList.innerHTML='<p class="help">Queue is empty.</p>';return}
+ els.flightList.innerHTML=fs.map((f,i)=>{const done=f.gates?Object.values(f.gates).filter(Boolean).length:0;return `<article class="flight-card ${state.selected===f.id?'selected':''}"><div class="flight-top"><button class="flight-select" type="button" data-edit="${f.id}"><strong>${esc(f.callsign)}</strong><small>${esc(f.aircraft)} × ${f.count} · ${short(sec(f.ready))}</small></button><div class="order-buttons"><button class="icon-btn" type="button" data-move="${f.id}" data-dir="-1" aria-label="Move ${esc(f.callsign)} earlier" ${i===0?'disabled':''}>↑</button><button class="icon-btn" type="button" data-move="${f.id}" data-dir="1" aria-label="Move ${esc(f.callsign)} later" ${i===fs.length-1?'disabled':''}>↓</button></div></div><div class="flight-meta"><span>START<b>${esc(f.startType)}</b></span><span>LINEUP<b>${esc(f.lineup)}</b></span><span>GATES<b>${done}/3</b></span></div></article>`}).join('');
+ els.flightList.querySelectorAll('[data-edit]').forEach(b=>b.onclick=()=>openEdit(b.dataset.edit));els.flightList.querySelectorAll('[data-move]').forEach(b=>b.onclick=()=>moveFlight(b.dataset.move,Number(b.dataset.dir)));
+}
+function renderAlerts(){
+ const issues=[];if(!state.airfield)issues.push({title:'Airfield not set',text:'Name the operating location before handoff.'});if(!state.runway)issues.push({title:'Runway not set',text:'Record the active runway or departure surface.'});
+ state.flights.forEach(f=>{if(!f.parking&&f.startType.includes('ramp'))issues.push({title:`${f.callsign}: parking unknown`,text:'Ramp starts need explicit slot ownership.'});if(!f.trigger)issues.push({title:`${f.callsign}: release condition blank`,text:'Record the Mission Editor activation or release rule.'});if(!f.gates||!Object.values(f.gates).every(Boolean))issues.push({title:`${f.callsign}: readiness incomplete`,text:'Open the flight and close all three test gates.'})});
+ getConflicts().forEach(c=>issues.push({title:c.type==='parking'?'Parking collision':'Runway separation',text:c.message}));
+ els.alerts.innerHTML=issues.length?issues.map(x=>`<div class="alert"><strong>${esc(x.title)}</strong>${esc(x.text)}</div>`).join(''):'<div class="clear-state"><strong>Launch gate clear.</strong><br>No current configuration, parking, separation, or readiness flags.</div>';
+}
+function render(){syncHeader();renderTimeline();renderFlights();renderAlerts();save()}
+function openNew(){
+ const last=sorted().at(-1),next=last?sec(last.ready)+Number(last.occupancy||45)+Number(state.separation||60):120;
+ fillForm({id:'',callsign:'',aircraft:'',count:2,ready:hms(next),occupancy:45,startType:'Cold ramp',lineup:'Off',parking:'',trigger:'',route:'',gates:{parking:false,trigger:false,route:false}});openDrawer();setTimeout(()=>$('#callsign').focus(),50)
+}
+function openEdit(id){const f=state.flights.find(x=>x.id===id);if(!f)return;state.selected=id;fillForm(f);openDrawer();render();setTimeout(()=>$('#callsign').focus(),50)}
+function fillForm(f){$('#flightId').value=f.id||'';['callsign','aircraft','count','ready','occupancy','startType','lineup','parking','trigger','route'].forEach(k=>$('#'+k).value=f[k]??'');$('#gateParking').checked=!!f.gates?.parking;$('#gateTrigger').checked=!!f.gates?.trigger;$('#gateRoute').checked=!!f.gates?.route;$('#deleteFlight').style.visibility=f.id?'visible':'hidden'}
+function openDrawer(){els.drawer.classList.add('open');els.drawer.setAttribute('aria-hidden','false')}
+function closeDrawer(){els.drawer.classList.remove('open');els.drawer.setAttribute('aria-hidden','true');state.selected=null;render()}
+function readForm(){return{id:$('#flightId').value||uid(),callsign:$('#callsign').value.trim(),aircraft:$('#aircraft').value.trim(),count:Number($('#count').value),ready:$('#ready').value,occupancy:Number($('#occupancy').value),startType:$('#startType').value,lineup:$('#lineup').value,parking:$('#parking').value.trim(),trigger:$('#trigger').value.trim(),route:$('#route').value.trim(),gates:{parking:$('#gateParking').checked,trigger:$('#gateTrigger').checked,route:$('#gateRoute').checked},order:Date.now()}}
+function moveFlight(id,dir){const fs=sorted(),i=fs.findIndex(f=>f.id===id),j=i+dir;if(i<0||j<0||j>=fs.length)return;const a=fs[i],b=fs[j],tmp=a.ready;a.ready=b.ready;b.ready=tmp;render();toast('Queue order updated')}
+function compact(){let cursor=sorted().length?sec(sorted()[0].ready):120;sorted().forEach((f,i)=>{if(i===0)cursor=sec(f.ready);else f.ready=hms(cursor);cursor=sec(f.ready)+Number(f.occupancy||45)+Number(state.separation||60)});render();toast('Schedule compacted to minimum separation')}
+function sheetText(){const fs=sorted();const lines=[`DCS AI DEPARTURE BUILD SHEET`,`Airfield: ${state.airfield||'UNSET'}  Runway: ${state.runway||'UNSET'}  Mission start: ${state.missionStart}`,`Minimum runway separation: ${state.separation}s`,`Controller note: ${state.notes||'—'}`,''];fs.forEach((f,i)=>lines.push(`${i+1}. ${f.callsign} — ${f.aircraft} × ${f.count}`,`   Ready ${short(sec(f.ready))} | Occupancy ${f.occupancy}s | ${f.startType} | Runway lineup: ${f.lineup}`,`   Parking: ${f.parking||'UNSET'} | Release: ${f.trigger||'UNSET'}`,`   Route: ${f.route||'—'}`,`   Gates: parking ${f.gates?.parking?'YES':'NO'} / trigger ${f.gates?.trigger?'YES':'NO'} / route test ${f.gates?.route?'YES':'NO'}`));const cs=getConflicts();lines.push('',cs.length?`OPEN CONFLICTS: ${cs.length}`:'LAUNCH GATE: CLEAR');cs.forEach(c=>lines.push(`- ${c.message}`));return lines.join('\n')}
+async function copySheet(){try{await navigator.clipboard.writeText(sheetText());toast('Mission Editor sheet copied')}catch{const ta=document.createElement('textarea');ta.value=sheetText();document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove();toast('Mission Editor sheet copied')}}
+function exportPlan(){const blob=new Blob([JSON.stringify({...state,exportedAt:new Date().toISOString()},null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`launch-rail-${(state.airfield||'plan').toLowerCase().replace(/[^a-z0-9]+/g,'-')}.json`;a.click();URL.revokeObjectURL(a.href);toast('Plan exported')}
+function importPlan(file){const r=new FileReader();r.onload=()=>{try{const d=JSON.parse(r.result);if(!Array.isArray(d.flights))throw Error();state={...state,...d};hydrate();render();toast('Plan imported')}catch{toast('Import failed: invalid Launch Rail JSON')}};r.readAsText(file)}
+function reset(){if(!confirm('Clear this Launch Rail board and its saved local data?'))return;state={airfield:'',runway:'',missionStart:'08:00:00',separation:60,horizon:30,notes:'',flights:[],selected:null};localStorage.removeItem(KEY);hydrate();render();toast('Board reset')}
+function toast(msg){els.toast.textContent=msg;els.toast.classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(()=>els.toast.classList.remove('show'),1900)}
+['airfield','runway','missionStart','separation','horizon','notes'].forEach(k=>els[k].addEventListener('change',pullSettings));els.notes.addEventListener('input',()=>{state.notes=els.notes.value;save()});
+$('#addFlight').onclick=openNew;$('#compactBtn').onclick=compact;$('#copySheet').onclick=copySheet;$('#printBoard').onclick=()=>window.print();$('#exportPlan').onclick=exportPlan;$('#importPlan').onclick=()=>$('#importFile').click();$('#importFile').onchange=e=>{if(e.target.files[0])importPlan(e.target.files[0]);e.target.value=''};$('#resetPlan').onclick=reset;
+document.querySelectorAll('[data-close]').forEach(x=>x.onclick=closeDrawer);document.addEventListener('keydown',e=>{if(e.key==='Escape'&&els.drawer.classList.contains('open'))closeDrawer()});
+els.form.onsubmit=e=>{e.preventDefault();const f=readForm();const i=state.flights.findIndex(x=>x.id===f.id);if(i>=0){f.order=state.flights[i].order;state.flights[i]=f}else state.flights.push(f);closeDrawer();toast(i>=0?'Flight updated':'Flight added')};
+$('#deleteFlight').onclick=()=>{const id=$('#flightId').value,f=state.flights.find(x=>x.id===id);if(!f||!confirm(`Delete ${f.callsign}?`))return;state.flights=state.flights.filter(x=>x.id!==id);closeDrawer();toast('Flight deleted')};
+hydrate();render();
+})();
+</script>
+</body>
+</html>
