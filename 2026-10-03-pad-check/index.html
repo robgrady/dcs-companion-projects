@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="dark">
+<title>Pad Check — DCS Gamepad Setup & Rehearsal</title>
+<style>
+:root{
+  --bg:#111310;--panel:#191c18;--panel-2:#20241f;--ink:#f2f0e7;--muted:#a9afa3;
+  --line:#3b4138;--accent:#e4b653;--accent-ink:#221b0b;--good:#79bd8b;--warn:#e2a65e;
+  --bad:#e07668;--focus:#f7d47b;--radius:8px;--shadow:0 18px 50px rgba(0,0,0,.25);
+  --mono:"SFMono-Regular","Cascadia Code","Liberation Mono",monospace;
+  --sans:"Avenir Next","Segoe UI",Arial,sans-serif;
+}
+*{box-sizing:border-box}
+html{background:var(--bg)}
+body{margin:0;color:var(--ink);background:var(--bg);font-family:var(--sans);line-height:1.45}
+button,input,select,textarea{font:inherit}
+button,input,select,textarea{border:1px solid var(--line);background:#141713;color:var(--ink);border-radius:6px}
+button{min-height:44px;padding:.65rem .9rem;cursor:pointer;font-weight:650}
+button:hover{border-color:#717b6b;background:#22271f}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+button.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+button.primary:hover{background:#f0c76c}
+button.ghost{background:transparent}
+button.danger{color:#ffb0a5}
+input,select,textarea{width:100%;min-height:44px;padding:.62rem .7rem}
+textarea{min-height:82px;resize:vertical}
+label{display:grid;gap:.35rem;color:var(--muted);font-size:.82rem;font-weight:700;letter-spacing:.02em}
+small,.small{font-size:.79rem;color:var(--muted)}
+.shell{max-width:1500px;margin:0 auto;padding:0 24px 48px}
+.topbar{min-height:76px;display:flex;align-items:center;gap:18px;border-bottom:1px solid var(--line);position:sticky;top:0;background:#111310;z-index:20}
+.brand{display:flex;align-items:center;gap:12px;min-width:max-content}
+.brand-mark{width:34px;height:34px;border:2px solid var(--accent);display:grid;place-items:center;border-radius:50%;font:800 .72rem var(--mono);color:var(--accent)}
+.brand h1{font-size:1.08rem;letter-spacing:.09em;text-transform:uppercase;margin:0}
+.brand span{display:block;font:500 .72rem var(--mono);color:var(--muted);letter-spacing:0}
+.status{margin-left:auto;display:flex;align-items:center;gap:8px;color:var(--muted);font:700 .78rem var(--mono)}
+.dot{width:9px;height:9px;border-radius:50%;background:var(--bad);box-shadow:0 0 0 4px rgba(224,118,104,.12)}
+.dot.live{background:var(--good);box-shadow:0 0 0 4px rgba(121,189,139,.12)}
+.nav{display:flex;gap:6px;overflow:auto}
+.nav button{background:transparent;border-color:transparent;color:var(--muted);padding:.5rem .72rem;min-height:38px;white-space:nowrap}
+.nav button[aria-selected="true"]{color:var(--ink);border-color:var(--line);background:var(--panel-2)}
+main{padding-top:26px}
+.view{display:none}.view.active{display:block}
+.section-head{display:flex;justify-content:space-between;align-items:end;gap:18px;margin-bottom:16px}
+.section-head h2{font-size:clamp(1.55rem,3vw,2.35rem);margin:0;letter-spacing:-.035em;line-height:1}
+.section-head p{margin:.45rem 0 0;color:var(--muted);max-width:64ch}
+.eyebrow{font:750 .72rem var(--mono);text-transform:uppercase;letter-spacing:.12em;color:var(--accent);margin-bottom:.55rem}
+.grid{display:grid;grid-template-columns:minmax(250px,.85fr) minmax(520px,2fr);gap:18px;align-items:start}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
+.card-h{padding:16px 18px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:12px}
+.card-h h3{margin:0;font-size:.94rem;letter-spacing:.035em;text-transform:uppercase}
+.card-b{padding:18px}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.span-2{grid-column:1/-1}
+.notice{padding:12px 14px;background:#242319;border:1px solid #5f5738;border-radius:6px;color:#e8ddb8;font-size:.86rem}
+.metrics{display:grid;grid-template-columns:repeat(3,1fr);border-bottom:1px solid var(--line)}
+.metric{padding:14px 16px;border-right:1px solid var(--line)}.metric:last-child{border-right:0}
+.metric strong{display:block;font:800 1.5rem var(--mono);line-height:1.1}.metric span{font-size:.74rem;color:var(--muted)}
+.controller-stage{padding:22px;display:grid;grid-template-columns:minmax(280px,520px) 1fr;gap:24px;align-items:center}
+.controller{position:relative;aspect-ratio:1.6/1;max-width:520px;margin:auto;background:#242824;border:1px solid #51594d;border-radius:45% 45% 34% 34% / 34% 34% 58% 58%;box-shadow:inset 0 -18px 30px rgba(0,0,0,.28),0 18px 35px rgba(0,0,0,.3)}
+.ctrl-btn{position:absolute;width:42px;height:42px;border-radius:50%;display:grid;place-items:center;background:#111410;border:1px solid #596253;color:#d9ddcf;font:800 .68rem var(--mono);transition:.08s transform,.08s background}
+.ctrl-btn.on{background:var(--accent);color:var(--accent-ink);transform:scale(.94);box-shadow:0 0 0 5px rgba(228,182,83,.14)}
+.b0{right:12%;top:45%}.b1{right:20%;top:57%}.b2{right:20%;top:33%}.b3{right:28%;top:45%}
+.b4{left:12%;top:4%;border-radius:10px;width:82px}.b5{right:12%;top:4%;border-radius:10px;width:82px}
+.b6{left:16%;bottom:7%}.b7{right:16%;bottom:7%}.b8{left:42%;top:43%;width:34px;height:30px;border-radius:5px}.b9{right:42%;top:43%;width:34px;height:30px;border-radius:5px}
+.stick{position:absolute;width:68px;height:68px;border-radius:50%;background:#0d100d;border:1px solid #596253;box-shadow:inset 0 0 0 11px #1a1e19}
+.stick i{position:absolute;width:28px;height:28px;left:19px;top:19px;border-radius:50%;background:#40473d;transition:transform .05s}
+.ls{left:23%;top:37%}.rs{right:28%;bottom:16%}
+.dpad{position:absolute;left:27%;bottom:14%;width:72px;height:72px}.dpad:before,.dpad:after{content:"";position:absolute;background:#111410;border:1px solid #596253;border-radius:5px}.dpad:before{width:28px;height:72px;left:22px}.dpad:after{height:28px;width:72px;top:22px}.dpad span{position:absolute;z-index:2;inset:0;display:grid;place-items:center;font:700 .6rem var(--mono);color:#7e8878}
+.input-readout{display:grid;gap:12px}.axis-row{display:grid;grid-template-columns:42px 1fr 48px;gap:8px;align-items:center;font:700 .72rem var(--mono);color:var(--muted)}
+.track{height:10px;background:#0f110f;border:1px solid var(--line);position:relative;border-radius:10px;overflow:hidden}.track:before{content:"";position:absolute;left:50%;top:0;bottom:0;width:1px;background:#687061}.needle{position:absolute;top:0;bottom:0;width:5px;background:var(--accent);left:50%;transform:translateX(-50%)}
+.mapping-wrap{overflow:auto}.mapping{width:100%;border-collapse:collapse;min-width:900px}.mapping th{text-align:left;padding:10px 12px;background:#141713;color:var(--muted);font:.7rem var(--mono);text-transform:uppercase;letter-spacing:.07em;position:sticky;top:76px;z-index:3}.mapping td{padding:10px 12px;border-top:1px solid var(--line);vertical-align:middle}.mapping tr.issue{background:rgba(224,118,104,.06)}
+.mapping input,.mapping select{min-height:40px;padding:.45rem .55rem}.mapping .action{min-width:230px}.mapping .layer{min-width:130px}.mapping .physical{min-width:150px}
+.pill{display:inline-flex;align-items:center;min-height:28px;padding:3px 8px;border:1px solid var(--line);border-radius:999px;font:700 .68rem var(--mono);color:var(--muted)}.pill.bad{border-color:#8e4b43;color:#ffad9f}.pill.good{border-color:#477856;color:#a7dfb3}
+.row-actions{display:flex;gap:6px}.row-actions button{min-height:38px;padding:.35rem .55rem;font-size:.78rem}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap}
+.checklist{display:grid;gap:10px}.check{display:grid;grid-template-columns:24px 1fr;gap:10px;align-items:start;padding:12px;border:1px solid var(--line);border-radius:6px;background:#151815}.check input{width:20px;min-height:20px;margin-top:2px;accent-color:var(--accent)}.check strong{display:block;font-size:.9rem}.check span{font-size:.78rem;color:var(--muted)}
+.rehearse{display:grid;grid-template-columns:1.1fr .9fr;gap:18px}.prompt{min-height:360px;display:grid;place-items:center;text-align:center;padding:28px}.prompt h3{font-size:clamp(2rem,6vw,4.6rem);letter-spacing:-.05em;line-height:.95;margin:12px 0}.prompt .answer{font:800 1rem var(--mono);color:var(--accent);min-height:1.5rem}.scoreline{display:flex;justify-content:center;gap:22px;color:var(--muted);font:700 .78rem var(--mono)}
+.history{display:grid;gap:8px}.history-item{display:grid;grid-template-columns:1fr auto;gap:8px;padding:10px 0;border-bottom:1px solid var(--line);font-size:.84rem}.history-item time{color:var(--muted);font:600 .7rem var(--mono)}
+.empty{padding:32px;text-align:center;color:var(--muted)}
+.dialog{border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:10px;box-shadow:0 30px 100px #000;padding:0;max-width:520px;width:calc(100% - 28px)}.dialog::backdrop{background:rgba(0,0,0,.72)}.dialog form{padding:20px}.dialog h3{margin-top:0}.dialog-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:18px}
+.footer-note{margin-top:22px;color:var(--muted);font-size:.76rem}
+@media(max-width:980px){.grid,.controller-stage,.rehearse{grid-template-columns:1fr}.topbar{flex-wrap:wrap;padding:10px 0}.nav{order:3;width:100%}.status{margin-left:auto}.mapping th{top:122px}}
+@media(max-width:620px){.shell{padding:0 14px 34px}.form-grid{grid-template-columns:1fr}.span-2{grid-column:auto}.metrics{grid-template-columns:1fr}.metric{border-right:0;border-bottom:1px solid var(--line)}.controller-stage{padding:14px}.controller{width:100%}.ctrl-btn{width:32px;height:32px}.b4,.b5{width:62px}.section-head{align-items:start;flex-direction:column}.toolbar{width:100%}.toolbar button{flex:1}.mapping th{top:132px}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+@media print{body{background:#fff;color:#111}.shell{max-width:none;padding:0}.topbar,.nav,.no-print,.view:not(#mapView){display:none!important}#mapView{display:block!important}.card{box-shadow:none;border-color:#999;background:#fff}.mapping{min-width:0;font-size:9pt}.mapping th{position:static;background:#eee;color:#222}.mapping td{border-color:#bbb;padding:6px}.mapping input,.mapping select{border:0;color:#111;background:transparent;padding:0;min-height:0;appearance:none}.row-actions,.metrics{display:none}.section-head p{color:#333}}
+</style>
+</head>
+<body>
+<div class="shell">
+<header class="topbar">
+  <div class="brand"><div class="brand-mark">PC</div><div><h1>Pad Check</h1><span>DCS gamepad setup & rehearsal</span></div></div>
+  <nav class="nav" aria-label="Workspace">
+    <button type="button" data-view="setup" aria-selected="true">01 Setup</button>
+    <button type="button" data-view="map" aria-selected="false">02 Map</button>
+    <button type="button" data-view="rehearse" aria-selected="false">03 Rehearse</button>
+    <button type="button" data-view="preflight" aria-selected="false">04 Preflight</button>
+  </nav>
+  <div class="status"><span class="dot" id="liveDot"></span><span id="connectionText">No gamepad detected</span></div>
+</header>
+<main>
+<section class="view active" id="setupView">
+  <div class="section-head"><div><div class="eyebrow">Configure / establish the contract</div><h2>Build a pad you can fly by feel.</h2><p>Design around reachable flight-critical controls, then prove the layout with the live input monitor. Pad Check plans bindings; DCS remains the source of truth.</p></div><div class="toolbar no-print"><button type="button" id="loadStarter">Load starter set</button><button type="button" id="resetAll" class="danger ghost">Reset profile</button></div></div>
+  <div class="grid">
+    <section class="card" aria-labelledby="profileTitle"><div class="card-h"><h3 id="profileTitle">Flight profile</h3><span class="pill" id="saveState">Saved locally</span></div><div class="card-b form-grid">
+      <label class="span-2">Profile name<input id="profileName" value="First gamepad sortie"></label>
+      <label>Aircraft / seat<input id="aircraft" value="F/A-18C Pilot"></label>
+      <label>Mission focus<select id="mission"><option>Basic flight</option><option>Air-to-air</option><option>Air-to-ground</option><option>Carrier operations</option><option>Helicopter</option><option>Mission editor</option></select></label>
+      <label>Controller labels<select id="layout"><option value="xbox">Xbox / XInput</option><option value="ps">PlayStation</option><option value="generic">Generic numbered</option></select></label>
+      <label>Primary modifier<select id="modifier"><option value="None">None</option><option value="LB">LB / L1</option><option value="RB">RB / R1</option><option value="LT">LT / L2</option><option value="RT">RT / R2</option><option value="Start">Start / Options</option></select></label>
+      <label class="span-2">Design rule<textarea id="rule">Keep pitch, roll, trim, view, trigger, weapon release, sensor control and countermeasures reachable without releasing the flight controls.</textarea></label>
+      <div class="notice span-2"><strong>Scope:</strong> this app does not write DCS input files. Enter the final assignments in DCS Options → Controls and validate them in the loaded aircraft.</div>
+    </div></section>
+    <section class="card" aria-labelledby="monitorTitle">
+      <div class="metrics"><div class="metric"><strong id="assignedCount">0</strong><span>assigned actions</span></div><div class="metric"><strong id="issueCount">0</strong><span>mapping issues</span></div><div class="metric"><strong id="checkCount">0/6</strong><span>preflight gates</span></div></div>
+      <div class="card-h"><h3 id="monitorTitle">Live input monitor</h3><button type="button" id="scanPad" class="ghost no-print">Scan controllers</button></div>
+      <div class="controller-stage">
+        <div class="controller" aria-label="Gamepad input visualization">
+          <div class="ctrl-btn b0" data-button="0">A</div><div class="ctrl-btn b1" data-button="1">B</div><div class="ctrl-btn b2" data-button="2">X</div><div class="ctrl-btn b3" data-button="3">Y</div>
+          <div class="ctrl-btn b4" data-button="4">LB</div><div class="ctrl-btn b5" data-button="5">RB</div><div class="ctrl-btn b6" data-button="6">LT</div><div class="ctrl-btn b7" data-button="7">RT</div><div class="ctrl-btn b8" data-button="8">SEL</div><div class="ctrl-btn b9" data-button="9">START</div>
+          <div class="stick ls"><i id="leftStick"></i></div><div class="stick rs"><i id="rightStick"></i></div><div class="dpad"><span>D-PAD</span></div>
+        </div>
+        <div class="input-readout">
+          <div class="axis-row"><span>L-X</span><div class="track"><i class="needle" id="axis0"></i></div><output id="axis0v">0.00</output></div>
+          <div class="axis-row"><span>L-Y</span><div class="track"><i class="needle" id="axis1"></i></div><output id="axis1v">0.00</output></div>
+          <div class="axis-row"><span>R-X</span><div class="track"><i class="needle" id="axis2"></i></div><output id="axis2v">0.00</output></div>
+          <div class="axis-row"><span>R-Y</span><div class="track"><i class="needle" id="axis3"></i></div><output id="axis3v">0.00</output></div>
+          <p class="small" id="monitorHelp">Connect a controller, press a button, then choose “Scan controllers.” Browser privacy rules may require one physical input before detection.</p>
+        </div>
+      </div>
+    </section>
+  </div>
+</section>
+<section class="view" id="mapView">
+  <div class="section-head"><div><div class="eyebrow">Configure / map by priority</div><h2>One action, one deliberate home.</h2><p>Use a layer only when base controls are full. Duplicate assignments are flagged unless the DCS command context makes the overlap intentional.</p></div><div class="toolbar no-print"><button type="button" id="addAction">Add action</button><button type="button" id="exportBtn">Export JSON</button><button type="button" id="importBtn">Import JSON</button><button type="button" onclick="window.print()">Print card</button><input id="importFile" type="file" accept="application/json" hidden></div></div>
+  <section class="card"><div class="metrics"><div class="metric"><strong id="urgentOpen">0</strong><span>flight-critical open</span></div><div class="metric"><strong id="duplicates">0</strong><span>duplicate slots</span></div><div class="metric"><strong id="layersUsed">0</strong><span>shifted assignments</span></div></div><div class="mapping-wrap"><table class="mapping"><thead><tr><th>Action</th><th>Priority</th><th>Phase</th><th>Layer</th><th>Physical input</th><th>Status</th><th class="no-print">Tools</th></tr></thead><tbody id="mappingBody"></tbody></table></div></section>
+  <p class="footer-note">Tip: standardize flight controls and trim across aircraft; let aircraft-specific HOTAS logic occupy the remaining reachable inputs.</p>
+</section>
+<section class="view" id="rehearseView">
+  <div class="section-head"><div><div class="eyebrow">Operate / eyes-out recall</div><h2>Call it. Find it. Confirm it.</h2><p>Pad Check calls an assigned action. Press the mapped gamepad button, or reveal the answer and grade yourself when no controller is connected.</p></div><div class="toolbar"><button type="button" class="primary" id="startDrill">Start 10-call drill</button><button type="button" id="stopDrill" class="ghost">End drill</button></div></div>
+  <div class="rehearse">
+    <section class="card prompt" aria-live="polite"><div><div class="pill" id="drillPhase">Ready</div><h3 id="drillAction">Map controls first</h3><div class="answer" id="drillAnswer"></div><div class="toolbar" style="justify-content:center;margin-top:22px"><button type="button" id="revealBtn">Reveal</button><button type="button" id="correctBtn" class="primary">I found it</button><button type="button" id="missBtn">Miss / wrong input</button></div><div class="scoreline" style="margin-top:22px"><span id="drillProgress">0 / 10</span><span id="drillScore">0 correct</span><span id="drillTimer">0.0 s</span></div></div></section>
+    <aside class="card"><div class="card-h"><h3>Drill history</h3><button type="button" id="clearHistory" class="ghost">Clear</button></div><div class="card-b"><div class="history" id="history"></div></div></aside>
+  </div>
+</section>
+<section class="view" id="preflightView">
+  <div class="section-head"><div><div class="eyebrow">Verify / inside DCS</div><h2>The paper map is not the binding.</h2><p>Finish these checks in the exact aircraft and seat before calling the profile ready.</p></div><div class="toolbar"><button type="button" id="copySummary">Copy handoff</button><button type="button" id="clearChecks" class="ghost">Clear checks</button></div></div>
+  <div class="grid">
+    <section class="card"><div class="card-h"><h3>Six readiness gates</h3><span class="pill" id="readyPill">Not ready</span></div><div class="card-b checklist" id="checklist"></div></section>
+    <aside class="card"><div class="card-h"><h3>Handoff summary</h3></div><div class="card-b"><p id="summaryText"></p><label>In-cockpit findings<textarea id="notes" placeholder="Record any command-name mismatch, over-sensitive axis, unreachable chord, or accidental activation."></textarea></label><div class="notice" style="margin-top:14px">Back up the final DCS profile from the Controls screen. Pad Check’s JSON export is a planning backup, not a DCS-compatible binding file.</div></div></aside>
+  </div>
+</section>
+</main>
+</div>
+<dialog class="dialog" id="actionDialog"><form method="dialog" id="actionForm"><h3>Add mapping row</h3><div class="form-grid"><label class="span-2">DCS action label<input id="newAction" required></label><label>Priority<select id="newPriority"><option>Critical</option><option>High</option><option>Normal</option></select></label><label>Phase<select id="newPhase"><option>Flight</option><option>Combat</option><option>Sensor</option><option>View</option><option>Ground</option><option>Radio</option></select></label></div><div class="dialog-actions"><button value="cancel">Cancel</button><button value="default" class="primary" id="confirmAdd">Add row</button></div></form></dialog>
+<script>
+(()=>{
+'use strict';
+const KEY='dcs-pad-check-v1';
+const labels={
+ xbox:['A','B','X','Y','LB','RB','LT','RT','View','Menu','LS','RS','D↑','D↓','D←','D→'],
+ ps:['Cross','Circle','Square','Triangle','L1','R1','L2','R2','Share','Options','L3','R3','D↑','D↓','D←','D→'],
+ generic:Array.from({length:16},(_,i)=>'Button '+i)
+};
+const starter=[
+ ['Pitch / Roll','Critical','Flight','Base','Left stick'],['Rudder','Critical','Flight','Base','Triggers'],['Throttle up / down','Critical','Flight','Base','D↑ / D↓'],['Trim','Critical','Flight','Modifier','D-pad'],['View / mouse look','Critical','View','Base','Right stick'],['Center view','High','View','Base','RS press'],['Trigger — first detent','High','Combat','Base','RT'],['Weapon release','High','Combat','Base','A'],['Countermeasures','High','Combat','Modifier','B'],['Sensor control / TDC slew','High','Sensor','Modifier','Right stick'],['TDC depress / designate','High','Sensor','Modifier','RS press'],['Target management hat','High','Sensor','Modifier','D-pad'],['Speed brake','Normal','Flight','Modifier','Y'],['Landing gear','Normal','Ground','Modifier','X'],['Flaps','Normal','Ground','Modifier','A'],['Radio / push-to-talk','Normal','Radio','Base','LB']
+];
+const checks=[
+ ['Device column confirmed','The intended gamepad appears in the correct DCS controller column.'],['Axis motion verified','Pitch, roll, rudder, throttle and view move in the intended direction without duplicate axes.'],['Modifiers tested','Every shifted command fires only with the intended modifier held.'],['Critical controls exercised','Flight, trim, view, trigger, release and countermeasures respond in the loaded aircraft.'],['Accidental activations checked','No base press triggers an unwanted shifted command or cockpit action.'],['Profile backed up','The final DCS controller profile has been saved or exported from DCS.']
+];
+const defaults={profileName:'First gamepad sortie',aircraft:'F/A-18C Pilot',mission:'Basic flight',layout:'xbox',modifier:'LB',rule:'Keep pitch, roll, trim, view, trigger, weapon release, sensor control and countermeasures reachable without releasing the flight controls.',notes:'',rows:starter.map((r,i)=>({id:Date.now()+i,action:r[0],priority:r[1],phase:r[2],layer:r[3],physical:r[4]})),checks:Array(6).fill(false),history:[]};
+let state=load(); let pad=null; let listeningId=null; let previousButtons=[]; let drill={active:false,queue:[],index:0,correct:0,started:0,totalStarted:0,timer:null};
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+function load(){try{return {...defaults,...JSON.parse(localStorage.getItem(KEY)||'{}')}}catch{return structuredClone(defaults)}}
+function save(){localStorage.setItem(KEY,JSON.stringify(state));$('#saveState').textContent='Saved locally';updateAll()}
+function esc(s){return String(s).replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]))}
+function setupFields(){['profileName','aircraft','mission','layout','modifier','rule','notes'].forEach(id=>{const e=$('#'+id);e.value=state[id]??'';e.addEventListener('input',()=>{state[id]=e.value;$('#saveState').textContent='Saving…';save()})})}
+function options(vals,current){return vals.map(v=>`<option${v===current?' selected':''}>${esc(v)}</option>`).join('')}
+function renderMap(){const body=$('#mappingBody');body.innerHTML='';const seen={};state.rows.forEach(r=>{const key=(r.layer+'|'+r.physical).toLowerCase();if(r.physical)seen[key]=(seen[key]||0)+1});state.rows.forEach(r=>{
+  const key=(r.layer+'|'+r.physical).toLowerCase(), duplicate=r.physical&&seen[key]>1, open=!r.physical, issue=duplicate||open;
+  const tr=document.createElement('tr');if(issue)tr.className='issue';tr.dataset.id=r.id;
+  tr.innerHTML=`<td><input class="action" aria-label="Action" value="${esc(r.action)}"></td><td><select data-k="priority">${options(['Critical','High','Normal'],r.priority)}</select></td><td><select data-k="phase">${options(['Flight','Combat','Sensor','View','Ground','Radio','Other'],r.phase)}</select></td><td><select class="layer" data-k="layer">${options(['Base','Modifier','Second modifier'],r.layer)}</select></td><td><input class="physical" aria-label="Physical input" value="${esc(r.physical)}"></td><td>${duplicate?'<span class="pill bad">Duplicate</span>':open?'<span class="pill bad">Open</span>':'<span class="pill good">Mapped</span>'}</td><td class="no-print"><div class="row-actions"><button type="button" data-listen="${r.id}">${listeningId===r.id?'Listening…':'Listen'}</button><button type="button" data-remove="${r.id}" class="danger">×</button></div></td>`;
+  body.appendChild(tr);
+ });
+ body.querySelectorAll('input,select').forEach(el=>el.addEventListener('change',e=>{const tr=e.target.closest('tr'),r=state.rows.find(x=>x.id==tr.dataset.id);const k=e.target.dataset.k||(e.target.classList.contains('action')?'action':'physical');r[k]=e.target.value.trim();save()}));
+ body.querySelectorAll('[data-remove]').forEach(b=>b.onclick=()=>{state.rows=state.rows.filter(r=>r.id!=b.dataset.remove);save()});
+ body.querySelectorAll('[data-listen]').forEach(b=>b.onclick=()=>{listeningId=Number(b.dataset.listen);renderMap();$('#connectionText').textContent='Press a gamepad button to assign';});
+}
+function stats(){const assigned=state.rows.filter(r=>r.physical).length;const keys={};state.rows.filter(r=>r.physical).forEach(r=>{const k=(r.layer+'|'+r.physical).toLowerCase();keys[k]=(keys[k]||0)+1});const dups=Object.values(keys).filter(n=>n>1).length;const urgent=state.rows.filter(r=>r.priority==='Critical'&&!r.physical).length;const issues=urgent+dups;const checked=state.checks.filter(Boolean).length;
+ $('#assignedCount').textContent=assigned;$('#issueCount').textContent=issues;$('#checkCount').textContent=checked+'/6';$('#urgentOpen').textContent=urgent;$('#duplicates').textContent=dups;$('#layersUsed').textContent=state.rows.filter(r=>r.physical&&r.layer!=='Base').length;$('#readyPill').textContent=checked===6&&issues===0?'Ready to fly':'Not ready';$('#readyPill').className='pill '+(checked===6&&issues===0?'good':'bad');
+ $('#summaryText').textContent=`${state.profileName}: ${assigned} actions mapped for ${state.aircraft}; ${issues} mapping issue${issues===1?'':'s'}; ${checked} of 6 DCS verification gates complete.`;
+}
+function renderChecks(){const wrap=$('#checklist');wrap.innerHTML=checks.map((c,i)=>`<label class="check"><input type="checkbox" data-check="${i}" ${state.checks[i]?'checked':''}><span><strong>${c[0]}</strong><span>${c[1]}</span></span></label>`).join('');wrap.querySelectorAll('input').forEach(e=>e.onchange=()=>{state.checks[+e.dataset.check]=e.checked;save()})}
+function renderHistory(){const h=$('#history');if(!state.history.length){h.innerHTML='<div class="empty">No completed drills yet.</div>';return}h.innerHTML=state.history.slice(0,10).map(x=>`<div class="history-item"><span><strong>${x.score}/10</strong> · avg ${x.avg}s · ${esc(x.aircraft)}</span><time>${esc(x.date)}</time></div>`).join('')}
+function updateAll(){renderMap();renderChecks();renderHistory();stats()}
+function setView(name){$$('.view').forEach(v=>v.classList.toggle('active',v.id===name+'View'));$$('.nav button').forEach(b=>b.setAttribute('aria-selected',b.dataset.view===name));localStorage.setItem(KEY+'-view',name)}
+$$('.nav button').forEach(b=>b.onclick=()=>setView(b.dataset.view));
+function getPads(){return navigator.getGamepads?[...navigator.getGamepads()].filter(Boolean):[]}
+function scan(){const pads=getPads();pad=pads[0]||null;$('#liveDot').classList.toggle('live',!!pad);$('#connectionText').textContent=pad?pad.id.slice(0,48):'No gamepad detected';$('#monitorHelp').textContent=pad?`${pad.buttons.length} buttons · ${pad.axes.length} axes · live input active`:'No device returned. Press a controller button, then scan again.'}
+function mapButton(index){const set=labels[state.layout]||labels.generic;return set[index]||'Button '+index}
+function monitor(){const fresh=getPads();if(fresh.length)pad=fresh[0];if(pad){
+  pad=getPads().find(p=>p.index===pad.index)||pad;$('.dot').classList.add('live');$('#connectionText').textContent=pad.id.slice(0,48);
+  pad.buttons.forEach((b,i)=>{const pressed=b.pressed||b.value>.5, justPressed=pressed&&!previousButtons[i];const el=document.querySelector(`[data-button="${i}"]`);if(el)el.classList.toggle('on',pressed);if(listeningId&&justPressed){const r=state.rows.find(x=>x.id===listeningId);if(r){r.physical=mapButton(i);listeningId=null;save()}}});
+  [0,1,2,3].forEach(i=>{const val=pad.axes[i]||0,needle=$('#axis'+i),out=$('#axis'+i+'v');needle.style.left=((val+1)*50)+'%';out.value=val.toFixed(2)});$('#leftStick').style.transform=`translate(${(pad.axes[0]||0)*14}px,${(pad.axes[1]||0)*14}px)`;$('#rightStick').style.transform=`translate(${(pad.axes[2]||0)*14}px,${(pad.axes[3]||0)*14}px)`;
+  if(drill.active){const current=drill.queue[drill.index];if(current&&current.physical){const expected=current.physical.toLowerCase();pad.buttons.forEach((b,i)=>{const pressed=b.pressed||b.value>.7;if(pressed&&!previousButtons[i]&&expected.includes(mapButton(i).toLowerCase()))grade(true)})}}
+  previousButtons=pad.buttons.map(b=>b.pressed||b.value>.5);
+ }
+ requestAnimationFrame(monitor)
+}
+window.addEventListener('gamepadconnected',e=>{pad=e.gamepad;scan()});window.addEventListener('gamepaddisconnected',scan);$('#scanPad').onclick=scan;
+$('#addAction').onclick=()=>$('#actionDialog').showModal();$('#confirmAdd').onclick=e=>{e.preventDefault();const action=$('#newAction').value.trim();if(!action)return;state.rows.push({id:Date.now(),action,priority:$('#newPriority').value,phase:$('#newPhase').value,layer:'Base',physical:''});$('#newAction').value='';$('#actionDialog').close();save()};
+$('#loadStarter').onclick=()=>{if(confirm('Replace mapping rows with the complete starter set?')){state.rows=defaults.rows.map((r,i)=>({...r,id:Date.now()+i}));save();setView('map')}};
+$('#resetAll').onclick=()=>{if(confirm('Reset the entire Pad Check profile and drill history?')){state=structuredClone(defaults);setupFields();save()}};
+$('#exportBtn').onclick=()=>{const blob=new Blob([JSON.stringify({...state,exported:new Date().toISOString()},null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`pad-check-${state.aircraft.toLowerCase().replace(/[^a-z0-9]+/g,'-')}.json`;a.click();URL.revokeObjectURL(a.href)};
+$('#importBtn').onclick=()=>$('#importFile').click();$('#importFile').onchange=async e=>{try{const data=JSON.parse(await e.target.files[0].text());if(!Array.isArray(data.rows)||!Array.isArray(data.checks))throw Error();state={...defaults,...data};setupFields();save()}catch{alert('That file is not a valid Pad Check backup.')}};
+function startDrill(){const pool=state.rows.filter(r=>r.physical);if(pool.length<3){alert('Assign at least three actions before rehearsing.');setView('map');return}drill.queue=Array.from({length:10},()=>pool[Math.floor(Math.random()*pool.length)]);drill.active=true;drill.index=0;drill.correct=0;drill.totalStarted=performance.now();drill.started=drill.totalStarted;showPrompt();clearInterval(drill.timer);drill.timer=setInterval(tick,100)}
+function showPrompt(){const r=drill.queue[drill.index];if(!r)return finishDrill();$('#drillPhase').textContent=r.phase;$('#drillAction').textContent=r.action;$('#drillAnswer').textContent='';$('#drillProgress').textContent=`${drill.index+1} / 10`;drill.started=performance.now()}
+function tick(){if(drill.active)$('#drillTimer').textContent=((performance.now()-drill.started)/1000).toFixed(1)+' s'}
+function grade(ok){if(!drill.active)return;if(ok)drill.correct++;drill.index++;$('#drillScore').textContent=drill.correct+' correct';showPrompt()}
+function finishDrill(){if(!drill.active)return;drill.active=false;clearInterval(drill.timer);const calls=Math.max(1,drill.index);const avg=((performance.now()-drill.totalStarted)/1000/calls).toFixed(1);state.history.unshift({score:drill.correct,avg,date:new Date().toLocaleDateString(),aircraft:state.aircraft});state.history=state.history.slice(0,20);save();$('#drillPhase').textContent='Complete';$('#drillAction').textContent=`${drill.correct} / 10`;$('#drillAnswer').textContent='Run it again until the critical controls are automatic.'}
+$('#startDrill').onclick=startDrill;$('#stopDrill').onclick=finishDrill;$('#correctBtn').onclick=()=>grade(true);$('#missBtn').onclick=()=>grade(false);$('#revealBtn').onclick=()=>{const r=drill.queue[drill.index];if(r)$('#drillAnswer').textContent=(r.layer==='Base'?'':state.modifier+' + ')+r.physical};$('#clearHistory').onclick=()=>{state.history=[];save()};
+$('#clearChecks').onclick=()=>{state.checks=Array(6).fill(false);save()};$('#copySummary').onclick=async()=>{const text=$('#summaryText').textContent+' Notes: '+(state.notes||'none');try{await navigator.clipboard.writeText(text);$('#copySummary').textContent='Copied';setTimeout(()=>$('#copySummary').textContent='Copy handoff',1200)}catch{prompt('Copy this handoff:',text)}};
+setupFields();save();setView(localStorage.getItem(KEY+'-view')||'setup');scan();monitor();
+})();
+</script>
+</body>
+</html>
