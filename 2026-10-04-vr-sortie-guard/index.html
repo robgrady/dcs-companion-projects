@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark">
+<title>VR Sortie Guard — DCS Session Degradation Log</title>
+<style>
+:root{
+  --bg:#0b0d0e;--panel:#131719;--panel-2:#191e20;--ink:#f0eee7;--muted:#a7ada9;
+  --line:#303638;--accent:#e6a33a;--accent-ink:#191107;--ok:#76b88a;--warn:#e3b85f;
+  --bad:#e06c5f;--info:#79a8c9;--focus:#f4c46e;--r:6px;--shadow:0 16px 40px rgba(0,0,0,.24)
+}
+*{box-sizing:border-box}
+html{background:var(--bg);color:var(--ink);font-family:"Avenir Next",Avenir,"Segoe UI",sans-serif}
+body{margin:0;min-height:100vh;background:linear-gradient(90deg,rgba(255,255,255,.015) 1px,transparent 1px) 0 0/32px 32px,var(--bg)}
+button,input,select,textarea{font:inherit}
+button,input,select,textarea,a{outline:none}
+:focus-visible{box-shadow:0 0 0 3px var(--bg),0 0 0 5px var(--focus)!important}
+button{min-height:44px;border:1px solid var(--line);border-radius:var(--r);background:var(--panel-2);color:var(--ink);cursor:pointer;padding:.68rem .9rem;font-weight:700;letter-spacing:.01em}
+button:hover{border-color:#596164;background:#202628}
+button.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+button.danger{color:#ffc5bd;border-color:#7a413b}
+button.ghost{background:transparent}
+input,select,textarea{width:100%;min-height:44px;border:1px solid var(--line);border-radius:var(--r);background:#0e1112;color:var(--ink);padding:.65rem .72rem}
+textarea{min-height:76px;resize:vertical}
+label{display:grid;gap:.36rem;color:var(--muted);font-size:.78rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+header{position:sticky;top:0;z-index:5;display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:.8rem clamp(1rem,3vw,2rem);border-bottom:1px solid var(--line);background:rgba(11,13,14,.94);backdrop-filter:blur(10px)}
+.brand{display:flex;align-items:center;gap:.85rem}.brand-mark{width:10px;height:34px;background:var(--accent);border-radius:2px}.brand h1{font-size:1rem;margin:0;letter-spacing:.14em;text-transform:uppercase}.brand p{margin:.18rem 0 0;color:var(--muted);font-size:.72rem}
+.header-actions{display:flex;gap:.5rem}.header-actions button{min-height:38px;padding:.45rem .7rem;font-size:.78rem}
+main{width:min(1500px,100%);margin:auto;padding:clamp(1rem,3vw,2rem);display:grid;grid-template-columns:minmax(260px,.72fr) minmax(380px,1.25fr) minmax(300px,.85fr);gap:1rem;align-items:start}
+.stack{display:grid;gap:1rem}.panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);overflow:hidden}.panel-head{display:flex;justify-content:space-between;align-items:center;gap:.7rem;padding:.85rem 1rem;border-bottom:1px solid var(--line)}.panel-head h2{font-size:.78rem;margin:0;letter-spacing:.12em;text-transform:uppercase}.panel-body{padding:1rem}.kicker{color:var(--accent);font:700 .7rem ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.1em;text-transform:uppercase}
+.status-panel{border-top:3px solid var(--info)}.status-panel[data-level="stable"]{border-top-color:var(--ok)}.status-panel[data-level="watch"]{border-top-color:var(--warn)}.status-panel[data-level="recover"]{border-top-color:var(--bad)}
+.status-line{display:flex;align-items:flex-start;justify-content:space-between;gap:1rem}.status-copy h2{font-size:clamp(1.8rem,4vw,3.6rem);line-height:.92;margin:.35rem 0;text-transform:uppercase;letter-spacing:-.05em}.status-copy p{color:var(--muted);margin:.7rem 0 0;max-width:55ch}.clock{text-align:right;font:700 1.05rem ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--muted)}
+.metric-strip{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--line);margin:1rem -1rem -1rem}.metric{padding:.8rem 1rem;border-right:1px solid var(--line)}.metric:last-child{border-right:0}.metric b{display:block;font:700 1.25rem ui-monospace,SFMono-Regular,Menlo,monospace}.metric span{color:var(--muted);font-size:.7rem;text-transform:uppercase;letter-spacing:.08em}
+.form-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.75rem}.form-grid .wide{grid-column:1/-1}.hint{font-size:.75rem;line-height:1.45;color:var(--muted);margin:.7rem 0 0}.inline-actions{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.85rem}
+.event-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.55rem}.event-grid button{font-size:.78rem;text-align:left;min-height:58px}.event-grid button span{display:block;color:var(--muted);font-size:.67rem;font-weight:500;margin-top:.2rem}
+.sample-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.6rem}.sample-grid label{font-size:.67rem}.delta{font:700 .75rem ui-monospace,SFMono-Regular,Menlo,monospace;margin-top:.3rem;color:var(--muted)}.delta.bad{color:var(--bad)}.delta.good{color:var(--ok)}
+.timeline{display:grid;gap:.55rem;max-height:430px;overflow:auto;padding-right:.2rem}.empty{padding:1.4rem;border:1px dashed var(--line);color:var(--muted);text-align:center;font-size:.84rem}.entry{display:grid;grid-template-columns:66px 1fr auto;gap:.65rem;align-items:start;padding:.7rem;border:1px solid var(--line);background:#101415;border-radius:var(--r)}.entry time{font:700 .72rem ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--muted)}.entry strong{display:block;font-size:.84rem}.entry p{margin:.25rem 0 0;color:var(--muted);font-size:.75rem;line-height:1.35}.tag{font:700 .63rem ui-monospace,SFMono-Regular,Menlo,monospace;text-transform:uppercase;border:1px solid var(--line);padding:.22rem .34rem;border-radius:3px}.tag.sample{color:var(--info)}.tag.risk{color:var(--warn)}.tag.recovery{color:var(--ok)}
+.guard-list{display:grid;gap:.6rem}.guard{display:grid;grid-template-columns:auto 1fr;gap:.65rem;padding:.7rem 0;border-bottom:1px solid var(--line)}.guard:last-child{border:0}.guard-dot{width:10px;height:10px;border-radius:50%;background:var(--line);margin-top:.28rem}.guard.active .guard-dot{background:var(--warn)}.guard strong{display:block;font-size:.82rem}.guard p{margin:.22rem 0 0;color:var(--muted);font-size:.73rem;line-height:1.35}
+.threshold{display:grid;grid-template-columns:1fr 90px;gap:.6rem;align-items:end;margin-bottom:.65rem}.threshold input{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+.note{padding:.75rem;border:1px solid var(--line);background:#0e1112;color:var(--muted);font-size:.75rem;line-height:1.5;border-radius:var(--r)}
+footer{width:min(1500px,100%);margin:auto;padding:0 2rem 2rem;color:var(--muted);font-size:.7rem}.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.toast{position:fixed;right:1rem;bottom:1rem;z-index:20;background:var(--ink);color:var(--bg);padding:.75rem 1rem;border-radius:var(--r);font-weight:700;box-shadow:var(--shadow);transform:translateY(150%);transition:transform .18s ease}.toast.show{transform:translateY(0)}
+@media(max-width:1050px){main{grid-template-columns:1fr 1fr}.center{grid-column:1/-1;grid-row:1}.metric-strip{grid-template-columns:repeat(4,1fr)}}
+@media(max-width:700px){header{align-items:flex-start}.header-actions{display:none}main{display:block}.stack,.panel{margin-bottom:1rem}.status-line{display:block}.clock{text-align:left;margin-top:.6rem}.metric-strip{grid-template-columns:1fr 1fr}.metric:nth-child(2){border-right:0}.metric:nth-child(-n+2){border-bottom:1px solid var(--line)}.event-grid{grid-template-columns:1fr 1fr}.sample-grid{grid-template-columns:1fr 1fr}.entry{grid-template-columns:58px 1fr}.entry .tag{grid-column:2}}
+@media print{header,.event-grid,.inline-actions,.header-actions,.sample-controls,footer{display:none!important}body{background:#fff;color:#111}main{display:block;padding:0}.panel{box-shadow:none;border-color:#aaa;break-inside:avoid;margin-bottom:12px;background:#fff}.panel-body,.panel-head{background:#fff}.status-copy p,.hint,.entry p,.metric span,.clock,.guard p,.note{color:#444}input,textarea,select{border-color:#999;background:#fff;color:#111}.timeline{max-height:none}.entry{background:#fff;border-color:#bbb}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand"><span class="brand-mark" aria-hidden="true"></span><div><h1>VR Sortie Guard</h1><p>DCS session degradation log · offline</p></div></div>
+  <div class="header-actions"><button id="printBtn">Print log</button><button id="exportBtn">Export JSON</button><button id="resetBtn" class="danger">New session</button></div>
+</header>
+<main>
+  <aside class="stack">
+    <section class="panel" aria-labelledby="setup-title">
+      <div class="panel-head"><h2 id="setup-title">Session contract</h2><span class="kicker">01 / setup</span></div>
+      <div class="panel-body">
+        <div class="form-grid">
+          <label>Headset<input id="headset" value="Quest 3" autocomplete="off"></label>
+          <label>Link method<select id="link"><option>Virtual Desktop</option><option>Meta Link</option><option>Steam Link</option><option>OpenXR / other</option></select></label>
+          <label>GPU<input id="gpu" placeholder="RTX 3080 Ti" autocomplete="off"></label>
+          <label>VRAM GB<input id="vram" type="number" min="1" max="64" step="1" placeholder="12"></label>
+          <label class="wide">Server / mission<input id="mission" placeholder="Server and mission name" autocomplete="off"></label>
+          <label>Aircraft<input id="aircraft" placeholder="F-16C" autocomplete="off"></label>
+          <label>Target FPS<input id="targetFps" type="number" min="20" max="180" value="72"></label>
+        </div>
+        <p class="hint">Describe one repeatable session. The guard records observations; it does not diagnose DCS, drivers, or hardware.</p>
+      </div>
+    </section>
+
+    <section class="panel" aria-labelledby="threshold-title">
+      <div class="panel-head"><h2 id="threshold-title">Guard thresholds</h2><span class="kicker">personal</span></div>
+      <div class="panel-body">
+        <div class="threshold"><label>FPS drop from baseline</label><input id="fpsThreshold" type="number" min="5" max="80" value="20" aria-label="FPS drop threshold percent"></div>
+        <div class="threshold"><label>Game latency rise</label><input id="latencyThreshold" type="number" min="5" max="300" value="15" aria-label="Game latency increase threshold milliseconds"></div>
+        <div class="threshold"><label>Consecutive bad samples</label><input id="badLimit" type="number" min="1" max="10" value="2" aria-label="Consecutive bad sample limit"></div>
+        <p class="hint">A sample is flagged when either threshold is crossed. Adjust these to fit your normal frame pacing.</p>
+      </div>
+    </section>
+  </aside>
+
+  <section class="stack center">
+    <section class="panel status-panel" id="statusPanel" data-level="idle" aria-live="polite">
+      <div class="panel-body">
+        <div class="status-line">
+          <div class="status-copy"><span class="kicker" id="statusKicker">Awaiting baseline</span><h2 id="statusTitle">Set the line</h2><p id="statusText">Capture performance while the session is healthy. Later samples will be compared with this baseline.</p></div>
+          <div class="clock"><span id="elapsed">00:00:00</span><br><small id="sampleCount">0 samples</small></div>
+        </div>
+        <div class="metric-strip">
+          <div class="metric"><b id="metricFps">—</b><span>current FPS</span></div>
+          <div class="metric"><b id="metricGame">—</b><span>game latency</span></div>
+          <div class="metric"><b id="metricRisk">0</b><span>risk events</span></div>
+          <div class="metric"><b id="metricBad">0</b><span>bad streak</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel" aria-labelledby="sample-title">
+      <div class="panel-head"><h2 id="sample-title">Performance sample</h2><span class="kicker">02 / observe</span></div>
+      <div class="panel-body">
+        <div class="sample-grid">
+          <label>FPS<input id="fps" type="number" min="1" max="300" step="1" inputmode="decimal"><span class="delta" id="fpsDelta">baseline —</span></label>
+          <label>Game ms<input id="gameMs" type="number" min="0" max="1000" step="1" inputmode="decimal"><span class="delta" id="gameDelta">baseline —</span></label>
+          <label>Encode ms<input id="encodeMs" type="number" min="0" max="1000" step="1" inputmode="decimal"><span class="delta" id="encodeDelta">reference</span></label>
+          <label>Network ms<input id="networkMs" type="number" min="0" max="1000" step="1" inputmode="decimal"><span class="delta" id="networkDelta">reference</span></label>
+        </div>
+        <label style="margin-top:.8rem">Observation<input id="sampleNote" placeholder="Optional: location, view direction, symptoms" autocomplete="off"></label>
+        <div class="inline-actions sample-controls"><button id="baselineBtn" class="primary">Capture baseline</button><button id="sampleBtn">Log comparison</button></div>
+      </div>
+    </section>
+
+    <section class="panel" aria-labelledby="event-title">
+      <div class="panel-head"><h2 id="event-title">Event wire</h2><span class="kicker">03 / mark</span></div>
+      <div class="panel-body">
+        <div class="event-grid" id="eventGrid">
+          <button data-event="F10 map opened" data-kind="risk">F10 map<span>mark a map exposure</span></button>
+          <button data-event="Death / respawn" data-kind="risk">Respawn<span>new life or aircraft</span></button>
+          <button data-event="Slot or aircraft changed" data-kind="risk">Slot swap<span>changed role / module</span></button>
+          <button data-event="Server rejoined" data-kind="recovery">Rejoin<span>left and re-entered</span></button>
+          <button data-event="Alt-tab recovery tried" data-kind="recovery">Alt-tab<span>recovery attempt</span></button>
+          <button data-event="Headset sleep / wake tried" data-kind="recovery">Sleep / wake<span>recovery attempt</span></button>
+          <button data-event="Streaming codec switched" data-kind="recovery">Codec switch<span>recovery attempt</span></button>
+          <button data-event="DCS fully restarted" data-kind="recovery">Full restart<span>new clean process</span></button>
+          <button data-event="Manual marker" data-kind="note">Other event<span>use observation field</span></button>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel" aria-labelledby="timeline-title">
+      <div class="panel-head"><h2 id="timeline-title">Session timeline</h2><span class="kicker" id="timelineCount">0 entries</span></div>
+      <div class="panel-body"><div class="timeline" id="timeline"><div class="empty">Capture a baseline to begin the wire.</div></div></div>
+    </section>
+  </section>
+
+  <aside class="stack">
+    <section class="panel" aria-labelledby="guard-title">
+      <div class="panel-head"><h2 id="guard-title">Risk gates</h2><span class="kicker">live</span></div>
+      <div class="panel-body"><div class="guard-list">
+        <div class="guard" id="guardRespawn"><span class="guard-dot"></span><div><strong>Respawn exposure</strong><p>No respawn or aircraft swap logged since the last clean baseline.</p></div></div>
+        <div class="guard" id="guardMap"><span class="guard-dot"></span><div><strong>Map exposure</strong><p>No F10 map use logged since the last clean baseline.</p></div></div>
+        <div class="guard" id="guardTrend"><span class="guard-dot"></span><div><strong>Performance trend</strong><p>No consecutive threshold crossings.</p></div></div>
+        <div class="guard" id="guardRecovery"><span class="guard-dot"></span><div><strong>Recovery evidence</strong><p>Log a sample after each attempted recovery; do not rely on feel alone.</p></div></div>
+      </div></div>
+    </section>
+
+    <section class="panel" aria-labelledby="decision-title">
+      <div class="panel-head"><h2 id="decision-title">Decision discipline</h2><span class="kicker">not a fix list</span></div>
+      <div class="panel-body">
+        <div class="note"><strong>Stable:</strong> keep flying and sample after major state changes.<br><br><strong>Watch:</strong> avoid stacking unlogged changes; take another sample in a comparable scene.<br><br><strong>Recover:</strong> record one recovery action at a time, then sample. A full DCS restart becomes evidence only when post-restart numbers recover.</div>
+        <label style="margin-top:.8rem">Crew note<textarea id="crewNote" placeholder="What will make you end or restart this session?"></textarea></label>
+      </div>
+    </section>
+
+    <section class="panel" aria-labelledby="data-title">
+      <div class="panel-head"><h2 id="data-title">Handoff</h2><span class="kicker">local only</span></div>
+      <div class="panel-body">
+        <p class="hint" style="margin-top:0">State stays in this browser via localStorage. Export before clearing browser data or moving machines.</p>
+        <div class="inline-actions"><button id="csvBtn">Export CSV</button><button id="copyBtn">Copy summary</button><button id="printBtn2">Print</button></div>
+      </div>
+    </section>
+  </aside>
+</main>
+<footer>VR Sortie Guard is an observation tool, not an official Eagle Dynamics utility or a substitute for controlled troubleshooting.</footer>
+<div class="toast" id="toast" role="status"></div>
+<script>
+(() => {
+'use strict';
+const KEY='dcs-vr-sortie-guard-v1';
+const $=id=>document.getElementById(id);
+const fields=['headset','link','gpu','vram','mission','aircraft','targetFps','fpsThreshold','latencyThreshold','badLimit','crewNote'];
+const state={startedAt:null,baseline:null,samples:[],events:[],badStreak:0};
+let tick;
+function num(id){const v=parseFloat($(id).value);return Number.isFinite(v)?v:null}
+function nowISO(){return new Date().toISOString()}
+function stamp(iso){return new Date(iso).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit',second:'2-digit'})}
+function escapeHtml(s){return String(s??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]))}
+function settings(){return Object.fromEntries(fields.map(id=>[id,$(id).value]))}
+function save(){localStorage.setItem(KEY,JSON.stringify({...state,settings:settings()}))}
+function load(){try{const p=JSON.parse(localStorage.getItem(KEY));if(!p)return;Object.assign(state,{startedAt:p.startedAt||null,baseline:p.baseline||null,samples:p.samples||[],events:p.events||[],badStreak:p.badStreak||0});if(p.settings)fields.forEach(id=>{if(p.settings[id]!==undefined)$(id).value=p.settings[id]})}catch(e){console.warn('Stored session could not be loaded',e)}}
+function toast(msg){$('toast').textContent=msg;$('toast').classList.add('show');setTimeout(()=>$('toast').classList.remove('show'),1800)}
+function elapsed(){if(!state.startedAt)return '00:00:00';const d=Math.max(0,Date.now()-new Date(state.startedAt));const h=Math.floor(d/36e5),m=Math.floor(d%36e5/6e4),s=Math.floor(d%6e4/1000);return [h,m,s].map(v=>String(v).padStart(2,'0')).join(':')}
+function sampleFromForm(){return {fps:num('fps'),gameMs:num('gameMs'),encodeMs:num('encodeMs'),networkMs:num('networkMs'),note:$('sampleNote').value.trim()}}
+function validSample(s){return s.fps!==null&&s.gameMs!==null&&s.fps>0&&s.gameMs>=0}
+function assess(s){if(!state.baseline)return {bad:false,fpsDrop:0,gameRise:0};const fpsDrop=((state.baseline.fps-s.fps)/state.baseline.fps)*100;const gameRise=s.gameMs-state.baseline.gameMs;return {bad:fpsDrop>=num('fpsThreshold')||gameRise>=num('latencyThreshold'),fpsDrop,gameRise}}
+function addEntry(type,label,kind,note='',data=null){const entry={id:crypto.randomUUID?crypto.randomUUID():String(Date.now()+Math.random()),at:nowISO(),type,label,kind,note,data};state.events.push(entry);return entry}
+function setBaseline(){const s=sampleFromForm();if(!validSample(s)){toast('Enter FPS and game latency first');$('fps').focus();return}state.startedAt=state.startedAt||nowISO();state.baseline={...s,at:nowISO()};state.samples=[];state.badStreak=0;addEntry('baseline','Healthy baseline captured','sample',s.note||`${s.fps} FPS · ${s.gameMs} ms game`,s);$('sampleNote').value='';save();render();toast('Baseline captured')}
+function logSample(){const s=sampleFromForm();if(!state.baseline){toast('Capture a baseline first');return}if(!validSample(s)){toast('Enter FPS and game latency');return}const a=assess(s);const full={...s,...a,at:nowISO()};state.samples.push(full);state.badStreak=a.bad?state.badStreak+1:0;addEntry('sample',a.bad?'Threshold crossed':'Comparison sample',a.bad?'risk':'sample',s.note||`${s.fps} FPS · ${s.gameMs} ms game`,full);$('sampleNote').value='';save();render();toast(a.bad?'Sample flagged':'Sample logged')}
+function logEvent(btn){if(!state.baseline){toast('Capture a baseline first');return}let note=$('sampleNote').value.trim();if(btn.dataset.event==='Manual marker'&&!note){toast('Add an observation for this marker');$('sampleNote').focus();return}addEntry('event',btn.dataset.event,btn.dataset.kind,note);$('sampleNote').value='';if(btn.dataset.event==='DCS fully restarted'){state.badStreak=0}save();render();toast('Event marked')}
+function latestSample(){return state.samples.at(-1)||state.baseline}
+function sinceBaselineEvents(){if(!state.baseline)return[];return state.events.filter(e=>new Date(e.at)>=new Date(state.baseline.at))}
+function status(){if(!state.baseline)return {level:'idle',kicker:'Awaiting baseline',title:'Set the line',text:'Capture performance while the session is healthy. Later samples will be compared with this baseline.'};const limit=num('badLimit')||2;if(state.badStreak>=limit)return {level:'recover',kicker:'Threshold persisted',title:'Recover deliberately',text:'The bad-sample limit has been reached. Log one recovery action, then capture a comparable sample before deciding whether it worked.'};if(state.badStreak>0)return {level:'watch',kicker:'One flagged sample',title:'Hold and compare',text:'A threshold was crossed. Sample again in a comparable scene before changing multiple variables.'};return {level:'stable',kicker:'Within your guard',title:'Continue sortie',text:'The latest comparison is inside your personal thresholds. Mark major state changes and keep the evidence wire intact.'}}
+function updateDelta(){const s=sampleFromForm();if(!state.baseline){$('fpsDelta').textContent='baseline —';$('gameDelta').textContent='baseline —';return}if(s.fps!==null){const p=((s.fps-state.baseline.fps)/state.baseline.fps)*100;$('fpsDelta').textContent=`${p>=0?'+':''}${p.toFixed(0)}% vs base`;$('fpsDelta').className='delta '+(p<=-(num('fpsThreshold')||20)?'bad':p>=0?'good':'')}if(s.gameMs!==null){const d=s.gameMs-state.baseline.gameMs;$('gameDelta').textContent=`${d>=0?'+':''}${d.toFixed(0)} ms vs base`;$('gameDelta').className='delta '+(d>=(num('latencyThreshold')||15)?'bad':d<=0?'good':'')}}
+function renderTimeline(){const root=$('timeline');const entries=[...state.events].reverse();$('timelineCount').textContent=`${entries.length} ${entries.length===1?'entry':'entries'}`;if(!entries.length){root.innerHTML='<div class="empty">Capture a baseline to begin the wire.</div>';return}root.innerHTML=entries.map(e=>`<article class="entry"><time datetime="${e.at}">${stamp(e.at)}</time><div><strong>${escapeHtml(e.label)}</strong>${e.note?`<p>${escapeHtml(e.note)}</p>`:''}</div><span class="tag ${escapeHtml(e.kind)}">${escapeHtml(e.kind)}</span></article>`).join('')}
+function renderGuards(){const ev=sinceBaselineEvents();const respawn=ev.some(e=>/respawn|slot/i.test(e.label));const map=ev.some(e=>e.label==='F10 map opened');const recovery=ev.some(e=>e.kind==='recovery');$('guardRespawn').classList.toggle('active',respawn);$('guardRespawn').querySelector('p').textContent=respawn?'Respawn or aircraft-change exposure is present in this wire.':'No respawn or aircraft swap logged since the last clean baseline.';$('guardMap').classList.toggle('active',map);$('guardMap').querySelector('p').textContent=map?'F10 map exposure is present; use the next sample to observe—not assume—impact.':'No F10 map use logged since the last clean baseline.';$('guardTrend').classList.toggle('active',state.badStreak>0);$('guardTrend').querySelector('p').textContent=state.badStreak?`${state.badStreak} consecutive sample${state.badStreak===1?'':'s'} crossed a personal threshold.`:'No consecutive threshold crossings.';$('guardRecovery').classList.toggle('active',recovery);$('guardRecovery').querySelector('p').textContent=recovery?'A recovery action is logged. Capture a post-action sample to judge it.':'Log a sample after each attempted recovery; do not rely on feel alone.'}
+function render(){const st=status(),last=latestSample(),ev=sinceBaselineEvents();$('statusPanel').dataset.level=st.level;$('statusKicker').textContent=st.kicker;$('statusTitle').textContent=st.title;$('statusText').textContent=st.text;$('metricFps').textContent=last?.fps??'—';$('metricGame').textContent=last?.gameMs!==undefined?`${last.gameMs} ms`:'—';$('metricRisk').textContent=ev.filter(e=>e.kind==='risk').length;$('metricBad').textContent=state.badStreak;$('sampleCount').textContent=`${state.samples.length} sample${state.samples.length===1?'':'s'}`;$('elapsed').textContent=elapsed();renderTimeline();renderGuards();updateDelta()}
+function download(name,type,text){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type}));a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},100)}
+function exportJSON(){download(`vr-sortie-guard-${new Date().toISOString().slice(0,10)}.json`,'application/json',JSON.stringify({...state,settings:settings(),exportedAt:nowISO()},null,2));toast('JSON exported')}
+function exportCSV(){const rows=[['time','type','label','kind','fps','game_ms','encode_ms','network_ms','fps_drop_pct','game_rise_ms','note']];state.events.forEach(e=>{const d=e.data||{};rows.push([e.at,e.type,e.label,e.kind,d.fps??'',d.gameMs??'',d.encodeMs??'',d.networkMs??'',d.fpsDrop!==undefined?d.fpsDrop.toFixed(1):'',d.gameRise!==undefined?d.gameRise.toFixed(1):'',e.note||''])});const csv=rows.map(r=>r.map(v=>`"${String(v).replaceAll('"','""')}"`).join(',')).join('\n');download(`vr-sortie-guard-${new Date().toISOString().slice(0,10)}.csv`,'text/csv',csv);toast('CSV exported')}
+function summary(){const st=status(),last=latestSample(),risk=sinceBaselineEvents().filter(e=>e.kind==='risk').length;return `DCS VR SORTIE GUARD\nStatus: ${st.title}\nAircraft: ${$('aircraft').value||'—'}\nMission: ${$('mission').value||'—'}\nBaseline: ${state.baseline?`${state.baseline.fps} FPS / ${state.baseline.gameMs} ms game`:'—'}\nLatest: ${last?`${last.fps} FPS / ${last.gameMs} ms game`:'—'}\nRisk events: ${risk}\nBad-sample streak: ${state.badStreak}\nCrew note: ${$('crewNote').value||'—'}`}
+async function copySummary(){try{await navigator.clipboard.writeText(summary());toast('Summary copied')}catch{const ta=document.createElement('textarea');ta.value=summary();document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove();toast('Summary copied')}}
+function reset(){if(!confirm('Start a new session? Export first if you need this wire.'))return;state.startedAt=null;state.baseline=null;state.samples=[];state.events=[];state.badStreak=0;['fps','gameMs','encodeMs','networkMs','sampleNote'].forEach(id=>$(id).value='');save();render();toast('New session ready')}
+fields.forEach(id=>$(id).addEventListener('change',()=>{save();render()}));['fps','gameMs','encodeMs','networkMs'].forEach(id=>$(id).addEventListener('input',updateDelta));$('baselineBtn').addEventListener('click',setBaseline);$('sampleBtn').addEventListener('click',logSample);$('eventGrid').addEventListener('click',e=>{const b=e.target.closest('button[data-event]');if(b)logEvent(b)});$('exportBtn').addEventListener('click',exportJSON);$('csvBtn').addEventListener('click',exportCSV);$('copyBtn').addEventListener('click',copySummary);$('printBtn').addEventListener('click',()=>window.print());$('printBtn2').addEventListener('click',()=>window.print());$('resetBtn').addEventListener('click',reset);load();render();tick=setInterval(()=>$('elapsed').textContent=elapsed(),1000);
+})();
+</script>
+</body>
+</html>
