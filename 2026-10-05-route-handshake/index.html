@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark light">
+<title>Route Handshake — DCS Flight-Plan Revision Desk</title>
+<style>
+:root{
+  --bg:#11110f;--surface:#191a17;--surface-2:#20221e;--ink:#f1efe6;--muted:#aaa99e;
+  --line:#393b34;--line-strong:#5a5d50;--accent:#d6b85f;--accent-ink:#1b1708;
+  --ok:#80b68a;--warn:#dfaa59;--bad:#d87768;--info:#7ca8b8;--focus:#f5d67b;
+  --radius:5px;--shadow:0 18px 48px rgba(0,0,0,.22)
+}
+*{box-sizing:border-box}
+html{background:var(--bg);color:var(--ink);font-family:"Avenir Next",Avenir,"Gill Sans",Calibri,sans-serif}
+body{margin:0;min-height:100vh;background:linear-gradient(rgba(255,255,255,.018) 1px,transparent 1px) 0 0/100% 28px,var(--bg)}
+button,input,select,textarea{font:inherit}
+button,input,select,textarea,a{outline:none}
+:focus-visible{box-shadow:0 0 0 3px var(--bg),0 0 0 5px var(--focus)!important}
+button{min-height:44px;border:1px solid var(--line);border-radius:var(--radius);background:var(--surface-2);color:var(--ink);padding:.64rem .86rem;font-weight:750;cursor:pointer}
+button:hover{border-color:var(--line-strong);background:#292b26}
+button.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+button.danger{color:#ffb9ae;border-color:#75483f}
+button.small{min-height:36px;padding:.4rem .62rem;font-size:.75rem}
+button:disabled{opacity:.45;cursor:not-allowed}
+input,select,textarea{width:100%;min-height:44px;border:1px solid var(--line);border-radius:var(--radius);background:#10110f;color:var(--ink);padding:.62rem .7rem}
+textarea{resize:vertical;min-height:94px;line-height:1.45}
+label{display:grid;gap:.34rem;color:var(--muted);font-size:.7rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
+header{position:sticky;top:0;z-index:10;display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:.72rem clamp(.8rem,2vw,1.7rem);border-bottom:1px solid var(--line);background:rgba(17,17,15,.96)}
+.brand{display:flex;align-items:center;gap:.78rem;min-width:0}.brand-mark{width:34px;height:34px;border:1px solid var(--accent);display:grid;place-items:center;color:var(--accent);font:800 .7rem ui-monospace,SFMono-Regular,Menlo,monospace;transform:rotate(45deg)}.brand-mark span{transform:rotate(-45deg)}
+.brand h1{font-size:.93rem;margin:0;letter-spacing:.14em;text-transform:uppercase}.brand p{font-size:.68rem;color:var(--muted);margin:.16rem 0 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.header-actions{display:flex;gap:.45rem;flex-wrap:wrap;justify-content:flex-end}.header-actions button{min-height:38px;font-size:.75rem;padding:.45rem .66rem}
+.statusbar{display:grid;grid-template-columns:1fr auto auto;gap:1rem;align-items:center;padding:.72rem clamp(.8rem,2vw,1.7rem);border-bottom:1px solid var(--line);background:#141512}
+.status-main{display:flex;align-items:center;gap:.62rem;min-width:0}.status-dot{width:9px;height:9px;border-radius:50%;background:var(--warn);flex:0 0 auto}.status-dot.clean{background:var(--ok)}.status-main strong{font-size:.8rem}.status-main span{color:var(--muted);font-size:.75rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.fingerprint{font:800 .76rem ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--accent)}
+main{width:min(1580px,100%);margin:auto;padding:clamp(.8rem,2vw,1.5rem);display:grid;grid-template-columns:minmax(250px,.7fr) minmax(570px,1.65fr) minmax(290px,.8fr);gap:.85rem;align-items:start}
+.stack{display:grid;gap:.85rem}.panel{border:1px solid var(--line);border-radius:var(--radius);background:var(--surface);box-shadow:var(--shadow);overflow:hidden}.panel-head{min-height:45px;display:flex;align-items:center;justify-content:space-between;gap:.7rem;padding:.68rem .82rem;border-bottom:1px solid var(--line)}.panel-head h2{font-size:.73rem;margin:0;text-transform:uppercase;letter-spacing:.12em}.panel-head .step{font:800 .64rem ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--accent);text-transform:uppercase}.panel-body{padding:.82rem}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:.65rem}.wide{grid-column:1/-1}.hint{font-size:.73rem;line-height:1.5;color:var(--muted);margin:.65rem 0 0}.inline-actions{display:flex;gap:.45rem;flex-wrap:wrap;margin-top:.72rem}
+.readiness{display:grid;grid-template-columns:1fr auto;gap:.65rem;align-items:start;padding:.75rem;border:1px solid var(--line);background:#121310;border-radius:var(--radius);margin-bottom:.55rem}.readiness:last-child{margin-bottom:0}.readiness strong{font-size:.79rem;display:block}.readiness p{font-size:.7rem;color:var(--muted);line-height:1.4;margin:.2rem 0 0}.tag{font:800 .61rem ui-monospace,SFMono-Regular,Menlo,monospace;border:1px solid var(--line);border-radius:3px;padding:.22rem .34rem;text-transform:uppercase;white-space:nowrap}.tag.ok{color:var(--ok);border-color:#46694e}.tag.warn{color:var(--warn);border-color:#765e34}.tag.bad{color:var(--bad);border-color:#75483f}
+.route-wrap{overflow:auto}.route-table{width:100%;min-width:940px;border-collapse:collapse}.route-table th{position:sticky;top:0;z-index:1;background:#161713;color:var(--muted);font-size:.62rem;letter-spacing:.08em;text-transform:uppercase;text-align:left;padding:.5rem .4rem;border-bottom:1px solid var(--line)}.route-table td{padding:.4rem;border-bottom:1px solid #2e302a;vertical-align:top}.route-table tr:last-child td{border-bottom:0}.route-table input,.route-table select{min-height:38px;padding:.44rem .5rem;font-size:.75rem}.route-table .seq{width:34px;text-align:center;color:var(--muted);font:800 .72rem ui-monospace,SFMono-Regular,Menlo,monospace;padding-top:.95rem}.route-table .label-col{width:92px}.route-table .coord-col{width:150px}.route-table .num-col{width:80px}.route-table .role-col{width:104px}.route-table .note-col{min-width:150px}.row-actions{display:flex;gap:.25rem}.row-actions button{min-width:34px;min-height:38px;padding:.28rem;font-size:.72rem}
+.leg-strip{display:flex;overflow:auto;border-top:1px solid var(--line);background:#141512}.leg{min-width:155px;padding:.68rem .78rem;border-right:1px solid var(--line)}.leg:last-child{border-right:0}.leg span{display:block;color:var(--muted);font-size:.62rem;text-transform:uppercase;letter-spacing:.08em}.leg strong{display:block;margin-top:.2rem;font:800 .84rem ui-monospace,SFMono-Regular,Menlo,monospace}.leg small{display:block;color:var(--muted);margin-top:.18rem;font-size:.66rem}
+.route-map{height:245px;background:#0e100e;border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}.route-map svg{display:block;width:100%;height:100%}.map-grid{stroke:#292c26;stroke-width:1}.map-line{fill:none;stroke:var(--accent);stroke-width:3;stroke-linejoin:round}.map-point{fill:var(--bg);stroke:var(--accent);stroke-width:2}.map-target{fill:var(--bad);stroke:#ffc1b7}.map-label{fill:var(--ink);font:700 11px ui-monospace,SFMono-Regular,Menlo,monospace}.map-empty{fill:var(--muted);font:700 13px "Avenir Next",Avenir,sans-serif}
+.packet{font:650 .72rem ui-monospace,SFMono-Regular,Menlo,monospace;min-height:118px;word-break:break-all}.packet-result{margin-top:.65rem;padding:.7rem;border:1px solid var(--line);border-radius:var(--radius);background:#11120f}.packet-result strong{display:block;font-size:.78rem}.packet-result p{margin:.28rem 0 0;color:var(--muted);font-size:.7rem;line-height:1.45}
+.roster{display:grid;gap:.45rem}.crew{display:grid;grid-template-columns:1fr auto auto;gap:.42rem;align-items:center;padding:.52rem .58rem;border:1px solid var(--line);border-radius:var(--radius);background:#121310}.crew strong{font-size:.78rem}.crew span{font-size:.66rem;color:var(--muted);display:block;margin-top:.1rem}.crew button{min-height:36px;font-size:.68rem;padding:.35rem .52rem}.crew .ack{color:var(--ok);border-color:#46694e}.crew .pending{color:var(--warn);border-color:#765e34}
+.empty{border:1px dashed var(--line);padding:1rem;color:var(--muted);text-align:center;font-size:.74rem}.summary{white-space:pre-wrap;font:650 .7rem/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;background:#10110f;border:1px solid var(--line);border-radius:var(--radius);padding:.72rem;max-height:290px;overflow:auto}.toast{position:fixed;right:1rem;bottom:1rem;z-index:30;max-width:320px;background:var(--ink);color:var(--bg);font-weight:800;padding:.72rem .9rem;border-radius:var(--radius);box-shadow:var(--shadow);transform:translateY(160%);transition:transform .18s ease}.toast.show{transform:translateY(0)}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}footer{width:min(1580px,100%);margin:auto;padding:0 1.5rem 1.5rem;color:var(--muted);font-size:.68rem}
+@media(max-width:1180px){main{grid-template-columns:minmax(250px,.72fr) minmax(540px,1.4fr)}.right{grid-column:1/-1;grid-template-columns:repeat(3,1fr)}}
+@media(max-width:800px){header{align-items:flex-start}.header-actions{display:none}.statusbar{grid-template-columns:1fr auto}.statusbar .fingerprint{grid-column:1/-1}main{display:block}.stack,.panel{margin-bottom:.8rem}.right{display:grid;grid-template-columns:1fr}.form-grid{grid-template-columns:1fr}.wide{grid-column:auto}.brand p{max-width:56vw}.route-map{height:210px}}
+@media print{header,.statusbar button,.header-actions,.inline-actions,.row-actions,.packet-panel,footer{display:none!important}body{background:#fff;color:#111}main{display:block;padding:0}.panel{box-shadow:none;border-color:#999;background:#fff;margin-bottom:10px;break-inside:avoid}.panel-head,.route-table th{background:#fff}.route-wrap{overflow:visible}.route-table{min-width:0}.route-table input,.route-table select{border:0;padding:2px;background:#fff;color:#111}.route-table .note-col{display:none}.hint,.readiness p,.leg span,.leg small{color:#444}.route-map{background:#fff}.map-grid{stroke:#ddd}.map-label{fill:#111}.summary{color:#111;background:#fff}.right .panel:nth-child(n+2){display:none}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand"><div class="brand-mark" aria-hidden="true"><span>RH</span></div><div><h1>Route Handshake</h1><p>DCS flight-plan revision desk · offline</p></div></div>
+  <div class="header-actions"><button id="printBtn">Print card</button><button id="exportBtn">Export JSON</button><button id="resetBtn" class="danger">New plan</button></div>
+</header>
+<div class="statusbar" role="status" aria-live="polite">
+  <div class="status-main"><span class="status-dot" id="statusDot"></span><div><strong id="statusTitle">Draft route</strong> <span id="statusDetail">Publish before flight members acknowledge.</span></div></div>
+  <button class="primary small" id="publishBtn">Publish revision</button>
+  <div class="fingerprint" id="fingerprint">REV 0 · --------</div>
+</div>
+<main>
+  <aside class="stack">
+    <section class="panel" aria-labelledby="plan-title">
+      <div class="panel-head"><h2 id="plan-title">Flight contract</h2><span class="step">01 / define</span></div>
+      <div class="panel-body">
+        <div class="form-grid">
+          <label class="wide">Mission / server<input id="mission" autocomplete="off" value="Tonight's mission"></label>
+          <label>Package<input id="packageName" autocomplete="off" value="STRIKE 1"></label>
+          <label>Planner<input id="planner" autocomplete="off" value="Rob Grady"></label>
+          <label>Aircraft<input id="aircraft" autocomplete="off" value="Mixed flight"></label>
+          <label>Start Zulu<input id="startZulu" type="time" value="20:00"></label>
+          <label>Coordinate display<select id="coordFormat"><option value="dd">Decimal degrees</option><option value="dms">DMS</option></select></label>
+          <label>Default GS (kt)<input id="defaultSpeed" type="number" min="40" max="1200" value="360"></label>
+          <label class="wide">Route intent<textarea id="intent">Build one shared route, publish a revision, then require every flight member to acknowledge the same fingerprint before taxi.</textarea></label>
+        </div>
+      </div>
+    </section>
+    <section class="panel" aria-labelledby="gate-title">
+      <div class="panel-head"><h2 id="gate-title">Handshake gates</h2><span class="step">live</span></div>
+      <div class="panel-body" id="gates"></div>
+    </section>
+    <section class="panel" aria-labelledby="backup-title">
+      <div class="panel-head"><h2 id="backup-title">Local data</h2><span class="step">browser only</span></div>
+      <div class="panel-body">
+        <p class="hint" style="margin-top:0">The current plan persists in this browser. Export JSON before clearing browser data or moving machines.</p>
+        <div class="inline-actions"><button id="importJsonBtn">Import JSON</button><button id="copyBriefBtn">Copy brief</button><button id="csvBtn">Export CSV</button></div>
+        <input type="file" id="jsonFile" accept="application/json,.json" class="sr-only">
+      </div>
+    </section>
+  </aside>
+
+  <section class="stack center">
+    <section class="panel" aria-labelledby="route-title">
+      <div class="panel-head"><h2 id="route-title">Shared route</h2><span class="step">02 / build</span></div>
+      <div class="route-wrap">
+        <table class="route-table">
+          <thead><tr><th>#</th><th>Label</th><th>Role</th><th>Latitude</th><th>Longitude</th><th>Alt ft</th><th>GS kt</th><th>Note</th><th>Order</th></tr></thead>
+          <tbody id="routeRows"></tbody>
+        </table>
+      </div>
+      <div class="panel-body"><button id="addWaypointBtn">Add waypoint</button><p class="hint">Coordinates accept signed decimal degrees or DMS such as <code>N 34 12 30</code>. Internal exchange always uses decimal degrees.</p></div>
+      <div class="leg-strip" id="legStrip"></div>
+    </section>
+    <section class="panel" aria-labelledby="plot-title">
+      <div class="panel-head"><h2 id="plot-title">Geometry check</h2><span class="step" id="mapCaption">not to scale</span></div>
+      <div class="panel-body"><div class="route-map" id="routeMap" role="img" aria-label="Schematic route plot"></div></div>
+    </section>
+    <section class="panel" aria-labelledby="brief-title">
+      <div class="panel-head"><h2 id="brief-title">Kneeboard route brief</h2><span class="step">derived</span></div>
+      <div class="panel-body"><div class="summary" id="summary"></div></div>
+    </section>
+  </section>
+
+  <aside class="stack right">
+    <section class="panel" aria-labelledby="crew-title">
+      <div class="panel-head"><h2 id="crew-title">Flight acknowledgments</h2><span class="step" id="ackCount">0 / 0</span></div>
+      <div class="panel-body">
+        <div class="roster" id="roster"></div>
+        <div class="form-grid" style="margin-top:.65rem;grid-template-columns:1fr auto"><label>Call sign<input id="newCrew" autocomplete="off" placeholder="SPRINGFIELD 1-2"></label><button id="addCrewBtn" style="align-self:end">Add</button></div>
+        <p class="hint">Any route edit after publication invalidates every acknowledgment. Re-publish, distribute the new fingerprint, and acknowledge again.</p>
+      </div>
+    </section>
+    <section class="panel packet-panel" aria-labelledby="packet-title">
+      <div class="panel-head"><h2 id="packet-title">Share packet</h2><span class="step">03 / exchange</span></div>
+      <div class="panel-body">
+        <label>Packet code<textarea id="packetCode" class="packet" spellcheck="false" placeholder="Publish to generate, or paste a received packet"></textarea></label>
+        <div class="inline-actions"><button id="copyPacketBtn">Copy current</button><button id="inspectBtn">Inspect pasted</button><button id="loadPacketBtn" disabled>Load inspected</button></div>
+        <div class="packet-result" id="packetResult"><strong>No packet inspected</strong><p>Paste a code to verify its checksum and revision before loading it.</p></div>
+      </div>
+    </section>
+    <section class="panel" aria-labelledby="rule-title">
+      <div class="panel-head"><h2 id="rule-title">Crew rule</h2><span class="step">one route</span></div>
+      <div class="panel-body"><div class="readiness"><div><strong>Read the fingerprint aloud</strong><p>Revision number alone is not enough. Match both revision and eight-character fingerprint.</p></div><span class="tag warn">required</span></div><div class="readiness"><div><strong>Re-acknowledge every edit</strong><p>A changed coordinate, altitude, speed, label, or note creates a new route state.</p></div><span class="tag warn">required</span></div></div>
+    </section>
+  </aside>
+</main>
+<footer>Route Handshake is a planning and crew-coordination aid. Verify coordinates, restrictions, fuel, threats, and mission data against the authoritative DCS briefing and your flight lead.</footer>
+<div class="toast" id="toast" role="status"></div>
+<script>
+(() => {
+'use strict';
+const KEY='dcs-route-handshake-v1';
+const $=id=>document.getElementById(id);
+const roles=['Departure','Turn','Hold','Push','IP','Target','Egress','Recovery','Alternate'];
+const defaultRoute=()=>[
+  {id:uid(),label:'DEP',role:'Departure',lat:'',lon:'',alt:0,speed:300,note:'Departure field'},
+  {id:uid(),label:'PUSH',role:'Push',lat:'',lon:'',alt:18000,speed:360,note:'Package push'},
+  {id:uid(),label:'TGT',role:'Target',lat:'',lon:'',alt:12000,speed:420,note:'Target area'},
+  {id:uid(),label:'REC',role:'Recovery',lat:'',lon:'',alt:0,speed:300,note:'Recovery field'}
+];
+function uid(){return crypto.randomUUID?crypto.randomUUID():String(Date.now()+Math.random())}
+let state={mission:"Tonight's mission",packageName:'STRIKE 1',planner:'Rob Grady',aircraft:'Mixed flight',startZulu:'20:00',coordFormat:'dd',defaultSpeed:360,intent:'Build one shared route, publish a revision, then require every flight member to acknowledge the same fingerprint before taxi.',revision:0,publishedFingerprint:'',publishedAt:'',route:defaultRoute(),crew:[{id:uid(),name:'FLIGHT LEAD',ack:false}],lastSaved:new Date().toISOString()};
+let inspected=null;
+const planFields=['mission','packageName','planner','aircraft','startZulu','coordFormat','defaultSpeed','intent'];
+function escapeHtml(v){return String(v??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]))}
+function toast(msg){$('toast').textContent=msg;$('toast').classList.add('show');setTimeout(()=>$('toast').classList.remove('show'),1800)}
+function hash(text){let h=2166136261;for(let i=0;i<text.length;i++){h^=text.charCodeAt(i);h=Math.imul(h,16777619)}return (h>>>0).toString(16).padStart(8,'0').toUpperCase()}
+function stablePayload(){return {mission:state.mission,packageName:state.packageName,planner:state.planner,aircraft:state.aircraft,startZulu:state.startZulu,coordFormat:state.coordFormat,defaultSpeed:Number(state.defaultSpeed)||0,intent:state.intent,revision:Number(state.revision)||0,route:state.route.map(w=>({label:w.label.trim(),role:w.role,lat:String(w.lat).trim(),lon:String(w.lon).trim(),alt:Number(w.alt)||0,speed:Number(w.speed)||0,note:w.note.trim()}))}}
+function currentFingerprint(){return hash(JSON.stringify(stablePayload()))}
+function isDirty(){return !state.publishedFingerprint||currentFingerprint()!==state.publishedFingerprint}
+function save(){state.lastSaved=new Date().toISOString();localStorage.setItem(KEY,JSON.stringify(state))}
+function load(){try{const p=JSON.parse(localStorage.getItem(KEY));if(p&&Array.isArray(p.route)&&Array.isArray(p.crew))state={...state,...p}}catch(e){console.warn('Stored route could not be loaded',e)}}
+function syncFields(){planFields.forEach(id=>{$(id).value=state[id]??''})}
+function parseCoord(raw,isLat){if(typeof raw==='number'&&Number.isFinite(raw))return validRange(raw,isLat)?raw:null;const s=String(raw??'').trim();if(!s)return null;const hemi=(s.match(/[NSEW]/i)||[])[0]?.toUpperCase();const nums=s.replace(/[NSEW°'"′″]/gi,' ').match(/-?\d+(?:\.\d+)?/g)?.map(Number)||[];if(!nums.length)return null;let value;if(nums.length===1)value=nums[0];else value=Math.abs(nums[0])+(nums[1]||0)/60+(nums[2]||0)/3600;if(hemi==='S'||hemi==='W')value=-Math.abs(value);else if(hemi==='N'||hemi==='E')value=Math.abs(value);else if(nums[0]<0)value=-Math.abs(value);return validRange(value,isLat)?value:null}
+function validRange(v,isLat){return Number.isFinite(v)&&Math.abs(v)<=(isLat?90:180)}
+function dms(v,isLat){if(v===null)return '—';const hemi=isLat?(v<0?'S':'N'):(v<0?'W':'E');let a=Math.abs(v),deg=Math.floor(a),mFloat=(a-deg)*60,min=Math.floor(mFloat),sec=(mFloat-min)*60;return `${hemi} ${String(deg).padStart(isLat?2:3,'0')}° ${String(min).padStart(2,'0')}′ ${sec.toFixed(1).padStart(4,'0')}″`}
+function coord(v,isLat){if(v===null)return '—';return state.coordFormat==='dms'?dms(v,isLat):`${v.toFixed(5)}°`}
+function radians(d){return d*Math.PI/180}
+function leg(a,b){const lat1=parseCoord(a.lat,true),lon1=parseCoord(a.lon,false),lat2=parseCoord(b.lat,true),lon2=parseCoord(b.lon,false);if([lat1,lon1,lat2,lon2].some(v=>v===null))return null;const p1=radians(lat1),p2=radians(lat2),dl=radians(lon2-lon1),dp=radians(lat2-lat1);const h=Math.sin(dp/2)**2+Math.cos(p1)*Math.cos(p2)*Math.sin(dl/2)**2;const nm=3440.065*2*Math.atan2(Math.sqrt(h),Math.sqrt(1-h));const y=Math.sin(dl)*Math.cos(p2),x=Math.cos(p1)*Math.sin(p2)-Math.sin(p1)*Math.cos(p2)*Math.cos(dl);const bearing=(Math.atan2(y,x)*180/Math.PI+360)%360;const speed=Number(b.speed)||Number(state.defaultSpeed)||0;return {nm,bearing,minutes:speed>0?nm/speed*60:null,speed}}
+function allLegs(){return state.route.slice(1).map((w,i)=>({...leg(state.route[i],w),from:state.route[i].label||`WP${i+1}`,to:w.label||`WP${i+2}`,valid:!!leg(state.route[i],w)}))}
+function minutesToZulu(total){if(!state.startZulu)return '—';const [h,m]=state.startZulu.split(':').map(Number);if(!Number.isFinite(h)||!Number.isFinite(m))return '—';const x=(h*60+m+Math.round(total)+1440)%1440;return `${String(Math.floor(x/60)).padStart(2,'0')}:${String(x%60).padStart(2,'0')}Z`}
+function validation(){const issues=[];if(state.route.length<2)issues.push('Route needs at least two waypoints.');const labels=state.route.map(w=>w.label.trim().toUpperCase()).filter(Boolean);const dup=labels.find((v,i)=>labels.indexOf(v)!==i);if(dup)issues.push(`Duplicate label: ${dup}.`);state.route.forEach((w,i)=>{if(!w.label.trim())issues.push(`WP ${i+1} needs a label.`);if(parseCoord(w.lat,true)===null||parseCoord(w.lon,false)===null)issues.push(`${w.label||`WP ${i+1}`} needs valid coordinates.`);if(Number(w.speed)<=0)issues.push(`${w.label||`WP ${i+1}`} needs a positive groundspeed.`)});return issues}
+function invalidateAcks(){if(state.crew.some(c=>c.ack))state.crew=state.crew.map(c=>({...c,ack:false}))}
+function mutate(){invalidateAcks();save();render()}
+function renderRoute(){const root=$('routeRows');root.innerHTML=state.route.map((w,i)=>`<tr data-id="${escapeHtml(w.id)}"><td class="seq">${i+1}</td><td class="label-col"><input data-key="label" value="${escapeHtml(w.label)}" aria-label="Waypoint ${i+1} label"></td><td class="role-col"><select data-key="role" aria-label="Waypoint ${i+1} role">${roles.map(r=>`<option${r===w.role?' selected':''}>${r}</option>`).join('')}</select></td><td class="coord-col"><input data-key="lat" value="${escapeHtml(w.lat)}" aria-label="Waypoint ${i+1} latitude"></td><td class="coord-col"><input data-key="lon" value="${escapeHtml(w.lon)}" aria-label="Waypoint ${i+1} longitude"></td><td class="num-col"><input data-key="alt" type="number" step="100" value="${escapeHtml(w.alt)}" aria-label="Waypoint ${i+1} altitude feet"></td><td class="num-col"><input data-key="speed" type="number" min="1" value="${escapeHtml(w.speed)}" aria-label="Waypoint ${i+1} groundspeed knots"></td><td class="note-col"><input data-key="note" value="${escapeHtml(w.note)}" aria-label="Waypoint ${i+1} note"></td><td><div class="row-actions"><button data-act="up" aria-label="Move waypoint ${i+1} up" ${i===0?'disabled':''}>↑</button><button data-act="down" aria-label="Move waypoint ${i+1} down" ${i===state.route.length-1?'disabled':''}>↓</button><button data-act="delete" class="danger" aria-label="Delete waypoint ${i+1}" ${state.route.length<=2?'disabled':''}>×</button></div></td></tr>`).join('')}
+function renderLegs(){const legs=allLegs();if(!legs.length){$('legStrip').innerHTML='<div class="leg"><span>No legs</span><strong>—</strong></div>';return}let elapsed=0;$('legStrip').innerHTML=legs.map(l=>{if(l.valid&&l.minutes!==null)elapsed+=l.minutes;return `<div class="leg"><span>${escapeHtml(l.from)} → ${escapeHtml(l.to)}</span><strong>${l.valid?`${l.bearing.toFixed(0).padStart(3,'0')}° · ${l.nm.toFixed(1)} NM`:'coordinates needed'}</strong><small>${l.valid&&l.minutes!==null?`${Math.round(l.minutes)} min · ETA ${minutesToZulu(elapsed)}`:'time unavailable'}</small></div>`}).join('')}
+function renderMap(){const pts=state.route.map((w,i)=>({i,w,lat:parseCoord(w.lat,true),lon:parseCoord(w.lon,false)})).filter(p=>p.lat!==null&&p.lon!==null);if(pts.length<2){$('routeMap').innerHTML='<svg viewBox="0 0 700 245" aria-hidden="true"><path class="map-grid" d="M0 60H700M0 120H700M0 180H700M140 0V245M280 0V245M420 0V245M560 0V245"/><text x="350" y="125" text-anchor="middle" class="map-empty">Enter two valid coordinates to inspect route geometry</text></svg>';$('mapCaption').textContent='awaiting coordinates';return}const minLat=Math.min(...pts.map(p=>p.lat)),maxLat=Math.max(...pts.map(p=>p.lat)),minLon=Math.min(...pts.map(p=>p.lon)),maxLon=Math.max(...pts.map(p=>p.lon));const latSpan=maxLat-minLat||.1,lonSpan=maxLon-minLon||.1;const xy=pts.map(p=>({...p,x:55+(p.lon-minLon)/lonSpan*590,y:205-(p.lat-minLat)/latSpan*165}));const line=xy.map(p=>`${p.x},${p.y}`).join(' ');$('routeMap').innerHTML=`<svg viewBox="0 0 700 245" aria-hidden="true"><path class="map-grid" d="M0 60H700M0 120H700M0 180H700M140 0V245M280 0V245M420 0V245M560 0V245"/><polyline class="map-line" points="${line}"/>${xy.map(p=>`<circle cx="${p.x}" cy="${p.y}" r="6" class="map-point ${p.w.role==='Target'?'map-target':''}"/><text x="${p.x+10}" y="${p.y-10}" class="map-label">${escapeHtml(p.w.label||`WP${p.i+1}`)}</text>`).join('')}</svg>`;$('mapCaption').textContent=`${pts.length} plotted points · schematic`}
+function brief(){const lines=[];lines.push(`${state.packageName||'FLIGHT'} ROUTE HANDSHAKE`);lines.push(`${state.mission||'UNNAMED MISSION'} · ${state.aircraft||'AIRCRAFT —'}`);lines.push(`REV ${state.revision} · ${state.publishedFingerprint||'UNPUBLISHED'} · START ${state.startZulu||'—'}Z`);lines.push('');let elapsed=0;state.route.forEach((w,i)=>{const lat=parseCoord(w.lat,true),lon=parseCoord(w.lon,false);let prefix='';if(i>0){const l=leg(state.route[i-1],w);if(l&&l.minutes!==null){elapsed+=l.minutes;prefix=`${l.bearing.toFixed(0).padStart(3,'0')}°/${l.nm.toFixed(1)}NM · ETA ${minutesToZulu(elapsed)} · `}}lines.push(`${String(i+1).padStart(2,'0')} ${w.label||'UNNAMED'} [${w.role}]`);lines.push(`   ${prefix}${coord(lat,true)} ${coord(lon,false)} · ${Number(w.alt)||0} FT · ${Number(w.speed)||0} KT`);if(w.note.trim())lines.push(`   ${w.note.trim()}`)});lines.push('');lines.push(`INTENT: ${state.intent||'—'}`);lines.push(`ACK: ${state.crew.filter(c=>c.ack).length}/${state.crew.length} MATCHED ${state.publishedFingerprint||'UNPUBLISHED'}`);return lines.join('\n')}
+function renderSummary(){$('summary').textContent=brief()}
+function renderRoster(){const root=$('roster');$('ackCount').textContent=`${state.crew.filter(c=>c.ack).length} / ${state.crew.length}`;root.innerHTML=state.crew.length?state.crew.map(c=>`<div class="crew" data-id="${escapeHtml(c.id)}"><div><strong>${escapeHtml(c.name)}</strong><span>${c.ack?`matched ${state.publishedFingerprint||'draft'}`:'awaiting fingerprint readback'}</span></div><button data-act="ack" class="${c.ack?'ack':'pending'}" ${!state.publishedFingerprint||isDirty()?'disabled':''}>${c.ack?'Acknowledged':'Mark ack'}</button><button data-act="remove" class="danger" aria-label="Remove ${escapeHtml(c.name)}">×</button></div>`).join(''):'<div class="empty">Add each pilot or crew station that must match the route.</div>'}
+function renderGates(){const issues=validation(),published=!!state.publishedFingerprint&&!isDirty(),allAck=state.crew.length>0&&state.crew.every(c=>c.ack),gates=[{name:'Route data',detail:issues.length?issues[0]:'Labels, coordinates, and speeds pass basic checks.',ok:!issues.length},{name:'Published revision',detail:published?`Revision ${state.revision} is locked to ${state.publishedFingerprint}.`:'Current edits are not represented by a published fingerprint.',ok:published},{name:'Crew agreement',detail:allAck?'Every listed member acknowledged this fingerprint.':`${state.crew.filter(c=>c.ack).length} of ${state.crew.length} members acknowledged.`,ok:allAck}];$('gates').innerHTML=gates.map(g=>`<div class="readiness"><div><strong>${escapeHtml(g.name)}</strong><p>${escapeHtml(g.detail)}</p></div><span class="tag ${g.ok?'ok':'warn'}">${g.ok?'clear':'hold'}</span></div>`).join('')}
+function packetForState(){const payload=stablePayload();return {app:'Route Handshake',schema:1,payload,checksum:hash(JSON.stringify(payload))}}
+function encodePacket(p){return btoa(unescape(encodeURIComponent(JSON.stringify(p))))}
+function decodePacket(code){const text=decodeURIComponent(escape(atob(code.replace(/\s/g,''))));const p=JSON.parse(text);if(p?.app!=='Route Handshake'||p?.schema!==1||!p.payload||!Array.isArray(p.payload.route))throw new Error('Not a Route Handshake packet');const actual=hash(JSON.stringify(p.payload));if(actual!==p.checksum)throw new Error(`Checksum mismatch: expected ${p.checksum}, got ${actual}`);return p}
+function renderStatus(){const issues=validation(),dirty=isDirty(),allAck=state.crew.length>0&&state.crew.every(c=>c.ack);let title,detail,clean=false;if(issues.length){title='Route incomplete';detail=`${issues.length} check${issues.length===1?'':'s'} remaining — ${issues[0]}`}else if(dirty){title=state.publishedFingerprint?'Revision changed':'Draft route';detail='Publish this route before collecting acknowledgments.'}else if(!allAck){title='Published — awaiting crew';detail=`Read back REV ${state.revision} and fingerprint ${state.publishedFingerprint}.`}else{title='Handshake complete';detail='Every listed flight member matched the current route fingerprint.';clean=true}$('statusTitle').textContent=title;$('statusDetail').textContent=detail;$('statusDot').classList.toggle('clean',clean);$('fingerprint').textContent=`REV ${state.revision} · ${state.publishedFingerprint||'--------'}`;$('publishBtn').disabled=issues.length>0||(!dirty&&!!state.publishedFingerprint);$('publishBtn').textContent=state.publishedFingerprint?'Publish new revision':'Publish revision'}
+function render(){renderRoute();renderLegs();renderMap();renderSummary();renderRoster();renderGates();renderStatus()}
+function publish(){const issues=validation();if(issues.length){toast(issues[0]);return}state.revision=(Number(state.revision)||0)+1;state.publishedFingerprint=currentFingerprint();state.publishedAt=new Date().toISOString();state.crew=state.crew.map(c=>({...c,ack:false}));save();$('packetCode').value=encodePacket(packetForState());render();toast(`Revision ${state.revision} published`)}
+function addWaypoint(){state.route.push({id:uid(),label:`WP${state.route.length+1}`,role:'Turn',lat:'',lon:'',alt:15000,speed:Number(state.defaultSpeed)||360,note:''});mutate();setTimeout(()=>{const rows=$('routeRows').querySelectorAll('tr');rows[rows.length-1]?.querySelector('input')?.focus()},0)}
+function download(name,type,text){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type}));a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},100)}
+async function copyText(text,msg){try{await navigator.clipboard.writeText(text)}catch{const t=document.createElement('textarea');t.value=text;document.body.appendChild(t);t.select();document.execCommand('copy');t.remove()}toast(msg)}
+function exportJson(){download(`route-handshake-${new Date().toISOString().slice(0,10)}.json`,'application/json',JSON.stringify({app:'Route Handshake',schema:1,state,exportedAt:new Date().toISOString()},null,2));toast('JSON exported')}
+function exportCsv(){const rows=[['sequence','label','role','latitude','longitude','altitude_ft','groundspeed_kt','note']];state.route.forEach((w,i)=>rows.push([i+1,w.label,w.role,parseCoord(w.lat,true)??'',parseCoord(w.lon,false)??'',w.alt,w.speed,w.note]));const csv=rows.map(r=>r.map(v=>`"${String(v).replaceAll('"','""')}"`).join(',')).join('\n');download(`route-handshake-${new Date().toISOString().slice(0,10)}.csv`,'text/csv',csv);toast('CSV exported')}
+function inspect(){try{inspected=decodePacket($('packetCode').value.trim());const p=inspected.payload,local=currentFingerprint(),same=inspected.checksum===local;$('packetResult').innerHTML=`<strong>${same?'Exact local match':'Valid packet ready'}</strong><p>${escapeHtml(p.packageName||'Unnamed')} · REV ${escapeHtml(p.revision)} · ${escapeHtml(inspected.checksum)} · ${p.route.length} waypoints${same?' · no load needed':''}</p>`;$('loadPacketBtn').disabled=same;toast('Packet checksum verified')}catch(e){inspected=null;$('packetResult').innerHTML=`<strong>Packet rejected</strong><p>${escapeHtml(e.message)}</p>`;$('loadPacketBtn').disabled=true;toast('Packet is not valid')}}
+function loadInspected(){if(!inspected)return;const p=inspected.payload;state={...state,...p,publishedFingerprint:inspected.checksum,publishedAt:new Date().toISOString(),route:p.route.map(w=>({...w,id:uid()})),crew:state.crew.map(c=>({...c,ack:false}))};syncFields();save();render();$('loadPacketBtn').disabled=true;toast(`Loaded revision ${state.revision}`)}
+function reset(){if(!confirm('Start a new route plan? Export first if this route must be retained.'))return;localStorage.removeItem(KEY);state={mission:"Tonight's mission",packageName:'STRIKE 1',planner:'Rob Grady',aircraft:'Mixed flight',startZulu:'20:00',coordFormat:'dd',defaultSpeed:360,intent:'Build one shared route, publish a revision, then require every flight member to acknowledge the same fingerprint before taxi.',revision:0,publishedFingerprint:'',publishedAt:'',route:defaultRoute(),crew:[{id:uid(),name:'FLIGHT LEAD',ack:false}],lastSaved:new Date().toISOString()};$('packetCode').value='';syncFields();save();render();toast('New plan ready')}
+planFields.forEach(id=>$(id).addEventListener('input',()=>{state[id]=$(id).value;mutate()}));
+$('routeRows').addEventListener('change',e=>{const tr=e.target.closest('tr'),key=e.target.dataset.key;if(!tr||!key)return;const w=state.route.find(x=>x.id===tr.dataset.id);if(!w)return;w[key]=e.target.value;mutate()});
+$('routeRows').addEventListener('click',e=>{const b=e.target.closest('button[data-act]'),tr=e.target.closest('tr');if(!b||!tr)return;const i=state.route.findIndex(w=>w.id===tr.dataset.id);if(i<0)return;if(b.dataset.act==='up'&&i>0)[state.route[i-1],state.route[i]]=[state.route[i],state.route[i-1]];if(b.dataset.act==='down'&&i<state.route.length-1)[state.route[i+1],state.route[i]]=[state.route[i],state.route[i+1]];if(b.dataset.act==='delete'&&state.route.length>2)state.route.splice(i,1);mutate()});
+$('roster').addEventListener('click',e=>{const b=e.target.closest('button[data-act]'),row=e.target.closest('.crew');if(!b||!row)return;const c=state.crew.find(x=>x.id===row.dataset.id);if(!c)return;if(b.dataset.act==='ack')c.ack=!c.ack;if(b.dataset.act==='remove')state.crew=state.crew.filter(x=>x.id!==c.id);save();render()});
+$('addCrewBtn').addEventListener('click',()=>{const name=$('newCrew').value.trim();if(!name){toast('Enter a call sign');return}state.crew.push({id:uid(),name,ack:false});$('newCrew').value='';save();render();toast('Crew member added')});
+$('newCrew').addEventListener('keydown',e=>{if(e.key==='Enter'){$('addCrewBtn').click()}});
+$('addWaypointBtn').addEventListener('click',addWaypoint);$('publishBtn').addEventListener('click',publish);$('copyPacketBtn').addEventListener('click',()=>{if(isDirty()||!state.publishedFingerprint){toast('Publish the current route first');return}$('packetCode').value=encodePacket(packetForState());copyText($('packetCode').value,'Packet copied')});$('inspectBtn').addEventListener('click',inspect);$('loadPacketBtn').addEventListener('click',loadInspected);$('copyBriefBtn').addEventListener('click',()=>copyText(brief(),'Brief copied'));$('exportBtn').addEventListener('click',exportJson);$('csvBtn').addEventListener('click',exportCsv);$('printBtn').addEventListener('click',()=>window.print());$('resetBtn').addEventListener('click',reset);$('importJsonBtn').addEventListener('click',()=>$('jsonFile').click());$('jsonFile').addEventListener('change',async e=>{const file=e.target.files[0];if(!file)return;try{const p=JSON.parse(await file.text());if(p.app!=='Route Handshake'||!p.state||!Array.isArray(p.state.route))throw new Error('Not a Route Handshake JSON export');state={...state,...p.state,route:p.state.route.map(w=>({...w,id:w.id||uid()})),crew:(p.state.crew||[]).map(c=>({...c,id:c.id||uid()}))};syncFields();save();render();toast('JSON imported')}catch(err){toast(err.message)}e.target.value=''});
+load();syncFields();save();render();
+})();
+</script>
+</body>
+</html>

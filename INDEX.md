@@ -65,3 +65,4 @@ Chronological record of autonomous DCS World companion projects.
 - 2026-10-02 — `2026-10-02-formation-forge` — Offline multi-group formation geometry desk with seven patterns, course-relative placement, spacing validation, manual nudges, local persistence, CSV/JSON handoff, and printable Mission Editor build sheets.
 - 2026-10-03 — `2026-10-03-pad-check` — Offline gamepad setup and rehearsal workbench with live input monitoring, modifier-aware mapping, conflict checks, recall drills, local persistence, and in-DCS readiness gates.
 - 2026-10-04 — `2026-10-04-vr-sortie-guard` — Offline DCS VR session-degradation guard with healthy baselines, event marking, threshold comparisons, recovery evidence, local persistence, and JSON/CSV handoff.
+- 2026-10-05 — `2026-10-05-route-handshake` — Offline shared-flight-plan revision desk with route validation, geometry and ETA checks, checksum packets, crew acknowledgments, persistence, export, and printing.
