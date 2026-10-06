@@ -33,9 +33,9 @@ The rule is intentionally visible and simple. Scores are personal observations, 
 
 The idea responds to repeated community questions about what to buy and how to use the limited evaluation window deliberately:
 
-- The October 5, 2026 r/dcsworld weekly thread explicitly routes repeated “what Module to buy” questions into one place; a current commenter was choosing between the F-14B(U) and F-16C as a new player: https://www.reddit.com/r/dcsworld/comments/1wy12p1/weekly_thread_20261005_questions_on_dcs_pcs/
-- The September 28, 2026 r/dcsworld weekly thread includes several live purchase-fit questions: F-16 versus a terrain, F-16 workflow after the Hornet, and Cold War module choice based on multiplayer population: https://www.reddit.com/r/dcsworld/comments/1ws6jar/weekly_thread_20260928_questions_on_dcs_pcs/
-- A September 1, 2026 r/hoggit weekly-thread discussion specifically describes not having enough time to understand a module within the free-trial window and not wanting to wait for another opportunity: https://www.reddit.com/r/hoggit/comments/1w3vni8/weekly_questions_thread_sep_01/
+- The October 5, 2026 r/dcsworld weekly thread explicitly routes repeated “what Module to buy” questions into one place, saying those questions recur multiple times per day: https://www.reddit.com/r/dcsworld/comments/1wy12p1/weekly_thread_20261005_questions_on_dcs_pcs/
+- The September 28, 2026 r/dcsworld thread uses the same recurring purchase-question format and points standalone users toward two-week trials: https://www.reddit.com/r/dcsworld/comments/1ws6jar/weekly_thread_20260928_questions_on_dcs_pcs/
+- A September 1, 2026 r/hoggit discussion asks whether the Viggen is a suitable first module, then describes not having enough free time to understand it within the trial window and not wanting to wait six months to try again: https://www.reddit.com/r/hoggit/comments/1w3vni8/weekly_questions_thread_sep_01/
 - Eagle Dynamics' current Free to Play FAQ documents the two-week evaluation period, six-month reactivation interval, Two-Step Authentication prerequisite, participating-product scope, and offline-mode limitation: https://www.digitalcombatsimulator.com/en/support/faq/discount/
 
 Those signals favor a neutral evidence ledger over another recommendation quiz: pilots need a way to define the question before activating a trial, log what they actually flew, and compare candidates on consistent criteria.
