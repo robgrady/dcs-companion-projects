@@ -1,0 +1,254 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="dark">
+<title>Trial Wire — DCS Module Evaluation Desk</title>
+<style>
+:root{
+  --bg:#10130f;--panel:#171b15;--panel-2:#1d221b;--ink:#f0eedf;--muted:#a9ae9d;
+  --line:#343b2f;--line-strong:#566149;--accent:#d7b85b;--accent-ink:#171307;
+  --good:#8fc79a;--warn:#e6b26a;--bad:#dd8178;--info:#8fbbcf;
+  --r:10px;--shadow:0 18px 48px rgba(0,0,0,.28);--max:1480px;
+}
+*{box-sizing:border-box}
+html{background:var(--bg);color:var(--ink);font-family:"Avenir Next","Trebuchet MS",sans-serif}
+body{margin:0;min-height:100vh;background:linear-gradient(180deg,#141812 0,#10130f 320px)}
+button,input,select,textarea{font:inherit}
+button,input,select,textarea{border-radius:7px}
+button{min-height:44px;border:1px solid var(--line-strong);background:var(--panel-2);color:var(--ink);padding:.62rem .9rem;cursor:pointer;font-weight:650;letter-spacing:.01em}
+button:hover{border-color:var(--accent);background:#252b21}
+button.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+button.primary:hover{background:#e4c96f}
+button.ghost{background:transparent;border-color:var(--line)}
+button.danger{color:#ffd2cc;border-color:#794740}
+button.small{min-height:36px;padding:.4rem .65rem;font-size:.86rem}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid #f4d978;outline-offset:2px}
+input,select,textarea{width:100%;background:#0e110d;color:var(--ink);border:1px solid var(--line-strong);padding:.72rem .75rem;min-height:44px}
+textarea{min-height:92px;resize:vertical;line-height:1.45}
+label{display:grid;gap:.38rem;color:var(--muted);font-size:.84rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase}
+input::placeholder,textarea::placeholder{color:#727969}
+.topbar{border-bottom:1px solid var(--line);background:rgba(16,19,15,.95);position:sticky;top:0;z-index:20;backdrop-filter:blur(10px)}
+.topbar-inner{max-width:var(--max);margin:auto;display:flex;align-items:center;gap:1rem;padding:.85rem 1.1rem}
+.brand{display:flex;align-items:baseline;gap:.72rem;min-width:max-content}
+.brand strong{font-family:"Iowan Old Style","Palatino Linotype",serif;font-size:1.38rem;letter-spacing:.02em}
+.brand span{color:var(--muted);font-size:.78rem;text-transform:uppercase;letter-spacing:.13em}
+.toolbar{display:flex;gap:.5rem;margin-left:auto;flex-wrap:wrap;justify-content:flex-end}
+main{max-width:var(--max);margin:auto;padding:1.1rem}
+.status-strip{display:grid;grid-template-columns:minmax(280px,1.6fr) repeat(3,minmax(120px,.55fr));border:1px solid var(--line);background:var(--panel);border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow)}
+.status-main,.status-cell{padding:1rem 1.1rem}
+.status-cell{border-left:1px solid var(--line)}
+.eyebrow{color:var(--accent);font-size:.72rem;text-transform:uppercase;letter-spacing:.14em;font-weight:800}
+.status-main h1{font-family:"Iowan Old Style","Palatino Linotype",serif;font-size:clamp(1.55rem,3vw,2.5rem);line-height:1;margin:.3rem 0 .35rem;font-weight:600}
+.status-main p{margin:0;color:var(--muted);max-width:70ch;line-height:1.42}
+.metric{font-family:Menlo,Consolas,monospace;font-size:1.34rem;margin:.24rem 0 .1rem}
+.metric-label{font-size:.75rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+.tabs{display:flex;gap:.4rem;margin:1rem 0;border-bottom:1px solid var(--line)}
+.tab{border:none;border-bottom:3px solid transparent;border-radius:0;background:transparent;color:var(--muted);padding:.72rem 1rem}
+.tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+.view[hidden]{display:none}
+.empty{border:1px dashed var(--line-strong);border-radius:var(--r);padding:clamp(2rem,8vw,5rem);text-align:center;background:#141812}
+.empty h2{font-family:"Iowan Old Style","Palatino Linotype",serif;font-size:2rem;margin:0 0 .5rem;font-weight:600}
+.empty p{color:var(--muted);max-width:58ch;margin:.5rem auto 1.2rem;line-height:1.5}
+.compare-shell{display:grid;grid-template-columns:230px minmax(0,1fr);border:1px solid var(--line);border-radius:var(--r);overflow:auto;background:var(--panel);box-shadow:var(--shadow)}
+.labels,.candidate-col{display:grid;grid-template-rows:186px repeat(8,minmax(62px,auto));min-width:210px}
+.labels{position:sticky;left:0;z-index:4;background:#131711;border-right:1px solid var(--line)}
+.labels>div,.candidate-col>div{padding:.82rem .9rem;border-bottom:1px solid var(--line);display:flex;align-items:center}
+.labels>div{font-size:.78rem;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;font-weight:750}
+.labels .corner{align-items:flex-end;color:var(--ink);font-size:.92rem}
+.candidates{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(255px,1fr);min-width:max-content}
+.candidate-col{border-right:1px solid var(--line)}
+.candidate-head{display:block!important;position:relative;background:var(--panel-2)}
+.candidate-head h2{font-family:"Iowan Old Style","Palatino Linotype",serif;font-size:1.48rem;margin:.2rem 2.2rem .15rem 0;font-weight:600}
+.candidate-head .role{color:var(--muted);font-size:.88rem;min-height:1.3em}
+.head-actions{position:absolute;right:.55rem;top:.55rem;display:flex;gap:.25rem}
+.icon-btn{width:38px;min-height:38px;padding:0;display:grid;place-items:center;background:transparent;border-color:transparent;font-size:1rem}
+.score{font-family:Menlo,Consolas,monospace;font-size:1.3rem;font-weight:800}
+.score small{font-family:"Avenir Next",sans-serif;color:var(--muted);font-size:.7rem;font-weight:500}
+.badge{display:inline-flex;align-items:center;min-height:28px;padding:.24rem .55rem;border-radius:99px;font-size:.73rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;border:1px solid}
+.badge.good{color:var(--good);border-color:#416249;background:#1a2a1d}.badge.warn{color:var(--warn);border-color:#6d5330;background:#2b2114}.badge.bad{color:var(--bad);border-color:#6b3c37;background:#2a1916}.badge.info{color:var(--info);border-color:#3d5c69;background:#14232a}.badge.muted{color:var(--muted);border-color:var(--line-strong);background:#181c16}
+.mini-bar{height:7px;background:#0c0f0c;border-radius:9px;overflow:hidden;width:100%;margin-top:.45rem}.mini-bar span{display:block;height:100%;background:var(--accent)}
+.cell-stack{display:grid!important;align-content:center!important;gap:.3rem}
+.cell-note{font-size:.8rem;color:var(--muted);line-height:1.35}
+.actions-row{display:flex;gap:.55rem;flex-wrap:wrap;margin:1rem 0}
+.panel-grid{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(300px,.7fr);gap:1rem}
+.panel{border:1px solid var(--line);border-radius:var(--r);background:var(--panel);padding:1rem;box-shadow:var(--shadow)}
+.panel h2,.panel h3{font-family:"Iowan Old Style","Palatino Linotype",serif;font-weight:600;margin:.15rem 0 .8rem}
+.session-list{display:grid;gap:.6rem}
+.session{display:grid;grid-template-columns:110px minmax(140px,.7fr) 1fr auto;gap:.75rem;align-items:center;border-top:1px solid var(--line);padding:.75rem .2rem}
+.session:first-child{border-top:0}
+.session-date{font-family:Menlo,Consolas,monospace;font-size:.8rem;color:var(--muted)}
+.session-note{font-size:.86rem;color:var(--muted);line-height:1.35}
+.session-score{font-family:Menlo,Consolas,monospace;font-weight:800}
+.callout{border:1px solid var(--line);background:#121611;border-radius:8px;padding:.85rem;line-height:1.45;color:var(--muted);font-size:.88rem}
+.callout strong{color:var(--ink)}
+.criteria-list{display:grid;gap:.75rem}.criterion{display:grid;grid-template-columns:1fr 80px;gap:.8rem;align-items:center}.criterion p{margin:0;color:var(--muted);font-size:.8rem}.criterion strong{font-size:.9rem}
+.decision-list{display:grid;gap:.8rem}.decision-card{border:1px solid var(--line);border-radius:8px;padding:1rem;background:#141812}.decision-card header{display:flex;align-items:start;justify-content:space-between;gap:1rem}.decision-card h3{margin:0}.decision-card p{color:var(--muted);line-height:1.45}.evidence{display:flex;gap:.45rem;flex-wrap:wrap}.evidence span{font-size:.75rem;border:1px solid var(--line);padding:.28rem .45rem;border-radius:5px;color:var(--muted)}
+dialog{border:1px solid var(--line-strong);background:var(--panel);color:var(--ink);border-radius:12px;padding:0;width:min(620px,calc(100vw - 2rem));max-height:calc(100vh - 2rem);box-shadow:0 30px 100px #000;overflow:auto}
+dialog::backdrop{background:rgba(3,5,3,.78);backdrop-filter:blur(3px)}
+.dialog-head{position:sticky;top:0;background:var(--panel);display:flex;justify-content:space-between;align-items:center;padding:1rem;border-bottom:1px solid var(--line);z-index:2}.dialog-head h2{font-family:"Iowan Old Style","Palatino Linotype",serif;margin:0;font-weight:600}.dialog-body{padding:1rem}.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}.span-2{grid-column:1/-1}.dialog-actions{display:flex;justify-content:flex-end;gap:.55rem;padding:1rem;border-top:1px solid var(--line);position:sticky;bottom:0;background:var(--panel)}
+.range-row{display:grid;grid-template-columns:1fr 48px;gap:.7rem;align-items:center}.range-row output{text-align:center;font-family:Menlo,monospace;color:var(--accent);font-weight:800}.range-row input{min-height:30px;padding:0}
+.notice{font-size:.8rem;color:var(--muted);line-height:1.45;margin:.6rem 0}.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.toast{position:fixed;right:1rem;bottom:1rem;z-index:50;background:var(--ink);color:#171a14;padding:.75rem 1rem;border-radius:8px;font-weight:750;box-shadow:var(--shadow);transform:translateY(140%);transition:transform .2s ease}.toast.show{transform:translateY(0)}
+@media(max-width:800px){.brand span{display:none}.toolbar .wide{display:none}.status-strip{grid-template-columns:1fr 1fr}.status-main{grid-column:1/-1}.status-cell{border-left:0;border-top:1px solid var(--line)}.status-cell:nth-child(3){border-left:1px solid var(--line)}.status-cell:last-child{display:none}.compare-shell{grid-template-columns:150px 1fr}.labels{min-width:150px}.labels,.candidate-col{grid-template-rows:186px repeat(8,minmax(70px,auto))}.candidates{grid-auto-columns:240px}.panel-grid{grid-template-columns:1fr}.session{grid-template-columns:92px 1fr auto}.session-note{grid-column:1/-1}.form-grid{grid-template-columns:1fr}.span-2{grid-column:auto}}
+@media(max-width:520px){main{padding:.7rem}.topbar-inner{padding:.65rem .7rem}.toolbar button{min-width:44px;padding:.5rem}.toolbar .button-text{display:none}.status-strip{border-radius:8px}.tabs{overflow:auto}.tab{white-space:nowrap}.compare-shell{grid-template-columns:120px 1fr}.labels{min-width:120px}.labels>div{padding:.65rem;font-size:.68rem}.candidates{grid-auto-columns:220px}.candidate-col>div{padding:.65rem}.actions-row button{flex:1}}
+@media print{body{background:white;color:#111}.topbar,.tabs,.actions-row,.head-actions,.toast{display:none!important}main{max-width:none;padding:0}.status-strip,.compare-shell,.panel,.decision-card{box-shadow:none;border-color:#888;background:white}.status-main p,.metric-label,.labels>div,.cell-note,.session-note,.decision-card p{color:#444}.candidate-head,.labels{background:#f2f0e8}.compare-shell{overflow:visible}.candidates{min-width:0;grid-auto-columns:minmax(180px,1fr)}.badge{color:#111!important;background:white!important}.view[hidden]{display:none!important}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="topbar-inner">
+    <div class="brand"><strong>Trial Wire</strong><span>DCS evaluation desk</span></div>
+    <div class="toolbar">
+      <button class="ghost" id="importBtn" title="Import backup"><span aria-hidden="true">↥</span> <span class="button-text">Import</span></button>
+      <button class="ghost wide" id="exportBtn">Export</button>
+      <button class="ghost wide" id="printBtn">Print</button>
+      <button class="primary" id="addCandidateBtn"><span aria-hidden="true">＋</span> <span class="button-text">Add module</span></button>
+    </div>
+  </div>
+</header>
+<main>
+  <section class="status-strip" aria-labelledby="pageTitle">
+    <div class="status-main">
+      <div class="eyebrow">Evidence before impulse</div>
+      <h1 id="pageTitle">Build a purchase case from flown sessions.</h1>
+      <p>Compare trial candidates on the same criteria, record actual sorties, and separate cockpit chemistry from launch-week noise.</p>
+    </div>
+    <div class="status-cell"><div class="metric-label">Candidates</div><div class="metric" id="candidateCount">0</div></div>
+    <div class="status-cell"><div class="metric-label">Logged sessions</div><div class="metric" id="sessionCount">0</div></div>
+    <div class="status-cell"><div class="metric-label">Evidence time</div><div class="metric" id="flightTime">0h</div></div>
+  </section>
+
+  <nav class="tabs" aria-label="Trial Wire views">
+    <button class="tab" role="tab" aria-selected="true" data-view="compare">Compare</button>
+    <button class="tab" role="tab" aria-selected="false" data-view="sessions">Session log</button>
+    <button class="tab" role="tab" aria-selected="false" data-view="decision">Decision brief</button>
+  </nav>
+
+  <section class="view" id="compareView">
+    <div id="compareContent"></div>
+    <div class="actions-row" id="compareActions" hidden>
+      <button class="primary" id="logSessionBtn">Log flown session</button>
+      <button id="weightsBtn">Adjust criteria weights</button>
+      <button id="copyBriefBtn">Copy decision brief</button>
+    </div>
+  </section>
+
+  <section class="view" id="sessionsView" hidden>
+    <div class="panel-grid">
+      <div class="panel"><h2>Flight evidence</h2><div id="sessionList" class="session-list"></div></div>
+      <aside class="panel"><h2>Evidence discipline</h2><div class="callout"><strong>Log the sortie you flew, not the module you hoped to buy.</strong><br>Use the same criteria after each session. Two or more sessions reveal more than one long first impression.</div><div style="height:1rem"></div><button class="primary" id="logSessionBtn2">Log flown session</button></aside>
+    </div>
+  </section>
+
+  <section class="view" id="decisionView" hidden>
+    <div class="panel-grid">
+      <div class="panel"><h2>Decision queue</h2><div id="decisionList" class="decision-list"></div></div>
+      <aside class="panel"><h2>Read the signal</h2><div class="callout">The recommendation is a transparent local rule: <strong>consider</strong> at 4.0+, <strong>continue</strong> below 4.0, and <strong>hold</strong> when any unresolved blocker is logged. Fewer than two sessions stays <strong>insufficient evidence</strong>.</div><div style="height:1rem"></div><button id="clearDataBtn" class="danger">Clear all local data</button></aside>
+    </div>
+  </section>
+</main>
+
+<dialog id="candidateDialog">
+<form method="dialog" id="candidateForm">
+  <div class="dialog-head"><h2 id="candidateDialogTitle">Add a module</h2><button type="button" class="icon-btn" data-close="candidateDialog" aria-label="Close">×</button></div>
+  <div class="dialog-body form-grid">
+    <input type="hidden" id="candidateId">
+    <label class="span-2">Module or aircraft name<input id="candidateName" maxlength="60" required autocomplete="off"></label>
+    <label>Trial start date<input type="date" id="trialStart"></label>
+    <label>Trial end date<input type="date" id="trialEnd"></label>
+    <label>Primary role<input id="candidateRole" maxlength="50" autocomplete="off"></label>
+    <label>Observed price, optional<input id="candidatePrice" maxlength="24" autocomplete="off" inputmode="decimal"></label>
+    <label class="span-2">Decision question<textarea id="candidateQuestion" maxlength="260" placeholder="What must this module prove during the trial?"></textarea></label>
+  </div>
+  <div class="dialog-actions"><button type="button" data-close="candidateDialog">Cancel</button><button class="primary" value="save">Save module</button></div>
+</form>
+</dialog>
+
+<dialog id="sessionDialog">
+<form method="dialog" id="sessionForm">
+  <div class="dialog-head"><h2>Log flown session</h2><button type="button" class="icon-btn" data-close="sessionDialog" aria-label="Close">×</button></div>
+  <div class="dialog-body form-grid">
+    <label>Module<select id="sessionCandidate" required></select></label>
+    <label>Date<input type="date" id="sessionDate" required></label>
+    <label>Minutes flown<input type="number" id="sessionMinutes" min="1" max="1440" value="60" required></label>
+    <label><span>Unresolved blocker</span><select id="sessionBlocker"><option value="false">No</option><option value="true">Yes</option></select></label>
+    <div class="span-2" id="scoreInputs"></div>
+    <label class="span-2">Evidence note<textarea id="sessionNotes" maxlength="500" required placeholder="Mission flown, what worked, and what resisted you."></textarea></label>
+  </div>
+  <div class="dialog-actions"><button type="button" data-close="sessionDialog">Cancel</button><button class="primary" value="save">Save session</button></div>
+</form>
+</dialog>
+
+<dialog id="weightsDialog">
+<form method="dialog" id="weightsForm">
+  <div class="dialog-head"><h2>Criteria weights</h2><button type="button" class="icon-btn" data-close="weightsDialog" aria-label="Close">×</button></div>
+  <div class="dialog-body"><p class="notice">Weights run from 1 (context only) to 5 (purchase-critical). They apply to every candidate so the comparison remains fair.</p><div id="weightsList" class="criteria-list"></div></div>
+  <div class="dialog-actions"><button type="button" data-close="weightsDialog">Cancel</button><button class="primary" value="save">Save weights</button></div>
+</form>
+</dialog>
+<input type="file" id="importFile" accept="application/json,.json" hidden>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script>
+(()=>{
+'use strict';
+const STORAGE='dcs-trial-wire-v1';
+const criteria=[
+ {id:'mission',name:'Mission fit',desc:'Does it enable sorties you genuinely want to repeat?'},
+ {id:'cockpit',name:'Cockpit clarity',desc:'Can you build and retain a workable scan?'},
+ {id:'handling',name:'Handling feel',desc:'Is the aircraft rewarding across normal flight regimes?'},
+ {id:'workflow',name:'Workflow friction',desc:'Are startup, setup, and rearming costs acceptable?'},
+ {id:'performance',name:'System performance',desc:'Does it run acceptably in your normal DCS setup?'},
+ {id:'crew',name:'Crew / multiplayer fit',desc:'Does it fit how and with whom you actually fly?'}
+];
+const defaultState={candidates:[],sessions:[],weights:Object.fromEntries(criteria.map(c=>[c.id,c.id==='mission'?5:3])),activeView:'compare'};
+let state=load();
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+function load(){try{const raw=JSON.parse(localStorage.getItem(STORAGE));return raw&&Array.isArray(raw.candidates)&&Array.isArray(raw.sessions)?{...defaultState,...raw,weights:{...defaultState.weights,...raw.weights}}:structuredClone(defaultState)}catch{return structuredClone(defaultState)}}
+function save(){localStorage.setItem(STORAGE,JSON.stringify(state));render()}
+function uid(){return crypto.randomUUID?crypto.randomUUID():Date.now().toString(36)+Math.random().toString(36).slice(2)}
+function esc(v=''){return String(v).replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]))}
+function today(){return new Date().toISOString().slice(0,10)}
+function fmtDate(v){if(!v)return 'Not set';const d=new Date(v+'T12:00:00');return d.toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'})}
+function daysLeft(c){if(!c.trialEnd)return null;const a=new Date(today()+'T12:00:00'),b=new Date(c.trialEnd+'T12:00:00');return Math.ceil((b-a)/86400000)}
+function sessionsFor(id){return state.sessions.filter(s=>s.candidateId===id)}
+function avgFor(c,id){const ss=sessionsFor(c.id);if(!ss.length)return null;return ss.reduce((n,s)=>n+(Number(s.scores[id])||0),0)/ss.length}
+function weighted(c){const ss=sessionsFor(c.id);if(!ss.length)return null;let total=0,weight=0;criteria.forEach(k=>{const a=avgFor(c,k.id);const w=Number(state.weights[k.id])||1;if(a!==null){total+=a*w;weight+=w}});return weight?total/weight:null}
+function decision(c){const ss=sessionsFor(c.id),score=weighted(c);if(ss.some(s=>s.blocker))return {text:'Hold — blocker open',tone:'bad'};if(ss.length<2)return {text:'Insufficient evidence',tone:'muted'};if(score>=4)return {text:'Consider purchase',tone:'good'};if(score>=3)return {text:'Continue trial',tone:'info'};return {text:'Pass for now',tone:'warn'}}
+function trialText(c){const d=daysLeft(c);if(d===null)return 'Dates not set';if(d>1)return d+' days remain';if(d===1)return '1 day remains';if(d===0)return 'Ends today';return Math.abs(d)+' days past end'}
+function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('show');clearTimeout(toast.timer);toast.timer=setTimeout(()=>t.classList.remove('show'),2200)}
+function render(){
+ $('#candidateCount').textContent=state.candidates.length;
+ $('#sessionCount').textContent=state.sessions.length;
+ const mins=state.sessions.reduce((n,s)=>n+Number(s.minutes||0),0);$('#flightTime').textContent=mins<60?mins+'m':(mins/60).toFixed(mins%60?1:0)+'h';
+ renderCompare();renderSessions();renderDecisions();activateView(state.activeView,false);
+}
+function renderCompare(){const root=$('#compareContent'),actions=$('#compareActions');if(!state.candidates.length){actions.hidden=true;root.innerHTML=`<div class="empty"><div class="eyebrow">No candidates yet</div><h2>Start with the module under consideration.</h2><p>Add a trial candidate, define what it must prove, then log the same evidence after each flown session. Trial Wire will build the comparison without inventing data.</p><button class="primary" data-add>Add first module</button></div>`;return}
+ actions.hidden=false;
+ const labels=['Weighted score','Decision','Trial window','Sessions','Mission fit','Cockpit clarity','Handling feel','Performance'];
+ root.innerHTML=`<div class="compare-shell" role="region" aria-label="Module comparison" tabindex="0"><div class="labels"><div class="corner">Comparable evidence</div>${labels.map(x=>`<div>${x}</div>`).join('')}</div><div class="candidates">${state.candidates.map(candidateColumn).join('')}</div></div>`;
+}
+function candidateColumn(c){const ss=sessionsFor(c.id),score=weighted(c),dec=decision(c);const scoreCell=score===null?'—':score.toFixed(1);const criterionCell=id=>{const n=avgFor(c,id);return n===null?`<span class="cell-note">No score yet</span>`:`<div style="width:100%"><span class="score">${n.toFixed(1)} <small>/ 5</small></span><div class="mini-bar"><span style="width:${n*20}%"></span></div></div>`};return `<article class="candidate-col" aria-label="${esc(c.name)} comparison"><div class="candidate-head"><div class="head-actions"><button class="icon-btn" data-edit="${c.id}" aria-label="Edit ${esc(c.name)}">✎</button><button class="icon-btn" data-delete="${c.id}" aria-label="Delete ${esc(c.name)}">×</button></div><div class="eyebrow">${esc(c.price||'Price not recorded')}</div><h2>${esc(c.name)}</h2><div class="role">${esc(c.role||'Role not set')}</div><p class="cell-note">${esc(c.question||'Decision question not set.')}</p></div><div class="cell-stack"><span class="score">${scoreCell} <small>/ 5</small></span><span class="cell-note">weighted across ${ss.length} session${ss.length===1?'':'s'}</span></div><div><span class="badge ${dec.tone}">${dec.text}</span></div><div class="cell-stack"><strong>${trialText(c)}</strong><span class="cell-note">${fmtDate(c.trialStart)} — ${fmtDate(c.trialEnd)}</span></div><div class="cell-stack"><strong>${ss.length} logged</strong><span class="cell-note">${ss.reduce((n,s)=>n+Number(s.minutes||0),0)} minutes flown</span></div><div>${criterionCell('mission')}</div><div>${criterionCell('cockpit')}</div><div>${criterionCell('handling')}</div><div>${criterionCell('performance')}</div></article>`}
+function renderSessions(){const root=$('#sessionList');if(!state.sessions.length){root.innerHTML='<div class="empty"><h2>No flown evidence yet.</h2><p>Add a candidate, fly a focused sortie, then score it while the friction and delight are still fresh.</p></div>';return}const sorted=[...state.sessions].sort((a,b)=>b.date.localeCompare(a.date));root.innerHTML=sorted.map(s=>{const c=state.candidates.find(x=>x.id===s.candidateId);if(!c)return'';const avg=criteria.reduce((n,k)=>n+Number(s.scores[k.id]||0),0)/criteria.length;return `<article class="session"><div class="session-date">${fmtDate(s.date)}<br>${s.minutes} min</div><div><strong>${esc(c.name)}</strong><br>${s.blocker?'<span class="badge bad">Blocker</span>':'<span class="badge muted">Clear</span>'}</div><div class="session-note">${esc(s.notes)}</div><div><span class="session-score">${avg.toFixed(1)}</span><button class="icon-btn" data-delete-session="${s.id}" aria-label="Delete session">×</button></div></article>`}).join('')}
+function renderDecisions(){const root=$('#decisionList');if(!state.candidates.length){root.innerHTML='<div class="empty"><h2>No decision queue yet.</h2><p>Add at least one candidate to begin.</p></div>';return}root.innerHTML=[...state.candidates].sort((a,b)=>(weighted(b)||0)-(weighted(a)||0)).map(c=>{const ss=sessionsFor(c.id),d=decision(c),score=weighted(c);const strongest=criteria.map(k=>({name:k.name,v:avgFor(c,k.id)})).filter(x=>x.v!==null).sort((a,b)=>b.v-a.v)[0];return `<article class="decision-card"><header><div><div class="eyebrow">${ss.length} sessions · ${ss.reduce((n,s)=>n+Number(s.minutes||0),0)} minutes</div><h3>${esc(c.name)}</h3></div><span class="badge ${d.tone}">${d.text}</span></header><p>${esc(c.question||'No decision question recorded.')} ${strongest?`Strongest observed criterion: <strong>${esc(strongest.name)} (${strongest.v.toFixed(1)}/5)</strong>.`:''}</p><div class="evidence"><span>Weighted ${score===null?'—':score.toFixed(1)}/5</span><span>${trialText(c)}</span><span>${ss.filter(s=>s.blocker).length} blocker sessions</span></div></article>`}).join('')}
+function activateView(name,persist=true){state.activeView=name;$$('.tab').forEach(b=>b.setAttribute('aria-selected',String(b.dataset.view===name)));$$('.view').forEach(v=>v.hidden=v.id!==name+'View');if(persist)localStorage.setItem(STORAGE,JSON.stringify(state))}
+function openCandidate(id){const c=state.candidates.find(x=>x.id===id);$('#candidateDialogTitle').textContent=c?'Edit module':'Add a module';$('#candidateId').value=c?.id||'';$('#candidateName').value=c?.name||'';$('#trialStart').value=c?.trialStart||today();$('#trialEnd').value=c?.trialEnd||'';$('#candidateRole').value=c?.role||'';$('#candidatePrice').value=c?.price||'';$('#candidateQuestion').value=c?.question||'';$('#candidateDialog').showModal();setTimeout(()=>$('#candidateName').focus(),0)}
+function openSession(){if(!state.candidates.length){openCandidate();return}$('#sessionCandidate').innerHTML=state.candidates.map(c=>`<option value="${c.id}">${esc(c.name)}</option>`).join('');$('#sessionDate').value=today();$('#sessionMinutes').value=60;$('#sessionBlocker').value='false';$('#sessionNotes').value='';$('#scoreInputs').innerHTML=`<div class="criteria-list">${criteria.map(k=>`<label>${k.name}<span class="range-row"><input type="range" min="1" max="5" step="1" value="3" data-score="${k.id}"><output>3</output></span><span class="notice">${k.desc}</span></label>`).join('')}</div>`;$('#sessionDialog').showModal()}
+function openWeights(){$('#weightsList').innerHTML=criteria.map(k=>`<div class="criterion"><div><strong>${k.name}</strong><p>${k.desc}</p></div><label><span class="sr-only">${k.name} weight</span><select data-weight="${k.id}">${[1,2,3,4,5].map(n=>`<option value="${n}" ${Number(state.weights[k.id])===n?'selected':''}>${n}×</option>`).join('')}</select></label></div>`).join('');$('#weightsDialog').showModal()}
+function brief(){const lines=['TRIAL WIRE — DCS MODULE DECISION BRIEF',`Generated ${fmtDate(today())}`,''];[...state.candidates].sort((a,b)=>(weighted(b)||0)-(weighted(a)||0)).forEach(c=>{const ss=sessionsFor(c.id),d=decision(c);lines.push(`${c.name.toUpperCase()} — ${d.text}`,`Weighted score: ${weighted(c)?.toFixed(1)||'—'}/5 | Sessions: ${ss.length} | Time: ${ss.reduce((n,s)=>n+Number(s.minutes||0),0)} min`,`Question: ${c.question||'Not recorded'}`,`Trial: ${fmtDate(c.trialStart)} to ${fmtDate(c.trialEnd)} (${trialText(c)})`,'')});lines.push('Scores are personal observations, not aircraft or module specifications.');return lines.join('\n')}
+function exportData(){const blob=new Blob([JSON.stringify({...state,exportedAt:new Date().toISOString()},null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='trial-wire-backup-'+today()+'.json';a.click();URL.revokeObjectURL(a.href);toast('Backup exported')}
+
+document.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;if(b.matches('[data-add],#addCandidateBtn'))openCandidate();if(b.dataset.edit)openCandidate(b.dataset.edit);if(b.dataset.delete&&confirm('Delete this candidate and all of its logged sessions?')){state.candidates=state.candidates.filter(c=>c.id!==b.dataset.delete);state.sessions=state.sessions.filter(s=>s.candidateId!==b.dataset.delete);save();toast('Candidate deleted')}if(b.dataset.deleteSession&&confirm('Delete this session?')){state.sessions=state.sessions.filter(s=>s.id!==b.dataset.deleteSession);save();toast('Session deleted')}if(b.dataset.close)document.getElementById(b.dataset.close).close();if(b.matches('#logSessionBtn,#logSessionBtn2'))openSession();if(b.id==='weightsBtn')openWeights();if(b.id==='exportBtn')exportData();if(b.id==='importBtn')$('#importFile').click();if(b.id==='printBtn')window.print();if(b.id==='copyBriefBtn')navigator.clipboard.writeText(brief()).then(()=>toast('Decision brief copied')).catch(()=>toast('Copy was blocked by the browser'));if(b.id==='clearDataBtn'&&confirm('Clear every candidate, session, and custom weight saved by Trial Wire?')){state=structuredClone(defaultState);save();toast('Local data cleared')}});
+$$('.tab').forEach(b=>b.addEventListener('click',()=>activateView(b.dataset.view)));
+document.addEventListener('input',e=>{if(e.target.matches('[data-score]'))e.target.nextElementSibling.value=e.target.value});
+$('#candidateForm').addEventListener('submit',e=>{if(e.submitter?.value!=='save')return;e.preventDefault();const id=$('#candidateId').value||uid(),existing=state.candidates.find(c=>c.id===id);const c={id,name:$('#candidateName').value.trim(),trialStart:$('#trialStart').value,trialEnd:$('#trialEnd').value,role:$('#candidateRole').value.trim(),price:$('#candidatePrice').value.trim(),question:$('#candidateQuestion').value.trim()};if(!c.name)return;if(c.trialStart&&c.trialEnd&&c.trialEnd<c.trialStart){toast('Trial end must follow trial start');return}if(existing)Object.assign(existing,c);else state.candidates.push(c);$('#candidateDialog').close();save();toast(existing?'Module updated':'Module added')});
+$('#sessionForm').addEventListener('submit',e=>{if(e.submitter?.value!=='save')return;e.preventDefault();const scores={};$$('[data-score]').forEach(x=>scores[x.dataset.score]=Number(x.value));state.sessions.push({id:uid(),candidateId:$('#sessionCandidate').value,date:$('#sessionDate').value,minutes:Number($('#sessionMinutes').value),blocker:$('#sessionBlocker').value==='true',notes:$('#sessionNotes').value.trim(),scores});$('#sessionDialog').close();save();toast('Flight evidence logged')});
+$('#weightsForm').addEventListener('submit',e=>{if(e.submitter?.value!=='save')return;e.preventDefault();$$('[data-weight]').forEach(x=>state.weights[x.dataset.weight]=Number(x.value));$('#weightsDialog').close();save();toast('Weights updated')});
+$('#importFile').addEventListener('change',async e=>{const f=e.target.files[0];if(!f)return;try{const data=JSON.parse(await f.text());if(!Array.isArray(data.candidates)||!Array.isArray(data.sessions)||typeof data.weights!=='object')throw Error();if(confirm('Replace current Trial Wire data with this backup?')){state={...defaultState,...data,weights:{...defaultState.weights,...data.weights}};save();toast('Backup imported')}}catch{toast('That file is not a valid Trial Wire backup')}e.target.value=''});
+render();
+})();
+</script>
+</body>
+</html>
