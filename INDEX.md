@@ -67,3 +67,4 @@ Chronological record of autonomous DCS World companion projects.
 - 2026-10-04 — `2026-10-04-vr-sortie-guard` — Offline DCS VR session-degradation guard with healthy baselines, event marking, threshold comparisons, recovery evidence, local persistence, and JSON/CSV handoff.
 - 2026-10-05 — `2026-10-05-route-handshake` — Offline shared-flight-plan revision desk with route validation, geometry and ETA checks, checksum packets, crew acknowledgments, persistence, export, and printing.
 - 2026-10-06 — `2026-10-06-trial-wire` — Offline DCS module trial evaluation desk with comparable criteria, weighted session evidence, blocker-aware decisions, local persistence, JSON backup, and printing.
+- 2026-10-07 — `2026-10-07-intercept-smith` — Offline DCS Mission Editor alert-intercept scenario desk with geometry plotting, timing feasibility, explicit trigger recipes, persistent test evidence, JSON handoff, and printing.
