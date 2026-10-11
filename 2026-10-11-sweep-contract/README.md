@@ -6,12 +6,12 @@ Open `index.html` directly in a browser. No server, install, network connection,
 
 ## Why it exists
 
-Recent community discussions continue to show a practical gap between knowing that the Tomcat radar works and understanding why a specific mission produces no useful picture:
+Recent community discussions continue to show a practical gap between knowing that the Tomcat radar works and building a repeatable solo-pilot search:
 
-- A current r/dcsworld question described Jester radar working in instant action but apparently failing during the *Speed and Angels* campaign. That is exactly the kind of “control case works, problem case does not” report that benefits from a disciplined A/B evidence card rather than random cockpit changes.
-- The current weekly r/dcsworld questions thread explicitly calls out the F-14(B/U), keeping pilot/Jester workflow questions visible for new and returning crews.
-- An Eagle Dynamics forum request asks for better control over radar azimuth, elevation, and bar settings through Jester, reflecting demand for clearer, more stable search contracts.
-- Heatblur’s F-14B(U) documentation says Quick Jester is contextual to the aircraft’s current master mode, and its published update notes describe expanded QJester radar controls plus VDIG-R/TID-related changes. The app therefore treats cockpit context and visible acknowledgment as evidence to record, not assumptions.
+- A March 2026 r/hoggit discussion described radar-elevation management as requiring too many Jester menu steps and target acquisition lagging visual acquisition.
+- An August 2026 Eagle Dynamics forum request asks for stable control over radar azimuth, elevation, and bar settings through Jester, including concern that selected scan settings are reset.
+- A July 2026 r/dcsworld discussion praised the F-14B(U) context command for pointing Jester and the radar at datalink targets, showing that the new workflow is valuable but important enough to rehearse deliberately.
+- Heatblur’s F-14B(U) documentation describes the context command as situation-dependent and documents pilot-visible A/A target data on VDIG-R. The app therefore treats cockpit context and visible acknowledgment as evidence to record, not assumptions.
 
 ## Use
 
@@ -37,12 +37,12 @@ All useful state is saved in browser `localStorage`.
 
 Accessed **2026-10-11**:
 
-- Reddit r/dcsworld — “F-14B/U Radar & Jester AI Issues in Speed and Angels Campaign”: https://www.reddit.com/r/dcsworld/comments/1y1i8qo/f14bu_radar_jester_ai_issues_in_speed_and_angels/
-- Reddit r/dcsworld — Weekly Thread (2026-10-05): https://www.reddit.com/r/dcsworld/comments/1wy12p1/weekly_thread_20261005_questions_on_dcs_pcs/
+- Reddit r/hoggit — “Opinion needed about Bombcat vs Phantom and Jester…”: https://www.reddit.com/r/hoggit/comments/1rxcmw1/opinion_needed_about_bombcat_vs_phantom_and/
+- Reddit r/dcsworld — “How are all of you liking the F-14 B/U?”: https://www.reddit.com/r/dcsworld/comments/1v5e0ao/how_are_all_of_you_liking_the_f14_bu/
 - Eagle Dynamics Forums — “Let us change radar azimut, elevation, bars with Jester…”: https://forum.dcs.world/topic/391119-let-us-change-radar-azimut-elevation-bars-with-jester-or-prevent-him-for-resetting-it-please/
 - Heatblur F-14B(U) manual — Jester & Iceman overview / Quick Jester: https://f14.manuals.heatblur.se/f14bu/jester_iceman/overview.html
 - Heatblur F-14B(U) manual — VDIG-R Air-to-Air modes: https://f14.manuals.heatblur.se/f14bu/weapons/air_to_air/vdigr_aa.html
-- Heatblur F-14 manual — DCS update changelog: https://f14.manuals.heatblur.se/changelog.html
+
 
 ## Privacy
 
