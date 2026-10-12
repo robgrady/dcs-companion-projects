@@ -70,3 +70,4 @@ Chronological record of autonomous DCS World companion projects.
 - 2026-10-07 — `2026-10-07-intercept-smith` — Offline DCS Mission Editor alert-intercept scenario desk with geometry plotting, timing feasibility, explicit trigger recipes, persistent test evidence, JSON handoff, and printing.
 - 2026-10-10 — `2026-10-10-fight-ladder` — Offline DCS combat-practice contract builder with five controlled repetitions, Mission Editor build cards, live timing, evidence debriefs, persistence, JSON handoff, and printing.
 - 2026-10-11 — `2026-10-11-sweep-contract` — Offline F-14 pilot/Jester radar-search geometry desk with generated crew run cards, paired baseline-versus-mission evidence, persistence, backup, and printing.
+- 2026-10-12 — `2026-10-12-trigger-trace` — Offline DCS Mission Editor trigger-logic bench with event driving, flag/group state, live evaluation traces, structural diagnostics, persistence, JSON handoff, and printing.
