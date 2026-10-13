@@ -1,0 +1,252 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Mission Spine builds timing-free, reactive solo mission blueprints for the DCS World Mission Editor.">
+<title>Mission Spine — DCS Reactive Mission Builder</title>
+<style>
+:root{
+  color-scheme:dark;
+  --bg:#171815;--panel:#20211d;--panel-2:#272821;--ink:#f2eddc;--muted:#aaa895;
+  --line:#45463b;--line-strong:#686a58;--accent:#e7a23b;--accent-2:#f2c978;
+  --ok:#90b879;--warn:#e1b75e;--bad:#d77b67;--shadow:0 20px 45px #08090566;
+  --radius:5px;--gap:18px;--font-ui:"Avenir Next Condensed","Arial Narrow",Arial,sans-serif;
+  --font-display:Georgia,"Times New Roman",serif;--font-mono:"SFMono-Regular",Consolas,monospace;
+}
+*{box-sizing:border-box}
+html{background:var(--bg);scroll-behavior:smooth}
+body{margin:0;min-height:100vh;background:
+  linear-gradient(90deg,transparent 49.8%,#ffffff05 50%,transparent 50.2%) 0 0/48px 48px,
+  linear-gradient(transparent 49.8%,#ffffff04 50%,transparent 50.2%) 0 0/48px 48px,var(--bg);
+  color:var(--ink);font-family:var(--font-ui);font-size:16px;letter-spacing:.01em}
+button,input,select,textarea{font:inherit}
+button,input,select,textarea{border-radius:var(--radius)}
+button{min-height:44px;cursor:pointer}
+:focus-visible{outline:3px solid var(--accent-2);outline-offset:3px}
+.skip{position:fixed;left:10px;top:-60px;z-index:20;background:var(--ink);color:var(--bg);padding:10px 14px}
+.skip:focus{top:10px}
+.app{max-width:1500px;margin:auto;padding:18px}
+.masthead{display:grid;grid-template-columns:1fr auto;gap:18px;align-items:end;padding:14px 2px 20px;border-bottom:1px solid var(--line-strong)}
+.eyebrow,.label,.kicker{font-family:var(--font-mono);text-transform:uppercase;letter-spacing:.14em;font-size:.72rem;color:var(--accent-2)}
+h1{font-family:var(--font-display);font-weight:400;font-size:clamp(2.2rem,5vw,4.8rem);line-height:.86;margin:.18em 0 .08em;letter-spacing:-.055em}
+.subtitle{margin:0;color:var(--muted);font-size:1rem;max-width:720px}
+.mast-actions{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:8px}
+.btn{border:1px solid var(--line-strong);background:var(--panel-2);color:var(--ink);padding:9px 14px;text-transform:uppercase;letter-spacing:.07em;font-weight:700;font-size:.8rem}
+.btn:hover{border-color:var(--accent);background:#303126}
+.btn.primary{background:var(--accent);color:#21170a;border-color:var(--accent);box-shadow:0 5px 0 #7e5218}
+.btn.primary:active{transform:translateY(3px);box-shadow:0 2px 0 #7e5218}
+.btn.danger{color:#f0b5a8}.btn.small{min-height:36px;padding:6px 10px;font-size:.72rem}
+.layout{display:grid;grid-template-columns:minmax(285px,365px) 1fr;gap:var(--gap);padding-top:18px}
+.config{background:var(--panel);border:1px solid var(--line);box-shadow:var(--shadow);align-self:start;position:sticky;top:16px;max-height:calc(100vh - 32px);overflow:auto}
+.section-head{padding:14px 16px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:10px;background:#1c1d19}
+.section-head h2{font-family:var(--font-display);font-weight:400;margin:0;font-size:1.35rem}
+.form{padding:16px;display:grid;gap:14px}
+.field{display:grid;gap:6px}.field-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+label{font-weight:700;font-size:.82rem;text-transform:uppercase;letter-spacing:.06em}
+.help{font-size:.78rem;color:var(--muted);line-height:1.3}
+input,select,textarea{width:100%;border:1px solid var(--line-strong);background:#151612;color:var(--ink);padding:10px 11px;min-height:44px}
+textarea{resize:vertical;min-height:74px;line-height:1.35}
+input[type="range"]{padding:0;accent-color:var(--accent)}
+.checkrow{display:flex;align-items:flex-start;gap:9px;text-transform:none;letter-spacing:0;font-weight:500;font-size:.92rem}
+.checkrow input{width:19px;min-height:19px;height:19px;margin:1px 0 0;accent-color:var(--accent);flex:0 0 auto}
+.range-line{display:flex;justify-content:space-between;align-items:center}.range-value{font-family:var(--font-mono);color:var(--accent-2)}
+.output{min-width:0}
+.statusbar{display:flex;flex-wrap:wrap;align-items:center;gap:8px 18px;padding:10px 14px;border:1px solid var(--line);background:#1b1c18;margin-bottom:12px}
+.statusbar strong{color:var(--accent-2)}
+.status-dot{width:9px;height:9px;border-radius:50%;background:var(--ok);box-shadow:0 0 0 4px #90b8791e}
+.tabs{display:flex;overflow:auto;border-bottom:1px solid var(--line-strong);gap:2px}
+.tab{border:0;border-radius:0;background:transparent;color:var(--muted);padding:10px 15px;min-width:max-content;text-transform:uppercase;letter-spacing:.08em;font-weight:800}
+.tab[aria-selected="true"]{color:var(--ink);box-shadow:inset 0 -3px var(--accent)}
+.tab:hover{background:#ffffff08;color:var(--ink)}
+.sheet{background:#e8e1cb;color:#26271f;min-height:730px;box-shadow:var(--shadow);border:1px solid #cfc6aa;position:relative;overflow:hidden}
+.sheet::before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.28;background:repeating-linear-gradient(0deg,transparent 0 27px,#857e681f 28px)}
+.panel{display:none;position:relative;padding:clamp(18px,3vw,38px)}.panel.active{display:block}
+.brief-top{display:grid;grid-template-columns:1fr auto;gap:20px;border-bottom:3px double #67624f;padding-bottom:18px;margin-bottom:20px}
+.brief-title h2{font-family:var(--font-display);font-size:clamp(2rem,4vw,4rem);font-weight:400;letter-spacing:-.045em;line-height:.95;margin:5px 0 8px}
+.brief-title p{margin:0;max-width:760px;line-height:1.35}
+.stamp{align-self:start;border:2px solid #8d5926;color:#8d5926;padding:9px 12px;transform:rotate(2deg);font-family:var(--font-mono);font-weight:800;text-transform:uppercase;letter-spacing:.1em;text-align:center}
+.meta{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid #8c8773;margin:0 0 22px}
+.meta div{padding:9px 11px;border-right:1px solid #8c8773}.meta div:last-child{border:0}.meta span{display:block;font-family:var(--font-mono);font-size:.68rem;text-transform:uppercase;color:#656251}.meta strong{display:block;margin-top:2px}
+.spine{position:relative;margin:18px 0 25px;padding-left:36px}.spine::before{content:"";position:absolute;left:10px;top:9px;bottom:12px;border-left:2px solid #8c8773}
+.act{position:relative;padding:0 0 24px}.act:last-child{padding-bottom:0}.act::before{content:"";position:absolute;left:-32px;top:5px;width:11px;height:11px;background:#e8e1cb;border:3px solid #875522;border-radius:50%}
+.act-head{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}.act-num{font-family:var(--font-mono);font-size:.7rem;color:#875522}.act h3{font-family:var(--font-display);font-size:1.5rem;margin:0}.act .trigger{font-family:var(--font-mono);font-size:.78rem;color:#686451;margin:4px 0 8px}.act p{margin:0;line-height:1.42;max-width:920px}.act ul{margin:7px 0 0;padding-left:18px;line-height:1.38}
+.columns{display:grid;grid-template-columns:1fr 1fr;gap:20px}.block{border-top:2px solid #625e4d;padding-top:8px}.block h3{font-family:var(--font-mono);text-transform:uppercase;letter-spacing:.1em;font-size:.78rem;margin:0 0 8px}.block ul{padding-left:18px;margin:0;line-height:1.42}
+.logic-header,.test-header{display:flex;justify-content:space-between;gap:12px;align-items:end;border-bottom:2px solid #67624f;padding-bottom:14px;margin-bottom:18px}.logic-header h2,.test-header h2{font-family:var(--font-display);font-size:2.3rem;font-weight:400;margin:0}.logic-header p,.test-header p{margin:0;color:#625e4d}
+.logic-grid{display:grid;gap:12px}.logic-row{display:grid;grid-template-columns:58px minmax(140px,.8fr) 1.4fr 1.2fr;gap:0;border:1px solid #8c8773;background:#f1ead6}
+.logic-row>*{padding:10px;border-right:1px solid #aaa38c}.logic-row>*:last-child{border:0}.logic-row .n{font-family:var(--font-mono);font-weight:800;color:#875522}.logic-row strong{display:block;font-size:.8rem;text-transform:uppercase;letter-spacing:.05em}.logic-row span{display:block;margin-top:3px;line-height:1.3}
+.flag-bank{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0}.flag{font-family:var(--font-mono);font-size:.76rem;padding:6px 8px;border:1px solid #8c8773;background:#ded6bd}
+.test-list{display:grid;gap:9px;margin-top:18px}.test-item{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:start;padding:12px;border:1px solid #9b947e;background:#eee6d0}.test-item input{width:21px;height:21px;min-height:21px;margin:1px 0 0;accent-color:#875522}.test-item label{text-transform:none;letter-spacing:0;font-size:1rem}.test-item p{margin:3px 0 0;color:#5f5c4c;font-size:.88rem;line-height:1.35}.test-item .tag{font-family:var(--font-mono);font-size:.68rem;border:1px solid #8c8773;padding:4px 6px;text-transform:uppercase}.test-summary{display:grid;grid-template-columns:auto 1fr;gap:15px;align-items:center;background:#272820;color:#f0ead8;padding:16px;margin-top:18px}.ring{width:64px;height:64px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(var(--accent) var(--p,0%),#ffffff1b 0);position:relative}.ring::after{content:"";position:absolute;width:48px;height:48px;border-radius:50%;background:#272820}.ring strong{position:relative;z-index:1;font-family:var(--font-mono)}
+.empty{padding:50px;text-align:center}.empty h2{font-family:var(--font-display);font-weight:400;font-size:2.3rem}
+.toast{position:fixed;right:18px;bottom:18px;background:var(--ink);color:var(--bg);padding:11px 14px;box-shadow:var(--shadow);transform:translateY(120px);transition:.2s;z-index:30;font-weight:800}.toast.show{transform:translateY(0)}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+@media(max-width:920px){.layout{grid-template-columns:1fr}.config{position:relative;top:auto;max-height:none}.masthead{grid-template-columns:1fr}.mast-actions{justify-content:flex-start}.meta{grid-template-columns:1fr 1fr}.meta div:nth-child(2){border-right:0}.meta div:nth-child(-n+2){border-bottom:1px solid #8c8773}.columns{grid-template-columns:1fr}.logic-row{grid-template-columns:44px 1fr}.logic-row>*{border-bottom:1px solid #aaa38c}.logic-row>*:nth-child(even){border-right:0}.logic-row>*:nth-last-child(-n+2){border-bottom:0}}
+@media(max-width:560px){.app{padding:8px}.field-row{grid-template-columns:1fr}.sheet{min-height:620px}.panel{padding:16px}.brief-top{grid-template-columns:1fr}.stamp{justify-self:start}.meta{grid-template-columns:1fr}.meta div{border-right:0!important;border-bottom:1px solid #8c8773!important}.meta div:last-child{border-bottom:0!important}.test-item{grid-template-columns:auto 1fr}.test-item .tag{grid-column:2}.statusbar{font-size:.88rem}}
+@media print{body{background:#fff}.app{max-width:none;padding:0}.masthead,.config,.statusbar,.tabs,.toast{display:none!important}.layout{display:block;padding:0}.sheet{box-shadow:none;border:0;min-height:0}.panel{display:none!important;padding:10mm}.panel.active{display:block!important}.test-item{break-inside:avoid}.sheet::before{display:none}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+</style>
+</head>
+<body>
+<a class="skip" href="#workspace">Skip to mission output</a>
+<div class="app">
+<header class="masthead">
+  <div><div class="eyebrow">DCS World · Mission Editor field tool</div><h1>Mission Spine</h1><p class="subtitle">Build a reactive solo mission around events, not a stopwatch. Configure the intent; receive a concrete group roster, four-act encounter, trigger recipe, and playtest gate.</p></div>
+  <div class="mast-actions">
+    <button class="btn" id="importBtn" type="button">Import</button><input class="sr-only" id="importFile" type="file" accept="application/json,.json">
+    <button class="btn" id="exportBtn" type="button">Export JSON</button>
+    <button class="btn" id="printBtn" type="button">Print sheet</button>
+  </div>
+</header>
+<div class="layout">
+<aside class="config" aria-label="Mission configuration">
+  <div class="section-head"><h2>Mission contract</h2><button class="btn small danger" id="resetBtn" type="button">Reset</button></div>
+  <form class="form" id="missionForm">
+    <div class="field"><label for="title">Mission name</label><input id="title" maxlength="55" value="Quiet Spear" autocomplete="off"></div>
+    <div class="field-row">
+      <div class="field"><label for="role">Primary task</label><select id="role">
+        <option value="dead">DEAD strike</option><option value="cap">Reactive CAP</option><option value="interdiction">Convoy interdiction</option><option value="csar">CSAR cover</option><option value="maritime">Maritime strike</option><option value="assault">Helicopter assault</option>
+      </select></div>
+      <div class="field"><label for="terrain">Terrain posture</label><select id="terrain"><option value="open">Open / desert</option><option value="broken">Broken / rolling</option><option value="mountain">Mountain / valley</option><option value="coastal">Coastal</option><option value="urban">Urban edge</option></select></div>
+    </div>
+    <div class="field"><label for="player">Player aircraft / flight</label><input id="player" maxlength="38" value="F-16C · Colt 1-1" autocomplete="off"><span class="help">Free text; the blueprint stays airframe-agnostic.</span></div>
+    <div class="field-row">
+      <div class="field"><label for="start">Start state</label><select id="start"><option>Cold ramp</option><option>Hot ramp</option><option>Runway</option><option>Airborne</option></select></div>
+      <div class="field"><label for="duration">Target length</label><select id="duration"><option value="30">30 min</option><option value="45" selected>45 min</option><option value="60">60 min</option><option value="90">90 min</option></select></div>
+    </div>
+    <div class="field"><div class="range-line"><label for="pressure">Enemy pressure</label><span class="range-value" id="pressureValue">3 / 5</span></div><input id="pressure" type="range" min="1" max="5" value="3"><span class="help">Controls reserve strength and escalation, not arbitrary stat inflation.</span></div>
+    <div class="field"><label for="support">Friendly support</label><select id="support"><option value="none">None — player owns the problem</option><option value="cap" selected>Cover flight</option><option value="sead">SEAD / suppression flight</option><option value="cas">On-call CAS flight</option><option value="escort">Escort flight</option></select></div>
+    <div class="field"><label class="checkrow"><input id="branch" type="checkbox" checked> Add one randomized branch so replays do not reveal the full script.</label></div>
+    <div class="field"><label class="checkrow"><input id="abort" type="checkbox" checked> Include an explicit abort / partial-success route.</label></div>
+    <div class="field"><label for="notes">Designer constraint</label><textarea id="notes" maxlength="240" placeholder="Example: Keep threats period-correct; no omniscient F10 map."></textarea></div>
+    <div class="field-row">
+      <div class="field"><label for="seed">Seed</label><input id="seed" inputmode="numeric" pattern="[0-9]*" value="131026"></div>
+      <button class="btn" id="rerollBtn" type="button" style="align-self:end">New branch</button>
+    </div>
+    <button class="btn primary" id="buildBtn" type="submit">Build mission spine</button>
+  </form>
+</aside>
+<main class="output" id="workspace" tabindex="-1">
+  <div class="statusbar"><span class="status-dot" aria-hidden="true"></span><span><strong id="statusName">Quiet Spear</strong> is locally saved</span><span>Seed <strong id="statusSeed">131026</strong></span><span id="statusChecks">0 / 7 tests passed</span></div>
+  <nav class="tabs" aria-label="Mission output views" role="tablist">
+    <button class="tab" id="tab-build" role="tab" aria-selected="true" aria-controls="buildPanel">Build sheet</button>
+    <button class="tab" id="tab-logic" role="tab" aria-selected="false" aria-controls="logicPanel">Trigger logic</button>
+    <button class="tab" id="tab-test" role="tab" aria-selected="false" aria-controls="testPanel">Test run</button>
+  </nav>
+  <section class="sheet" aria-live="polite">
+    <div class="panel active" id="buildPanel" role="tabpanel" aria-labelledby="tab-build"></div>
+    <div class="panel" id="logicPanel" role="tabpanel" aria-labelledby="tab-logic"></div>
+    <div class="panel" id="testPanel" role="tabpanel" aria-labelledby="tab-test"></div>
+  </section>
+</main>
+</div>
+</div>
+<div class="toast" id="toast" role="status"></div>
+<script>
+(()=>{
+'use strict';
+const KEY='mission-spine-v1';
+const $=s=>document.querySelector(s);
+const form=$('#missionForm');
+const fields=['title','role','terrain','player','start','duration','pressure','support','branch','abort','notes','seed'];
+const roleData={
+ dead:{label:'DEAD strike',intent:'Open a temporary lane by locating, fixing, and disabling a defended emitter group.',objective:'Threat site',target:'mobile SAM battery',reserve:'short-range air-defense section',proof:'primary search or tracking radar destroyed',decoy:'decoy emitter / empty revetment',supportAction:'suppress the outer defense while the player prosecutes the primary site'},
+ cap:{label:'Reactive CAP',intent:'Protect a defended point from an uncertain raid whose axis and commitment depend on detection.',objective:'Protected asset',target:'hostile strike package',reserve:'late fighter pair',proof:'raid turns cold, is destroyed, or fails to reach the protected zone',decoy:'high fast reconnaissance contact',supportAction:'hold the secondary axis and report leakers'},
+ interdiction:{label:'Convoy interdiction',intent:'Find and stop a moving logistics column before it reaches a dispersal area.',objective:'Interdiction box',target:'moving logistics convoy',reserve:'armed escort section',proof:'lead, command, and half of logistics vehicles stopped',decoy:'civilian or empty vehicle column',supportAction:'screen the player from the nearest response route'},
+ csar:{label:'CSAR cover',intent:'Keep a survivor pickup corridor open while enemy search forces converge on the survivor.',objective:'Survivor zone',target:'enemy search-and-capture force',reserve:'second search column',proof:'rescue helicopter exits the recovery zone alive',decoy:'false beacon / abandoned wreck',supportAction:'sanitize the outer ring while the player protects the pickup'},
+ maritime:{label:'Maritime strike',intent:'Identify and disable the designated combatant without spending weapons on the wrong hull.',objective:'Maritime box',target:'designated hostile combatant',reserve:'alert fighter section',proof:'designated ship mission-killed while neutral traffic remains unharmed',decoy:'neutral merchant on a crossing track',supportAction:'hold air cover outside the ship-defense ring'},
+ assault:{label:'Helicopter assault',intent:'Insert the assault element, protect the landing zone, and preserve a viable extraction route.',objective:'Landing zone',target:'defenders covering the landing zone',reserve:'mobile reinforcement platoon',proof:'assault group survives inside the objective zone',decoy:'alternate landing-zone marker',supportAction:'engage the reinforcement route after the assault commits'}
+};
+const terrainData={
+ open:{label:'Open / desert',ingress:'use terrain-independent offset navigation and a wide initial search gate',mask:'few masking opportunities; use distance and axis changes'},
+ broken:{label:'Broken / rolling',ingress:'place the commit line behind a ridge or low terrain fold',mask:'use broken terrain to hide the reserve until escalation'},
+ mountain:{label:'Mountain / valley',ingress:'define a valley gate and one no-go ridge crossing',mask:'keep activation zones clear of ridge-line false triggers'},
+ coastal:{label:'Coastal',ingress:'use shoreline references and separate land from sea trigger zones',mask:'approach clutter and sea-level detection need an explicit test'},
+ urban:{label:'Urban edge',ingress:'anchor the target area to visible roads and city-edge landmarks',mask:'avoid routing AI through dense blocks; test every ground path'}
+};
+const supportLabels={none:'No support',cap:'Cover flight',sead:'SEAD flight',cas:'CAS flight',escort:'Escort flight'};
+const choice=(arr,r)=>arr[Math.floor(r()*arr.length)];
+function rng(seed){let n=(Number(seed)||1)>>>0;return()=>{n+=0x6D2B79F5;let t=n;t=Math.imul(t^t>>>15,t|1);t^=t+Math.imul(t^t>>>7,t|61);return((t^t>>>14)>>>0)/4294967296}}
+function read(){const o={};fields.forEach(id=>{const e=$('#'+id);o[id]=e.type==='checkbox'?e.checked:e.value});return o}
+function write(o){fields.forEach(id=>{if(o[id]===undefined)return;const e=$('#'+id);e.type==='checkbox'?e.checked=!!o[id]:e.value=o[id]});updatePressure()}
+function esc(v){return String(v??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]))}
+function slug(v){return String(v).trim().replace(/[^a-z0-9]+/gi,'-').replace(/^-|-$/g,'').toLowerCase()||'mission'}
+function derive(s){
+ const r=rng(s.seed),d=roleData[s.role],t=terrainData[s.terrain],p=Number(s.pressure);
+ const axis=choice(['north','north-east','east','south-east','south','south-west','west','north-west'],r);
+ const branch=choice(['reserve arrives from a different axis','primary group displaces after first detection','decoy activates before the real threat','support becomes available only after positive identification','weather cue forces a lower search posture'],r);
+ const zone=choice(['12 NM','15 NM','18 NM','20 NM'],r);
+ const hold=choice(['8 NM','10 NM','12 NM'],r);
+ const flags={start:100,detect:110,commit:120,branch:130,success:900,abort:990};
+ const pressureText=['minimal','light','moderate','heavy','severe'][p-1];
+ const support=d.supportAction;
+ const groups=[
+  {name:'PLYR_'+slug(s.title).toUpperCase().slice(0,16),purpose:s.player+' — player group',state:s.start},
+  {name:'OBJ_PRIMARY',purpose:d.target,state:'Late activation'},
+  {name:'OBJ_RESERVE',purpose:d.reserve,state:'Late activation · randomized'},
+  {name:'OBJ_DECOY',purpose:d.decoy,state:s.branch?'Late activation':'Omit'},
+  {name:'FRI_SUPPORT',purpose:s.support==='none'?'Omit':supportLabels[s.support]+' — '+support,state:s.support==='none'?'Omit':'Late activation'},
+  {name:'MARK_OBJECTIVE',purpose:d.objective+' reference / trigger zone',state:'Visible to designer only'}
+ ];
+ const acts=[
+  {n:'01',name:'Orient',trigger:'MISSION START → FLAG '+flags.start+' = 1',text:'Give the player a concise task and a visible departure cue. '+t.ingress+'.',items:['Place the objective and player group first.','Keep every hostile group late-activated.','Brief success evidence, not hidden trigger mechanics.']},
+  {n:'02',name:'Detect',trigger:'PLAYER IN ZONE '+zone+' OR DESIGNER RADIO ITEM',text:'Reveal evidence of the problem without immediately dumping every hostile group into the fight.',items:['Activate OBJ_PRIMARY or expose its first observable effect.','Set FLAG '+flags.detect+' = 1 and send one short radio update.','Do not require an exact time-on-target.']},
+  {n:'03',name:'Commit',trigger:'FLAG '+flags.detect+' = 1 + PLAYER INSIDE COMMIT ZONE',text:'The player chooses to cross the commit line. Enemy pressure becomes '+pressureText+' and the mission responds to that choice.',items:['Set FLAG '+flags.commit+' = 1.','Activate friendly support '+(s.support==='none'?'only if the player requests an escape route':'after player commitment')+'.',s.branch?'Roll branch FLAG '+flags.branch+': '+branch+'.':'Run the primary encounter without a replay branch.']},
+  {n:'04',name:'Resolve',trigger:'SUCCESS CONDITION OR ABORT CONDITION',text:'End on observable mission effects. Success means '+d.proof+'.',items:['Set FLAG '+flags.success+' only from evidence the player can understand.',s.abort?'FLAG '+flags.abort+' provides a survivable partial-success or abort route.':'No alternate abort logic requested; retain a manual designer stop path.','Delay end message 8–12 seconds so the result is visible.']}
+ ];
+ const logic=[
+  {event:'Initialize',cond:'MISSION START',action:'FLAG '+flags.start+' = 1; coalition message with task and abort rule.'},
+  {event:'First evidence',cond:'PLAYER INSIDE DETECT_ZONE OR F10 “Begin scenario”',action:'ACTIVATE OBJ_PRIMARY; FLAG '+flags.detect+' = 1.'},
+  {event:'Commit',cond:'FLAG '+flags.detect+' = 1 AND PLAYER INSIDE COMMIT_ZONE',action:'FLAG '+flags.commit+' = 1; activate FRI_SUPPORT when configured.'},
+  {event:'Replay branch',cond:s.branch?'FLAG '+flags.commit+' = 1 AND RANDOM '+(25+p*8)+'%':'Disabled by contract',action:s.branch?'ACTIVATE '+choice(['OBJ_RESERVE','OBJ_DECOY'],r)+'; '+branch+'.':'No branch action.'},
+  {event:'Pressure reserve',cond:'FLAG '+flags.commit+' = 1 AND OBJ_PRIMARY LIFE BELOW '+Math.max(25,70-p*8)+'%',action:'ACTIVATE OBJ_RESERVE from '+axis+'; route toward objective, not player position.'},
+  {event:'Success',cond:'Mission-specific evidence: '+d.proof,action:'FLAG '+flags.success+' = 1; success message; stop further reserves.'},
+  {event:'Abort / partial',cond:s.abort?'Player enters EXIT_ZONE after commitment OR player uses F10 Abort':'Manual test-only stop',action:s.abort?'FLAG '+flags.abort+' = 1; order support cover; report partial outcome.':'No player-facing abort trigger.'}
+ ];
+ const tests=[
+  ['Cold start','All required groups, tasks, loadouts, frequencies, and late-activation states survive mission reload.'],
+  ['No-clock start','Waiting on the ramp for 10 minutes does not launch the encounter or break support timing.'],
+  ['Fast commit','Direct ingress activates the primary problem once and only once.'],
+  ['Turn-away','Player detects, turns cold, then recommits without duplicate messages or groups.'],
+  ['Branch','Run seed branch twice; confirm only intended reserve / decoy appears and remains fair.'],
+  ['Success','Observable success evidence sets FLAG '+flags.success+' and blocks further escalation.'],
+  ['Abort',s.abort?'EXIT_ZONE / F10 abort produces a survivable, coherent partial outcome.':'Manual stop leaves mission stable; no hidden abort dependency exists.']
+ ];
+ return{d,t,p,axis,zone,hold,branch,flags,groups,acts,logic,tests,pressureText}
+}
+function render(){
+ const s=read(),x=derive(s);localStorage.setItem(KEY,JSON.stringify({settings:s,checks:getChecks()}));
+ $('#statusName').textContent=s.title||'Untitled mission';$('#statusSeed').textContent=s.seed;updatePressure();
+ const notes=s.notes.trim()?`<div class="block"><h3>Designer constraint</h3><p>${esc(s.notes)}</p></div>`:'';
+ $('#buildPanel').innerHTML=`
+  <div class="brief-top"><div class="brief-title"><div class="kicker">Reactive mission build order</div><h2>${esc(s.title||'Untitled mission')}</h2><p>${esc(x.d.intent)} The scenario advances on detection, commitment, and observable effects—never because the player met an invisible schedule.</p></div><div class="stamp">Seed ${esc(s.seed)}<br>${esc(x.pressureText)} pressure</div></div>
+  <div class="meta"><div><span>Player</span><strong>${esc(s.player)}</strong></div><div><span>Task</span><strong>${esc(x.d.label)}</strong></div><div><span>Terrain</span><strong>${esc(x.t.label)}</strong></div><div><span>Session</span><strong>${esc(s.duration)} min · ${esc(s.start)}</strong></div></div>
+  <div class="spine">${x.acts.map(a=>`<article class="act"><div class="act-head"><span class="act-num">ACT ${a.n}</span><h3>${a.name}</h3></div><div class="trigger">${esc(a.trigger)}</div><p>${esc(a.text)}</p><ul>${a.items.map(i=>`<li>${esc(i)}</li>`).join('')}</ul></article>`).join('')}</div>
+  <div class="columns"><div class="block"><h3>Group roster / exact labels</h3><ul>${x.groups.map(g=>`<li><strong>${esc(g.name)}</strong> — ${esc(g.purpose)} <em>(${esc(g.state)})</em></li>`).join('')}</ul></div><div><div class="block"><h3>Geometry contract</h3><ul><li>Detect zone: ${esc(x.zone)} from objective.</li><li>Support hold: ${esc(x.hold)} outside the commit line.</li><li>Reserve axis: ${esc(x.axis)}; route to the objective, never teleport onto the player.</li><li>Terrain rule: ${esc(x.t.mask)}.</li></ul></div>${notes}</div></div>`;
+ $('#logicPanel').innerHTML=`<div class="logic-header"><div><div class="kicker">Trigger recipe</div><h2>State before spectacle.</h2></div><p>Build top to bottom. Keep every event inspectable.</p></div><div class="flag-bank">${Object.entries(x.flags).map(([k,v])=>`<span class="flag">${k.toUpperCase()} · ${v}</span>`).join('')}</div><div class="logic-grid">${x.logic.map((l,i)=>`<div class="logic-row"><div class="n">${String(i+1).padStart(2,'0')}</div><div><strong>${esc(l.event)}</strong><span>SWITCHED CONDITION</span></div><div><strong>When</strong><span>${esc(l.cond)}</span></div><div><strong>Then</strong><span>${esc(l.action)}</span></div></div>`).join('')}</div>`;
+ renderTests(x.tests);
+}
+function getChecks(){try{return JSON.parse(localStorage.getItem(KEY))?.checks||{}}catch{return{}}}
+function renderTests(tests){const checks=getChecks();$('#testPanel').innerHTML=`<div class="test-header"><div><div class="kicker">Minimum playtest</div><h2>Prove the spine.</h2></div><p>Passing once is not evidence of replay safety.</p></div><div class="test-list">${tests.map((t,i)=>`<div class="test-item"><input type="checkbox" id="test-${i}" data-test="${i}" ${checks[i]?'checked':''}><div><label for="test-${i}">${esc(t[0])}</label><p>${esc(t[1])}</p></div><span class="tag">Gate ${i+1}</span></div>`).join('')}</div><div class="test-summary"><div class="ring" id="ring"><strong id="pct">0%</strong></div><div><strong id="testCount">0 of ${tests.length} gates passed</strong><div class="help" style="color:#c1bca9;margin-top:4px">State is saved locally. Reset only when the mission file changes enough to invalidate evidence.</div><button class="btn small" id="clearTests" type="button" style="margin-top:9px">Clear evidence</button></div></div>`;updateChecks();}
+function updateChecks(){const boxes=[...document.querySelectorAll('[data-test]')],checks={};boxes.forEach(b=>checks[b.dataset.test]=b.checked);let stored={settings:read(),checks};localStorage.setItem(KEY,JSON.stringify(stored));const n=boxes.filter(b=>b.checked).length,total=boxes.length||7,p=Math.round(n/total*100);if($('#ring'))$('#ring').style.setProperty('--p',p+'%');if($('#pct'))$('#pct').textContent=p+'%';if($('#testCount'))$('#testCount').textContent=`${n} of ${total} gates passed`;$('#statusChecks').textContent=`${n} / ${total} tests passed`;}
+function updatePressure(){$('#pressureValue').textContent=$('#pressure').value+' / 5'}
+function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('show');clearTimeout(toast.timer);toast.timer=setTimeout(()=>t.classList.remove('show'),2200)}
+function switchTab(btn){document.querySelectorAll('.tab').forEach(t=>t.setAttribute('aria-selected',String(t===btn)));document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('active',p.id===btn.getAttribute('aria-controls')));btn.focus()}
+form.addEventListener('submit',e=>{e.preventDefault();render();toast('Mission spine rebuilt')});
+form.addEventListener('change',e=>{if(e.target.id==='pressure')updatePressure();render()});
+form.addEventListener('input',e=>{if(e.target.id==='pressure')updatePressure();if(['title','player','notes'].includes(e.target.id)){clearTimeout(form.timer);form.timer=setTimeout(render,250)}});
+document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>switchTab(b)));
+document.addEventListener('change',e=>{if(e.target.matches('[data-test]'))updateChecks()});
+document.addEventListener('click',e=>{if(e.target.id==='clearTests'){const data=JSON.parse(localStorage.getItem(KEY)||'{}');data.checks={};localStorage.setItem(KEY,JSON.stringify(data));render();toast('Test evidence cleared')}});
+$('#rerollBtn').addEventListener('click',()=>{$('#seed').value=String(Math.floor(100000+Math.random()*899999));render();toast('New branch seed set')});
+$('#resetBtn').addEventListener('click',()=>{if(!confirm('Reset mission settings and test evidence?'))return;localStorage.removeItem(KEY);form.reset();$('#title').value='Quiet Spear';$('#player').value='F-16C · Colt 1-1';$('#seed').value='131026';render();toast('Mission reset')});
+$('#printBtn').addEventListener('click',()=>window.print());
+$('#exportBtn').addEventListener('click',()=>{const s=read(),data={app:'Mission Spine',version:1,exported:new Date().toISOString(),settings:s,checks:getChecks(),blueprint:derive(s)};const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=slug(s.title)+'-mission-spine.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);toast('JSON exported')});
+$('#importBtn').addEventListener('click',()=>$('#importFile').click());
+$('#importFile').addEventListener('change',async e=>{const file=e.target.files[0];if(!file)return;try{const data=JSON.parse(await file.text());if(!data.settings||data.app!=='Mission Spine')throw Error('Not a Mission Spine export');write(data.settings);localStorage.setItem(KEY,JSON.stringify({settings:data.settings,checks:data.checks||{}}));render();toast('Mission imported')}catch(err){alert('Import failed: '+err.message)}e.target.value=''});
+document.addEventListener('keydown',e=>{if(e.altKey&&['1','2','3'].includes(e.key)){e.preventDefault();switchTab(document.querySelectorAll('.tab')[Number(e.key)-1])}});
+try{const saved=JSON.parse(localStorage.getItem(KEY));if(saved?.settings)write(saved.settings)}catch{}
+render();
+})();
+</script>
+</body>
+</html>
