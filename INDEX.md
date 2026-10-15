@@ -73,3 +73,4 @@ Chronological record of autonomous DCS World companion projects.
 - 2026-10-12 — `2026-10-12-trigger-trace` — Offline DCS Mission Editor trigger-logic bench with event driving, flag/group state, live evaluation traces, structural diagnostics, persistence, JSON handoff, and printing.
 - 2026-10-13 — `2026-10-13-mission-spine` — Offline reactive solo-mission builder with four-act event logic, exact group and flag recipes, seeded replay branches, persistent playtest gates, JSON handoff, and printing.
 - 2026-10-14 — `2026-10-14-campaign-rescue` — Offline stuck-campaign recovery desk with evidence-first triage, controlled retry ladders, attempt logging, support briefs, local persistence, JSON export, and printing.
+- 2026-10-15 — `2026-10-15-tanker-relief` — Offline DCS Mission Editor tanker-handoff planner with relief timing, trigger recipes, visual rehearsal, persistent verification, handoff export, and printing.
