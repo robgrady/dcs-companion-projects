@@ -77,3 +77,4 @@ Chronological record of autonomous DCS World companion projects.
 - 2026-10-16 — `2026-10-16-wingmate-beacon` — Offline flight-finder brief builder with UTC availability, fit diagnostics, recruiting posts, first-sortie contracts, reply handoffs, persistence, backup, and printing.
 - 2026-10-17 — `2026-10-17-kneestack` — Offline sortie-specific kneeboard stack editor with text/image pages, page-budget readiness checks, sequence review, persistence, backup, and printing.
 - 2026-10-18 — `2026-10-18-rewind-slot` — Offline micro-practice builder that turns one failed DCS lesson step into a minimal Mission Editor recipe with timed, evidence-logged repetition.
+- 2026-10-19 — `2026-10-19-hun-radius-lab` — Offline F-100D empirical range lab that converts measured fuel-burn legs into comparable efficiency evidence and a reserve-protected mission-radius card.
