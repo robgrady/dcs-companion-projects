@@ -79,3 +79,4 @@ Chronological record of autonomous DCS World companion projects.
 - 2026-10-18 — `2026-10-18-rewind-slot` — Offline micro-practice builder that turns one failed DCS lesson step into a minimal Mission Editor recipe with timed, evidence-logged repetition.
 - 2026-10-19 — `2026-10-19-hun-radius-lab` — Offline F-100D empirical range lab that converts measured fuel-burn legs into comparable efficiency evidence and a reserve-protected mission-radius card.
 - 2026-10-20 — `2026-10-20-layerboard` — Offline DCS Mission Editor object desk with custom layers, visibility controls, search, multi-select bulk moves, explicit ordering, persistent state, backup, and printable build-order handoff.
+- 2026-10-21 — `2026-10-21-savepoint` — Offline DCS Mission Editor change-control desk with dirty-operation logging, versioned checkpoints, reverse-ordered rollback, known-good gates, local persistence, backup, and printing.
