@@ -38,6 +38,8 @@ Open `index.html` directly in a modern browser. No server, package install, acco
 
 Accessed **2026-10-22**.
 
+- A February 2026 r/hoggit discussion asks how to preserve settings and HOTAS bindings for a new PC; replies repeatedly distinguish same-machine copying from the more nuanced device-GUID problem on a new Windows installation: https://www.reddit.com/r/hoggit/comments/1r6knim/building_a_new_pc_how_do_i_saveexport_my/
+- A May 2026 r/hoggit tool announcement drew strong interest by automating timestamped keybind backups and handling UUID changes during batch import, reinforcing demand for safer, less tedious migration workflows: https://www.reddit.com/r/hoggit/comments/1tn9mx7/psa_script_to_backuprestore_your_keybinds/
 - The r/dcsworld weekly support thread dated 2026-10-19 includes a standing “How to backup/transfer config/keybindings” answer, directs users to the Saved Games `DCS` folder, and identifies `Config\Input` as the binding location. Its continued presence in recent weekly support threads indicates that configuration transfer remains a recurring help need: https://www.reddit.com/r/dcsworld/comments/1x9p7tu/weekly_thread_20261019_questions_on_dcs_pcs/
 - The same backup/transfer guidance appears in the 2026-10-05 weekly thread, reinforcing that this is recurring support demand rather than a single isolated question: https://www.reddit.com/r/dcsworld/comments/1wy12p1/weekly_thread_20261005_questions_on_dcs_pcs/
 - An Eagle Dynamics forum discussion asks specifically what must be backed up before a reinstall, reflecting uncertainty around the boundary between install files and user state: https://forum.dcs.world/topic/309568-which-files-to-backup-to-save-present-input-settings-for-a-dcs-reinstall/
