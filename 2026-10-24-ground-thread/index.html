@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="dark">
+<title>Ground Thread — DCS Taxi Route Rehearsal</title>
+<style>
+:root{
+  --ink:#f3f0e7;--muted:#aaa99f;--dim:#77776f;--bg:#111310;--panel:#191c18;--panel2:#20241f;
+  --line:#383d35;--grid:#2a2f28;--amber:#efb34b;--amber2:#ffd58c;--green:#72c48d;--red:#e8796f;
+  --blue:#82a8c9;--focus:#fff2bf;--r:5px;--shadow:0 18px 45px rgba(0,0,0,.28);
+  --head:"Arial Narrow","Avenir Next Condensed","Roboto Condensed",sans-serif;
+  --body:"Avenir Next","Segoe UI",Arial,sans-serif;--mono:"SFMono-Regular",Consolas,monospace;
+}
+*{box-sizing:border-box}html{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px}
+body{margin:0;min-height:100vh;background:linear-gradient(90deg,rgba(255,255,255,.018) 1px,transparent 1px) 0 0/48px 48px,var(--bg)}
+button,input,select,textarea{font:inherit}button,input,select,textarea{outline:none}
+:focus-visible{box-shadow:0 0 0 3px var(--bg),0 0 0 5px var(--focus)!important}
+button{min-height:44px;border:1px solid var(--line);border-radius:var(--r);background:var(--panel2);color:var(--ink);padding:.68rem .9rem;cursor:pointer;font-weight:700;letter-spacing:.015em}
+button:hover{border-color:#62685d;background:#272c26}button.primary{background:var(--amber);border-color:var(--amber);color:#20190c}button.primary:hover{background:var(--amber2)}
+button.danger{color:#ffb6af}button.ghost{background:transparent}.iconbtn{width:44px;padding:0}.small{min-height:36px;padding:.45rem .65rem;font-size:.82rem}
+input,select,textarea{width:100%;min-height:44px;border:1px solid var(--line);border-radius:var(--r);background:#111410;color:var(--ink);padding:.65rem .72rem}
+textarea{min-height:86px;resize:vertical}label{display:grid;gap:.35rem;color:var(--muted);font-size:.76rem;font-weight:800;letter-spacing:.09em;text-transform:uppercase}
+select{cursor:pointer}option{background:#171a16}.app{max-width:1680px;margin:auto;padding:18px}
+.mast{display:grid;grid-template-columns:auto 1fr auto;gap:18px;align-items:center;border-bottom:1px solid var(--line);padding:3px 0 16px;margin-bottom:16px}
+.brand{display:flex;align-items:center;gap:12px}.roundel{width:42px;height:42px;border:2px solid var(--amber);border-radius:50%;display:grid;place-items:center;color:var(--amber);font-family:var(--mono);font-weight:900}.brand h1{font-family:var(--head);font-size:1.55rem;letter-spacing:.12em;text-transform:uppercase;margin:0}.brand p{margin:.15rem 0 0;color:var(--muted);font-size:.76rem;letter-spacing:.06em;text-transform:uppercase}
+.statusbar{justify-self:center;display:flex;gap:9px;align-items:center;color:var(--muted);font-family:var(--mono);font-size:.76rem}.lamp{width:9px;height:9px;border-radius:50%;background:var(--green);box-shadow:0 0 12px rgba(114,196,141,.5)}
+.actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}.layout{display:grid;grid-template-columns:330px minmax(480px,1fr) 350px;gap:14px;align-items:start}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow)}.panelhead{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;border-bottom:1px solid var(--line)}.panelhead h2{font-family:var(--head);font-size:.9rem;letter-spacing:.12em;text-transform:uppercase;margin:0}.panelbody{padding:14px}.stack{display:grid;gap:12px}.twocol{display:grid;grid-template-columns:1fr 1fr;gap:10px}.threecol{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.divider{height:1px;background:var(--line);margin:3px 0}.micro{font-size:.74rem;color:var(--muted);line-height:1.45}.kbd{font-family:var(--mono);font-size:.67rem;border:1px solid var(--line);padding:.15rem .35rem;border-radius:3px;background:#0f120f;color:var(--muted)}
+.boardpanel{overflow:hidden}.boardtools{display:flex;gap:7px;align-items:center;flex-wrap:wrap;padding:10px 12px;border-bottom:1px solid var(--line);background:#151815}.boardtools .hint{margin-left:auto;color:var(--muted);font-size:.75rem}.legend{display:flex;gap:12px;padding:9px 13px;border-top:1px solid var(--line);background:#151815;flex-wrap:wrap}.legend span{display:flex;align-items:center;gap:6px;font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}.dot{width:9px;height:9px;border-radius:50%;background:var(--blue)}.dot.hold{background:var(--amber)}.dot.cross{background:var(--red)}.dot.runway{border-radius:1px;background:var(--green)}
+#map{display:block;width:100%;height:min(62vh,650px);min-height:430px;background:#111410;touch-action:none}.gridline{stroke:var(--grid);stroke-width:1}.axisline{stroke:#3b4038;stroke-width:1.2}.route{fill:none;stroke:var(--amber);stroke-width:4;stroke-linecap:round;stroke-linejoin:round}.routehalo{fill:none;stroke:#0b0d0b;stroke-width:9;stroke-linecap:round;stroke-linejoin:round}.node circle{stroke:#0b0d0b;stroke-width:3}.node text{font:700 12px var(--mono);fill:var(--ink);paint-order:stroke;stroke:#0b0d0b;stroke-width:4;stroke-linejoin:round}.node.selected circle{stroke:var(--focus);stroke-width:4}.node:focus{outline:none}.node:focus circle{stroke:var(--focus);stroke-width:5}
+.routeList{display:grid;gap:7px;max-height:250px;overflow:auto}.routeItem{display:grid;grid-template-columns:31px 1fr auto;gap:8px;align-items:center;padding:8px;border:1px solid var(--line);border-radius:4px;background:#151815}.routeItem.active{border-color:var(--amber);background:#211d14}.routeNum{font-family:var(--mono);color:var(--amber);font-weight:900}.routeMeta{min-width:0}.routeMeta strong{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.routeMeta span{font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}.routeBtns{display:flex;gap:4px}.routeBtns button{width:32px;min-height:32px;padding:0;font-size:.7rem}
+.checks{display:grid;gap:7px}.check{display:flex;align-items:flex-start;gap:9px;padding:9px;border:1px solid var(--line);background:#151815;border-radius:4px}.check i{width:9px;height:9px;border-radius:50%;margin-top:5px;flex:0 0 auto}.check.ok i{background:var(--green)}.check.warn i{background:var(--amber)}.check.bad i{background:var(--red)}.check strong{display:block;font-size:.82rem}.check span{display:block;color:var(--muted);font-size:.72rem;line-height:1.4;margin-top:2px}
+.readiness{display:flex;justify-content:space-between;align-items:center;padding:11px 12px;border:1px solid var(--line);border-radius:4px}.readiness strong{font-family:var(--head);letter-spacing:.1em;text-transform:uppercase}.score{font-family:var(--mono);font-size:1.25rem;color:var(--amber)}
+.rehearsal{margin-top:14px}.rehearsalCard{display:grid;grid-template-columns:70px 1fr;gap:13px;padding:14px;border:1px solid var(--line);background:#121512;border-radius:4px;min-height:150px}.stepno{font-family:var(--mono);font-size:2.2rem;color:var(--amber);line-height:1}.stepmain h3{font-family:var(--head);text-transform:uppercase;letter-spacing:.08em;margin:0 0 5px;font-size:1.2rem}.stepmain p{margin:.3rem 0;color:var(--muted);line-height:1.45}.callout{margin-top:10px;padding:9px 10px;background:#201d14;border:1px solid #5b4929;color:var(--amber2);font-family:var(--mono);font-size:.78rem;line-height:1.5}.rehBtns{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;margin-top:8px}.tag{display:inline-flex;align-items:center;min-height:25px;border:1px solid var(--line);padding:.2rem .5rem;border-radius:2px;color:var(--muted);font-size:.67rem;text-transform:uppercase;letter-spacing:.08em}
+.empty{border:1px dashed #444a40;padding:18px;color:var(--muted);text-align:center;font-size:.82rem;line-height:1.5}.toast{position:fixed;right:20px;bottom:20px;z-index:30;background:#f2ead7;color:#17130b;padding:10px 14px;border-radius:4px;font-weight:800;box-shadow:0 14px 40px #0008;transform:translateY(120px);opacity:0;transition:.2s}.toast.show{transform:none;opacity:1}
+.modal{position:fixed;inset:0;background:#000b;display:none;place-items:center;z-index:50;padding:20px}.modal.open{display:grid}.modalbox{width:min(620px,100%);max-height:90vh;overflow:auto;background:var(--panel);border:1px solid #575d52;border-radius:6px;box-shadow:0 30px 90px #000;padding:18px}.modalhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}.modalhead h2{margin:0;font-family:var(--head);text-transform:uppercase;letter-spacing:.08em}.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+@media(max-width:1200px){.layout{grid-template-columns:300px 1fr}.rightcol{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:14px}.rightcol>.panel{height:100%}}
+@media(max-width:780px){.app{padding:10px}.mast{grid-template-columns:1fr auto}.statusbar{display:none}.actions{grid-column:1/-1;justify-content:stretch}.actions button{flex:1}.layout{grid-template-columns:1fr}.rightcol{grid-column:auto;display:grid;grid-template-columns:1fr}.brand h1{font-size:1.25rem}.twocol,.threecol{grid-template-columns:1fr}#map{min-height:380px;height:50vh}.boardtools .hint{width:100%;margin-left:0}.rehearsalCard{grid-template-columns:52px 1fr}.stepno{font-size:1.7rem}}
+@media print{body{background:#fff;color:#111}.app{max-width:none}.mast{border-color:#777}.actions,.boardtools,.routeBtns,.rehBtns,.editorOnly{display:none!important}.layout{grid-template-columns:28% 44% 28%;gap:8px}.panel{box-shadow:none;background:#fff;border-color:#777}.panelhead,.legend{background:#fff;border-color:#aaa}.panelbody{padding:10px}input,select,textarea{border-color:#999;background:#fff;color:#111}.micro,label,.routeMeta span,.check span,.stepmain p,.legend span{color:#444}#map{height:480px;background:#fff}.gridline{stroke:#ddd}.axisline{stroke:#aaa}.node text{fill:#111;stroke:#fff}.rightcol{display:block}.rightcol>.panel{margin-bottom:8px}.rehearsal{break-before:page}.routeItem,.check,.rehearsalCard{background:#fff;border-color:#aaa}.callout{color:#111;background:#fff;border-color:#777}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="mast">
+  <div class="brand"><div class="roundel" aria-hidden="true">GT</div><div><h1>Ground Thread</h1><p>DCS taxi route planner + rehearsal card</p></div></div>
+  <div class="statusbar"><span class="lamp"></span><span id="saveState">LOCAL / SAVED</span></div>
+  <div class="actions">
+    <button id="newBtn">New plan</button><button id="importBtn">Import</button><button id="exportBtn">Export</button><button id="printBtn" class="primary">Print card</button>
+    <input id="fileInput" class="sr-only" type="file" accept="application/json,.json">
+  </div>
+</header>
+<main class="layout">
+  <aside class="panel">
+    <div class="panelhead"><h2>01 / Airfield contract</h2><span class="tag">Configure</span></div>
+    <div class="panelbody stack">
+      <label>Plan name<input id="planName" maxlength="48" value="Untitled ground plan"></label>
+      <div class="twocol"><label>Airfield<input id="airfield" maxlength="40" placeholder="e.g. Kutaisi"></label><label>Mode<select id="mode"><option value="departure">Departure</option><option value="arrival">Arrival</option><option value="crossing">Ground reposition</option></select></label></div>
+      <div class="twocol"><label>Callsign<input id="callsign" maxlength="28" placeholder="Enfield 1-1"></label><label>Ground / traffic freq<input id="frequency" maxlength="16" placeholder="MHz or preset"></label></div>
+      <div class="twocol"><label>Active runway<input id="runway" maxlength="10" placeholder="07 / 25L"></label><label>Wind<input id="wind" maxlength="18" placeholder="240 / 08"></label></div>
+      <label>Operating posture<select id="posture"><option value="controlled">Controlled — request / read back</option><option value="self">Self-announce — traffic calls</option><option value="silent">Silent / AI workaround</option></select></label>
+      <div class="divider"></div>
+      <div class="readiness"><div><strong>Route readiness</strong><div class="micro" id="readyText">Add route points</div></div><div class="score" id="score">0%</div></div>
+      <label>Ground notes<textarea id="notes" placeholder="Hot spots, one-way restrictions, wingman order, visual landmarks…"></textarea></label>
+      <p class="micro">Ground Thread is a planning aid, not live ATC. Confirm runway, traffic, taxi signs, and clearances in the mission or server you are flying.</p>
+    </div>
+  </aside>
+
+  <section class="panel boardpanel" aria-labelledby="boardTitle">
+    <div class="panelhead"><h2 id="boardTitle">02 / Route schematic</h2><span class="tag" id="pointCount">0 points</span></div>
+    <div class="boardtools editorOnly">
+      <button id="addMode" class="small primary" aria-pressed="true">Add points</button><button id="selectMode" class="small" aria-pressed="false">Select</button><button id="undoBtn" class="small">Undo point</button><button id="clearRouteBtn" class="small danger">Clear route</button>
+      <span class="hint">Click the board to lay the taxi thread · <span class="kbd">←</span> <span class="kbd">→</span> rehearse</span>
+    </div>
+    <svg id="map" viewBox="0 0 900 620" role="img" aria-label="Editable taxi route schematic">
+      <g id="grid"></g><g id="routeLayer"></g><g id="nodeLayer"></g>
+    </svg>
+    <div class="legend"><span><i class="dot"></i>Parking / taxi</span><span><i class="dot hold"></i>Hold short</span><span><i class="dot cross"></i>Runway crossing</span><span><i class="dot runway"></i>Runway / clear</span></div>
+    <div class="panelbody">
+      <div id="emptyRoute" class="empty">Start at the parking spot or runway exit, then click each meaningful turn, hold point, crossing, and destination in order.</div>
+      <div id="routeList" class="routeList" aria-label="Route points"></div>
+    </div>
+  </section>
+
+  <div class="rightcol stack">
+    <section class="panel">
+      <div class="panelhead"><h2>03 / Selected point</h2><span class="tag" id="selectedTag">None</span></div>
+      <div class="panelbody stack" id="pointEditor">
+        <div class="empty">Select or add a route point to edit its label and operational meaning.</div>
+      </div>
+    </section>
+    <section class="panel">
+      <div class="panelhead"><h2>04 / Gate check</h2><span class="tag">Live</span></div>
+      <div class="panelbody"><div id="checks" class="checks"></div></div>
+    </section>
+  </div>
+</main>
+
+<section class="panel rehearsal">
+  <div class="panelhead"><h2>05 / Cockpit rehearsal</h2><span class="tag">Operate</span></div>
+  <div class="panelbody">
+    <div id="rehearsalEmpty" class="empty">Build a route to generate a step-through taxi rehearsal and radio scratch call.</div>
+    <div id="rehearsalCard" class="rehearsalCard" hidden>
+      <div class="stepno" id="stepNo">01</div>
+      <div class="stepmain"><h3 id="stepTitle"></h3><p id="stepInstruction"></p><div class="callout" id="stepCall"></div></div>
+    </div>
+    <div class="rehBtns editorOnly" id="rehBtns" hidden><button id="prevStep">Previous</button><button id="markStep" class="primary">Mark clear + next</button><button id="nextStep">Next</button></div>
+  </div>
+</section>
+</div>
+
+<div class="modal" id="newModal" role="dialog" aria-modal="true" aria-labelledby="newTitle">
+  <div class="modalbox"><div class="modalhead"><h2 id="newTitle">Start a new ground plan?</h2><button class="iconbtn" id="closeModal" aria-label="Close">×</button></div><p class="micro">This replaces the current locally saved plan. Export first if you want to keep a separate copy.</p><div class="twocol"><button id="cancelNew">Cancel</button><button id="confirmNew" class="danger">Clear and start new</button></div></div>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script>
+(() => {
+'use strict';
+const KEY='ground-thread-v1';
+const colors={park:'#82a8c9',taxi:'#82a8c9',hold:'#efb34b',cross:'#e8796f',runway:'#72c48d',clear:'#72c48d'};
+const defaults={meta:{planName:'Untitled ground plan',airfield:'',mode:'departure',callsign:'',frequency:'',runway:'',wind:'',posture:'controlled',notes:''},points:[],selected:null,rehearsal:0,completed:[]};
+let state=load(); let tool='add';
+const $=s=>document.querySelector(s); const $$=s=>[...document.querySelectorAll(s)];
+const metaIds=['planName','airfield','mode','callsign','frequency','runway','wind','posture','notes'];
+function cleanState(v){return {meta:{...defaults.meta,...(v&&v.meta||{})},points:Array.isArray(v&&v.points)?v.points.filter(p=>Number.isFinite(p.x)&&Number.isFinite(p.y)).map((p,i)=>({id:String(p.id||Date.now()+i),x:+p.x,y:+p.y,label:String(p.label||`POINT ${i+1}`).slice(0,32),type:['park','taxi','hold','cross','runway','clear'].includes(p.type)?p.type:'taxi',instruction:String(p.instruction||'').slice(0,180),clearance:!!p.clearance})):[],selected:null,rehearsal:Number.isInteger(v&&v.rehearsal)?v.rehearsal:0,completed:Array.isArray(v&&v.completed)?v.completed:[]};}
+function load(){try{return cleanState(JSON.parse(localStorage.getItem(KEY)))}catch{return cleanState(defaults)}}
+let saveTimer; function save(){clearTimeout(saveTimer);$('#saveState').textContent='LOCAL / SAVING';saveTimer=setTimeout(()=>{localStorage.setItem(KEY,JSON.stringify(state));$('#saveState').textContent='LOCAL / SAVED'},120)}
+function esc(s){return String(s).replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]))}
+function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1800)}
+function initGrid(){let out='';for(let x=0;x<=900;x+=50)out+=`<line class="gridline" x1="${x}" y1="0" x2="${x}" y2="620"/>`;for(let y=0;y<=620;y+=50)out+=`<line class="gridline" x1="0" y1="${y}" x2="900" y2="${y}"/>`;out+='<line class="axisline" x1="450" y1="0" x2="450" y2="620"/><line class="axisline" x1="0" y1="310" x2="900" y2="310"/>';$('#grid').innerHTML=out}
+function syncMeta(){metaIds.forEach(id=>{$('#'+id).value=state.meta[id]??''})}
+function updateMeta(e){state.meta[e.target.id]=e.target.value;save();renderChecks();renderRehearsal()}
+function svgPoint(evt){const svg=$('#map'),pt=svg.createSVGPoint();pt.x=evt.clientX;pt.y=evt.clientY;const p=pt.matrixTransform(svg.getScreenCTM().inverse());return{x:Math.max(18,Math.min(882,p.x)),y:Math.max(18,Math.min(602,p.y))}}
+function nextType(){if(state.points.length===0)return state.meta.mode==='arrival'?'runway':'park';return 'taxi'}
+function addPoint(evt){if(tool!=='add'||evt.target.closest('.node'))return;const p=svgPoint(evt),n=state.points.length+1;const point={id:String(Date.now()),x:Math.round(p.x),y:Math.round(p.y),label:n===1?(state.meta.mode==='arrival'?'RUNWAY EXIT':'PARKING'):`POINT ${n}`,type:nextType(),instruction:'',clearance:false};state.points.push(point);state.selected=point.id;state.rehearsal=Math.min(state.rehearsal,state.points.length-1);save();render()}
+function selectPoint(id){state.selected=id;tool='select';setToolButtons();render()}
+function setToolButtons(){$('#addMode').classList.toggle('primary',tool==='add');$('#selectMode').classList.toggle('primary',tool==='select');$('#addMode').setAttribute('aria-pressed',tool==='add');$('#selectMode').setAttribute('aria-pressed',tool==='select')}
+function pointIcon(p){return p.type==='hold'?'H':p.type==='cross'?'X':p.type==='runway'?'RWY':p.type==='clear'?'CLR':p.type==='park'?'P':'T'}
+function renderMap(){const pts=state.points;let path='';if(pts.length)path='M '+pts.map(p=>`${p.x} ${p.y}`).join(' L ');$('#routeLayer').innerHTML=path?`<path class="routehalo" d="${path}"/><path class="route" d="${path}"/>`:'';$('#nodeLayer').innerHTML=pts.map((p,i)=>`<g class="node ${p.id===state.selected?'selected':''}" tabindex="0" role="button" aria-label="Point ${i+1}, ${esc(p.label)}, ${p.type}" data-id="${p.id}" transform="translate(${p.x} ${p.y})"><circle r="13" fill="${colors[p.type]}"/><text x="18" y="4">${String(i+1).padStart(2,'0')} · ${esc(p.label)}</text><text x="0" y="4" text-anchor="middle" style="font-size:8px;stroke-width:2">${pointIcon(p)}</text></g>`).join('');$$('.node').forEach(n=>{n.addEventListener('click',e=>{e.stopPropagation();selectPoint(n.dataset.id)});n.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();selectPoint(n.dataset.id)}})})}
+function movePoint(i,d){const j=i+d;if(j<0||j>=state.points.length)return;[state.points[i],state.points[j]]=[state.points[j],state.points[i]];save();render()}
+function removePoint(id){const i=state.points.findIndex(p=>p.id===id);if(i<0)return;state.points.splice(i,1);state.selected=state.points[Math.min(i,state.points.length-1)]?.id||null;state.rehearsal=Math.max(0,Math.min(state.rehearsal,state.points.length-1));state.completed=state.completed.filter(x=>x!==id);save();render()}
+function renderList(){const box=$('#routeList');$('#emptyRoute').hidden=state.points.length>0;$('#pointCount').textContent=`${state.points.length} point${state.points.length===1?'':'s'}`;box.innerHTML=state.points.map((p,i)=>`<div class="routeItem ${p.id===state.selected?'active':''}"><div class="routeNum">${String(i+1).padStart(2,'0')}</div><button class="routeMeta ghost" data-select="${p.id}" style="text-align:left;min-height:36px;padding:0;border:0"><strong>${esc(p.label)}</strong><span>${esc(p.type)}${p.clearance?' · clearance gate':''}</span></button><div class="routeBtns editorOnly"><button data-up="${i}" aria-label="Move ${esc(p.label)} earlier">↑</button><button data-down="${i}" aria-label="Move ${esc(p.label)} later">↓</button><button data-del="${p.id}" class="danger" aria-label="Delete ${esc(p.label)}">×</button></div></div>`).join('');$$('[data-select]').forEach(b=>b.onclick=()=>selectPoint(b.dataset.select));$$('[data-up]').forEach(b=>b.onclick=()=>movePoint(+b.dataset.up,-1));$$('[data-down]').forEach(b=>b.onclick=()=>movePoint(+b.dataset.down,1));$$('[data-del]').forEach(b=>b.onclick=()=>removePoint(b.dataset.del))}
+function renderEditor(){const p=state.points.find(x=>x.id===state.selected);$('#selectedTag').textContent=p?p.type:'None';if(!p){$('#pointEditor').innerHTML='<div class="empty">Select or add a route point to edit its label and operational meaning.</div>';return}$('#pointEditor').innerHTML=`<label>Label<input id="pointLabel" maxlength="32" value="${esc(p.label)}"></label><div class="twocol"><label>Point type<select id="pointType"><option value="park">Parking / start</option><option value="taxi">Taxi checkpoint</option><option value="hold">Hold short</option><option value="cross">Runway crossing</option><option value="runway">Runway entry / exit</option><option value="clear">Clear of runway / destination</option></select></label><label>Clearance gate<select id="pointClearance"><option value="no">No</option><option value="yes">Required before passing</option></select></label></div><label>Cockpit cue<textarea id="pointInstruction" maxlength="180" placeholder="Landmark, turn, speed, wingman spacing, or danger cue">${esc(p.instruction)}</textarea></label><button id="deleteSelected" class="danger">Delete selected point</button>`;$('#pointType').value=p.type;$('#pointClearance').value=p.clearance?'yes':'no';['pointLabel','pointType','pointClearance','pointInstruction'].forEach(id=>{$('#'+id).addEventListener('input',e=>{if(id==='pointLabel')p.label=e.target.value;if(id==='pointType')p.type=e.target.value;if(id==='pointClearance')p.clearance=e.target.value==='yes';if(id==='pointInstruction')p.instruction=e.target.value;save();renderMap();renderList();renderChecks();renderRehearsal();$('#selectedTag').textContent=p.type})});$('#deleteSelected').onclick=()=>removePoint(p.id)}
+function diagnostics(){const pts=state.points,labels=pts.map(p=>p.label.trim().toLowerCase()).filter(Boolean),dups=labels.filter((x,i)=>labels.indexOf(x)!==i);const hasStart=pts.some(p=>p.type==='park'||(state.meta.mode==='arrival'&&p.type==='runway'));const hasEnd=pts.some(p=>p.type==='runway'||p.type==='clear');const hasHold=pts.some(p=>p.type==='hold');const crossings=pts.filter(p=>p.type==='cross');const missingCross=crossings.filter(p=>!p.clearance);let rows=[];rows.push({s:pts.length>=3?'ok':pts.length?'warn':'bad',t:'Route continuity',d:pts.length>=3?`${pts.length} ordered points define the thread.`:'Use at least three points: origin, meaningful gate, destination.'});rows.push({s:hasStart?'ok':'bad',t:'Origin identified',d:hasStart?'Parking or runway-exit origin is marked.':'Mark the first operational point as Parking / start (or Runway for an arrival).'});rows.push({s:hasEnd?'ok':'bad',t:'Destination identified',d:hasEnd?'Runway or clear destination is marked.':'Mark runway entry, runway exit, or clear destination.'});rows.push({s:hasHold?'ok':'warn',t:'Hold-short discipline',d:hasHold?'A hold-short point is explicit.':'No hold-short point is marked; confirm this route truly needs none.'});rows.push({s:missingCross.length?'bad':crossings.length?'ok':'ok',t:'Runway crossing gates',d:missingCross.length?`${missingCross.length} crossing point${missingCross.length>1?'s':''} lack a clearance gate.`:crossings.length?'Every crossing is marked as clearance-required.':'No runway crossing is planned.'});rows.push({s:dups.length?'warn':'ok',t:'Unambiguous labels',d:dups.length?'Duplicate labels can make rehearsal calls ambiguous.':'Point labels are unique.'});return rows}
+function renderChecks(){const rows=diagnostics();$('#checks').innerHTML=rows.map(r=>`<div class="check ${r.s}"><i></i><div><strong>${r.t}</strong><span>${r.d}</span></div></div>`).join('');const weights={ok:1,warn:.5,bad:0};const pct=Math.round(rows.reduce((a,r)=>a+weights[r.s],0)/rows.length*100);$('#score').textContent=pct+'%';$('#readyText').textContent=pct>=90?'Brief-ready':pct>=65?'Review amber gates':'Route incomplete'}
+function radioCall(p,i){const m=state.meta,cs=m.callsign||'[CALLSIGN]',af=m.airfield||'[AIRFIELD]',rwy=m.runway||'[RUNWAY]';if(m.posture==='silent')return 'NO RADIO CALL — visually clear the path and respect mission/server procedures.';if(m.posture==='self'){
+ if(i===0)return `${af} traffic, ${cs}, taxiing from ${p.label}${rwy?` for runway ${rwy}`:''}.`;
+ if(p.type==='hold')return `${af} traffic, ${cs}, holding short runway ${rwy} at ${p.label}.`;
+ if(p.type==='cross')return `${af} traffic, ${cs}, crossing runway ${rwy} at ${p.label}.`;
+ if(p.type==='runway')return `${af} traffic, ${cs}, ${state.meta.mode==='arrival'?'clear of':'lining up runway'} ${rwy}.`;
+ if(p.type==='clear')return `${af} traffic, ${cs}, clear of runway ${rwy}.`;
+ return `Monitor traffic — continuing via ${p.label}.`;
+ }
+ if(i===0)return `${af} Ground, ${cs}, request taxi${rwy?` runway ${rwy}`:''}${m.frequency?` on ${m.frequency}`:''}.`;
+ if(p.type==='hold')return `${cs}, holding short runway ${rwy} at ${p.label}.`;
+ if(p.type==='cross')return `${cs}, request crossing runway ${rwy} at ${p.label}.`;
+ if(p.type==='runway')return `${af} Tower, ${cs}, holding short runway ${rwy}, ready.`;
+ if(p.type==='clear')return `${af} Ground, ${cs}, clear of runway ${rwy} at ${p.label}.`;
+ return `Read back amended routing or hold instructions before ${p.label}.`;
+}
+function instruction(p,i){const prev=state.points[i-1],next=state.points[i+1];let base=p.instruction.trim();if(!base){if(p.type==='park')base='Set taxi light as appropriate, release brakes only after the path is clear.';else if(p.type==='hold')base='Stop before the hold marking. Check both directions; do not creep past the gate.';else if(p.type==='cross')base='Verify explicit crossing clearance or self-announced clear runway. Cross without delay; do not stop on the runway.';else if(p.type==='runway')base=state.meta.mode==='arrival'?'Exit fully, cross the hold marking, then report clear.':'Complete the final runway scan and lineup / takeoff check before entering.';else if(p.type==='clear')base='Confirm the entire aircraft or flight is clear, then switch lights and frequency as briefed.';else base=`Follow the planned centerline${prev?` from ${prev.label}`:''}${next?` toward ${next.label}`:''}. Recheck for traffic and wingtip clearance.`}return base}
+function renderRehearsal(){const pts=state.points;const has=pts.length>0;$('#rehearsalEmpty').hidden=has;$('#rehearsalCard').hidden=!has;$('#rehBtns').hidden=!has;if(!has)return;state.rehearsal=Math.max(0,Math.min(state.rehearsal,pts.length-1));const p=pts[state.rehearsal],done=state.completed.includes(p.id);$('#stepNo').textContent=String(state.rehearsal+1).padStart(2,'0');$('#stepTitle').textContent=`${p.label} · ${p.type.replace('park','parking')}`;$('#stepInstruction').textContent=instruction(p,state.rehearsal);$('#stepCall').textContent=radioCall(p,state.rehearsal);$('#markStep').textContent=done?'Marked clear ✓':'Mark clear + next';$('#prevStep').disabled=state.rehearsal===0;$('#nextStep').disabled=state.rehearsal===pts.length-1}
+function render(){renderMap();renderList();renderEditor();renderChecks();renderRehearsal();setToolButtons()}
+function exportPlan(){const data={app:'Ground Thread',version:1,exported:new Date().toISOString(),...state};const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=(state.meta.planName||'ground-thread').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')+'.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500);toast('Plan exported')}
+function importPlan(file){const r=new FileReader();r.onload=()=>{try{const data=JSON.parse(r.result);state=cleanState(data);syncMeta();save();render();toast('Plan imported')}catch{toast('Import failed: invalid JSON')}};r.readAsText(file)}
+function reset(){state=cleanState(defaults);syncMeta();save();render();$('#newModal').classList.remove('open');toast('New ground plan ready')}
+metaIds.forEach(id=>$('#'+id).addEventListener('input',updateMeta));$('#map').addEventListener('click',addPoint);$('#addMode').onclick=()=>{tool='add';setToolButtons()};$('#selectMode').onclick=()=>{tool='select';setToolButtons()};$('#undoBtn').onclick=()=>{if(state.points.length)removePoint(state.points.at(-1).id)};$('#clearRouteBtn').onclick=()=>{if(state.points.length&&confirm('Clear every route point?')){state.points=[];state.selected=null;state.rehearsal=0;state.completed=[];save();render()}};
+$('#prevStep').onclick=()=>{state.rehearsal=Math.max(0,state.rehearsal-1);save();renderRehearsal()};$('#nextStep').onclick=()=>{state.rehearsal=Math.min(state.points.length-1,state.rehearsal+1);save();renderRehearsal()};$('#markStep').onclick=()=>{const p=state.points[state.rehearsal];if(!p)return;if(!state.completed.includes(p.id))state.completed.push(p.id);if(state.rehearsal<state.points.length-1)state.rehearsal++;save();renderRehearsal()};
+$('#exportBtn').onclick=exportPlan;$('#importBtn').onclick=()=>$('#fileInput').click();$('#fileInput').onchange=e=>{if(e.target.files[0])importPlan(e.target.files[0]);e.target.value=''};$('#printBtn').onclick=()=>window.print();$('#newBtn').onclick=()=>$('#newModal').classList.add('open');$('#closeModal').onclick=$('#cancelNew').onclick=()=>$('#newModal').classList.remove('open');$('#confirmNew').onclick=reset;$('#newModal').addEventListener('click',e=>{if(e.target===$('#newModal'))$('#newModal').classList.remove('open')});
+document.addEventListener('keydown',e=>{if(e.target.matches('input,textarea,select'))return;if(e.key==='ArrowRight'&&state.points.length){state.rehearsal=Math.min(state.points.length-1,state.rehearsal+1);save();renderRehearsal()}if(e.key==='ArrowLeft'&&state.points.length){state.rehearsal=Math.max(0,state.rehearsal-1);save();renderRehearsal()}if(e.key==='Escape')$('#newModal').classList.remove('open')});
+initGrid();syncMeta();render();
+})();
+</script>
+</body>
+</html>
