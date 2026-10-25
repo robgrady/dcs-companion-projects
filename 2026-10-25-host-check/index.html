@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="dark">
+<title>Host Check — DCS Co-op Launch Desk</title>
+<style>
+:root{
+  --bg:#0e1110;--surface:#171b19;--surface2:#1d2320;--surface3:#111513;--line:#343c37;
+  --ink:#f2efe5;--muted:#a9afa8;--dim:#737c75;--amber:#e6ad55;--amber2:#ffd18b;
+  --green:#71bd8a;--red:#df776f;--blue:#83aabd;--focus:#fff0ae;--r:4px;
+  --head:"Arial Narrow","Avenir Next Condensed","Roboto Condensed",sans-serif;
+  --body:"Avenir Next","Segoe UI",Arial,sans-serif;--mono:"SFMono-Regular",Consolas,monospace;
+}
+*{box-sizing:border-box}html{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px}body{margin:0;min-height:100vh;background:repeating-linear-gradient(0deg,transparent 0 47px,rgba(255,255,255,.018) 48px),var(--bg)}
+button,input,select,textarea{font:inherit}button,input,select,textarea{outline:none}:focus-visible{box-shadow:0 0 0 3px var(--bg),0 0 0 5px var(--focus)!important}
+button{min-height:44px;border:1px solid var(--line);border-radius:var(--r);background:var(--surface2);color:var(--ink);padding:.65rem .85rem;cursor:pointer;font-weight:750}button:hover{border-color:#626d66;background:#252c28}button.primary{background:var(--amber);border-color:var(--amber);color:#20170a}button.primary:hover{background:var(--amber2)}button.danger{color:#ffb9b3}.small{min-height:34px;padding:.35rem .58rem;font-size:.78rem}.icon{width:36px;padding:0;min-height:36px}.ghost{background:transparent}
+input,select,textarea{width:100%;min-height:44px;border:1px solid var(--line);border-radius:var(--r);background:#0f1311;color:var(--ink);padding:.62rem .68rem}textarea{min-height:84px;resize:vertical}label{display:grid;gap:.34rem;color:var(--muted);font-size:.72rem;font-weight:800;letter-spacing:.09em;text-transform:uppercase}option{background:#121613}.app{max-width:1700px;margin:auto;padding:16px}
+.mast{display:grid;grid-template-columns:auto 1fr auto;gap:18px;align-items:center;border-bottom:1px solid var(--line);padding:4px 0 14px;margin-bottom:14px}.brand{display:flex;gap:12px;align-items:center}.mark{width:43px;height:43px;border:2px solid var(--amber);display:grid;place-items:center;font:900 .85rem var(--mono);color:var(--amber);transform:rotate(45deg)}.mark span{transform:rotate(-45deg)}h1{font:800 1.55rem/1 var(--head);letter-spacing:.13em;text-transform:uppercase;margin:0}.subtitle{font-size:.73rem;color:var(--muted);letter-spacing:.07em;text-transform:uppercase;margin:.3rem 0 0}.save{justify-self:center;font:.74rem var(--mono);color:var(--muted);display:flex;align-items:center;gap:8px}.lamp{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 10px #71bd8a88}.actions{display:flex;gap:7px;justify-content:flex-end;flex-wrap:wrap}
+.launchbar{display:grid;grid-template-columns:1fr auto auto;gap:16px;align-items:center;border:1px solid var(--line);background:var(--surface);padding:13px 15px;margin-bottom:14px}.launchbar.ready{border-color:#49775a}.launchbar.blocked{border-color:#70413e}.launchstatus{display:flex;align-items:center;gap:12px}.biglamp{width:14px;height:14px;border-radius:50%;background:var(--red);box-shadow:0 0 14px #df776f66}.ready .biglamp{background:var(--green);box-shadow:0 0 14px #71bd8a77}.launchstatus strong{font:800 1rem var(--head);letter-spacing:.1em;text-transform:uppercase}.launchstatus span{display:block;color:var(--muted);font-size:.76rem;margin-top:3px}.count{font:700 .8rem var(--mono);color:var(--amber)}
+.layout{display:grid;grid-template-columns:330px minmax(520px,1fr) 390px;gap:13px;align-items:start}.stack{display:grid;gap:13px}.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);box-shadow:0 16px 45px rgba(0,0,0,.2)}.panelhead{display:flex;align-items:center;justify-content:space-between;padding:11px 13px;border-bottom:1px solid var(--line)}.panelhead h2{font:800 .88rem var(--head);letter-spacing:.12em;text-transform:uppercase;margin:0}.tag{font:.64rem var(--mono);color:var(--muted);border:1px solid var(--line);padding:.22rem .42rem;border-radius:2px;text-transform:uppercase}.panelbody{padding:13px}.formstack{display:grid;gap:11px}.twocol{display:grid;grid-template-columns:1fr 1fr;gap:9px}.micro{font-size:.73rem;color:var(--muted);line-height:1.48;margin:0}.divider{height:1px;background:var(--line)}
+.gates{display:grid}.gate{display:grid;grid-template-columns:44px 1fr auto;gap:10px;align-items:start;padding:11px 12px;border-bottom:1px solid var(--line);background:var(--surface)}.gate:last-child{border-bottom:0}.gate:hover{background:#1a201d}.gatebtn{width:38px;height:38px;min-height:38px;padding:0;border-radius:50%;font:900 .9rem var(--mono)}.gate.done .gatebtn{background:var(--green);border-color:var(--green);color:#0b170f}.gate.warn .gatebtn{border-color:var(--amber);color:var(--amber)}.gate.block .gatebtn{border-color:var(--red);color:var(--red)}.gate h3{font-size:.86rem;margin:.12rem 0 .25rem}.gate p{font-size:.72rem;color:var(--muted);line-height:1.4;margin:0}.critical{font:.62rem var(--mono);letter-spacing:.05em;color:var(--red);text-transform:uppercase}.optional{font:.62rem var(--mono);letter-spacing:.05em;color:var(--dim);text-transform:uppercase}
+.roster{display:grid;gap:8px}.pilot{display:grid;grid-template-columns:1.1fr .8fr repeat(4,36px) 36px;gap:6px;align-items:center;padding:8px;border:1px solid var(--line);background:var(--surface3)}.pilot input,.pilot select{min-height:38px;padding:.45rem .52rem;font-size:.79rem}.statebtn{width:36px;min-height:36px;padding:0;font:800 .68rem var(--mono);color:var(--dim)}.statebtn.on{background:#244630;border-color:#47795a;color:#bfe6ca}.statebtn[title="Remove pilot"]{color:#e8a19b}.legend{display:flex;gap:12px;flex-wrap:wrap;margin:10px 0 0;color:var(--muted);font:.67rem var(--mono)}.legend b{color:var(--green)}
+.triageTop{display:grid;grid-template-columns:1fr auto;gap:8px}.ladder{display:grid;gap:7px;margin-top:11px}.step{display:grid;grid-template-columns:32px 1fr;gap:9px;padding:9px;border:1px solid var(--line);background:var(--surface3);cursor:pointer}.step:hover{border-color:#59635c}.step.done{opacity:.58}.step.done .stepnum{background:var(--green);color:#0a150d;border-color:var(--green)}.stepnum{width:30px;height:30px;border:1px solid var(--amber);color:var(--amber);display:grid;place-items:center;font:800 .75rem var(--mono)}.step strong{font-size:.8rem}.step p{font-size:.71rem;color:var(--muted);line-height:1.38;margin:.22rem 0 0}.result{margin-top:10px;padding:10px;border:1px solid #5b4a2d;background:#201b12;color:var(--amber2);font:.75rem/1.5 var(--mono)}
+.eventlog{display:grid;gap:6px;max-height:220px;overflow:auto}.event{display:grid;grid-template-columns:auto 1fr auto;gap:8px;align-items:start;padding:7px 0;border-bottom:1px solid var(--line);font-size:.72rem}.event time{font-family:var(--mono);color:var(--amber)}.event span{color:var(--muted)}.empty{padding:15px;border:1px dashed #465048;color:var(--muted);text-align:center;font-size:.76rem;line-height:1.45}.toast{position:fixed;right:18px;bottom:18px;background:#eee7d8;color:#17130c;padding:10px 13px;font-weight:800;border-radius:3px;box-shadow:0 18px 45px #0009;transform:translateY(100px);opacity:0;transition:.18s;z-index:20}.toast.show{transform:none;opacity:1}.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.audit{padding:10px 13px;border-top:1px solid var(--line);font-size:.7rem;color:var(--muted);display:flex;justify-content:space-between;gap:10px}.kbd{font-family:var(--mono);padding:.1rem .3rem;border:1px solid var(--line);background:#0d100e}
+@media(max-width:1250px){.layout{grid-template-columns:310px 1fr}.right{grid-column:1/-1;grid-template-columns:1fr 1fr}.right>.panel:last-child{grid-column:1/-1}}
+@media(max-width:800px){.app{padding:9px}.mast{grid-template-columns:1fr auto}.save{display:none}.actions{grid-column:1/-1;justify-content:stretch}.actions button{flex:1}.launchbar{grid-template-columns:1fr}.launchbar button{width:100%}.layout{grid-template-columns:1fr}.right{grid-column:auto;grid-template-columns:1fr}.right>.panel:last-child{grid-column:auto}.twocol{grid-template-columns:1fr}.pilot{grid-template-columns:1fr 1fr repeat(4,34px) 34px}.pilot input{grid-column:1/2}.pilot select{grid-column:2/8}.brand h1{font-size:1.25rem}.triageTop{grid-template-columns:1fr}}
+@media print{body{background:#fff;color:#111}.app{max-width:none}.actions,.statebtn[title="Remove pilot"],#addPilot,#resetTriage,#newBtn,.toast{display:none!important}.panel,.launchbar{box-shadow:none;background:#fff;border-color:#777}.layout{grid-template-columns:31% 42% 27%;gap:7px}.right{display:grid;grid-template-columns:1fr}.panelhead,.gate,.pilot,.step{background:#fff;border-color:#aaa}.micro,.gate p,.step p,.event span,.legend{color:#444}input,select,textarea{background:#fff;color:#111;border-color:#888}.launchbar{margin-bottom:8px}.panelbody{padding:9px}.gate{padding:7px}.eventlog{max-height:none}.audit{display:none}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="mast">
+  <div class="brand"><div class="mark" aria-hidden="true"><span>HC</span></div><div><h1>Host Check</h1><p class="subtitle">DCS private co-op launch + recovery desk</p></div></div>
+  <div class="save"><span class="lamp"></span><span id="saveState">LOCAL / SAVED</span></div>
+  <div class="actions"><button id="newBtn">New session</button><button id="importBtn">Import</button><button id="exportBtn">Export</button><button id="printBtn" class="primary">Print brief</button><input id="fileInput" class="sr-only" type="file" accept="application/json,.json"></div>
+</header>
+<section class="launchbar blocked" id="launchBar" aria-live="polite">
+  <div class="launchstatus"><i class="biglamp"></i><div><strong id="launchTitle">Hold the unpause</strong><span id="launchReason">Complete critical host gates and bring every pilot to ready.</span></div></div>
+  <div class="count" id="launchCount">0 / 0 READY</div>
+  <button id="launchBtn" class="primary">Log unpause</button>
+</section>
+<main class="layout">
+  <aside class="stack">
+    <section class="panel">
+      <div class="panelhead"><h2>01 / Session contract</h2><span class="tag">Configure</span></div>
+      <div class="panelbody formstack">
+        <label>Session name<input id="sessionName" maxlength="50" value="Private co-op"></label>
+        <div class="twocol"><label>Host callsign<input id="hostName" maxlength="28" placeholder="Host"></label><label>Mission<input id="mission" maxlength="42" placeholder="Mission filename / title"></label></div>
+        <div class="twocol"><label>Map<input id="map" maxlength="30" placeholder="e.g. Syria"></label><label>DCS branch / version<input id="version" maxlength="30" placeholder="Same for everyone"></label></div>
+        <div class="twocol"><label>Server mode<select id="mode"><option>Private hosted mission</option><option>Dedicated server</option><option>Public server rendezvous</option></select></label><label>Join path<select id="joinPath"><option>Direct IP</option><option>Server browser</option><option>Saved favorite</option><option>Public server name</option></select></label></div>
+        <label>Voice / comms plan<input id="comms" maxlength="50" placeholder="Discord + in-game presets"></label>
+        <label>Session notes<textarea id="notes" maxlength="500" placeholder="Password hint, coalition, slot restrictions, late-join rule, mission-specific cautions…"></textarea></label>
+        <p class="micro">Simulation aid only. Never put a real password in an exported brief; store a hint or agreed channel instead.</p>
+      </div>
+    </section>
+    <section class="panel">
+      <div class="panelhead"><h2>04 / Session wire</h2><span class="tag" id="eventCount">0 events</span></div>
+      <div class="panelbody"><div id="eventLog" class="eventlog"></div></div>
+      <div class="audit"><span><span class="kbd">L</span> log note</span><button id="noteBtn" class="small">Add event</button></div>
+    </section>
+  </aside>
+
+  <section class="panel">
+    <div class="panelhead"><h2>02 / Host gates</h2><span class="tag" id="gateCount">0 / 0</span></div>
+    <div id="gates" class="gates"></div>
+    <div class="audit"><span>Click a gate to cycle: open → checked → blocked</span><button id="clearGates" class="small danger">Clear gates</button></div>
+  </section>
+
+  <div class="right stack">
+    <section class="panel">
+      <div class="panelhead"><h2>03 / Crew board</h2><span class="tag" id="pilotCount">0 crew</span></div>
+      <div class="panelbody">
+        <div id="roster" class="roster"></div>
+        <button id="addPilot" class="small" style="width:100%;margin-top:8px">+ Add pilot / seat</button>
+        <div class="legend"><span><b>J</b> joined</span><span><b>S</b> slotted</span><span><b>C</b> controls</span><span><b>V</b> voice</span></div>
+      </div>
+    </section>
+    <section class="panel">
+      <div class="panelhead"><h2>05 / Fault ladder</h2><span class="tag">Recover</span></div>
+      <div class="panelbody">
+        <div class="triageTop"><label>Observed symptom<select id="symptom"></select></label><button id="resetTriage" class="small">Reset ladder</button></div>
+        <div id="ladder" class="ladder"></div>
+        <div id="triageResult" class="result"></div>
+      </div>
+    </section>
+  </div>
+</main>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+</div>
+<script>
+(()=>{
+'use strict';
+const KEY='dcs-host-check-v1';
+const gateDefs=[
+ {id:'mission',title:'Mission loads without script errors',detail:'Host opens the exact mission and reaches the role screen before inviting the crew.',critical:true},
+ {id:'slots',title:'Every human seat is set to Client',detail:'Verify intended aircraft and multicrew positions are not Player-only, AI-only, or coalition-locked by mistake.',critical:true},
+ {id:'parity',title:'Version, map, and required modules match',detail:'Read back the DCS branch/version and any required terrain or aircraft ownership before connection testing.',critical:true},
+ {id:'join',title:'Join path tested',detail:'Confirm server-browser visibility or direct-IP details. For private hosting, confirm the host network path works before mission time.',critical:true},
+ {id:'pause',title:'Pause and late-join behavior briefed',detail:'Keep the mission paused through slot and controls checks; agree whether late join or re-slot is allowed.',critical:true},
+ {id:'coalition',title:'Coalition, password hint, and slot plan read back',detail:'Crew can identify the correct side and seat without exposing a password in the saved brief.',critical:true},
+ {id:'comms',title:'Voice path and fallback proven',detail:'Make one live voice check and name the fallback channel before cockpit workload starts.',critical:true},
+ {id:'controls',title:'Each crew member performs a controls check',detail:'Pitch, roll, rudder, throttle, view/VR, and one mission-critical control respond in the occupied seat.',critical:true},
+ {id:'weather',title:'Weather, runway, and first task briefed',detail:'Give only the first operational objective, expected runway/start state, and immediate hazard.',critical:false},
+ {id:'restart',title:'Restart owner and abort rule named',detail:'Decide who calls restart and what failure triggers it, so troubleshooting does not consume the session.',critical:false}
+];
+const ladders={
+ 'Friend cannot see or join host':[
+  ['Confirm exact DCS version','Both players read back branch and version; update or repair before changing network settings.'],
+  ['Prove the mission locally','Host loads the same mission to the role screen and confirms a Client seat exists.'],
+  ['Retry the advertised join path','Refresh the browser or re-enter the exact direct-IP details; rule out a stale favorite.'],
+  ['Check host network exposure','Verify the intended DCS port is allowed through host firewall/router, or use a known-working dedicated/public server path.'],
+  ['Reduce variables','Disable nonessential mission mods/scripts and test a stock two-slot mission.'] ],
+ 'Joined, but stuck in spectator':[
+  ['Verify coalition access','Select the intended coalition and confirm any coalition password or mission restriction.'],
+  ['Inspect the slot type','Mission Editor seat must be Client for each joining human; Player is not a substitute for multiple clients.'],
+  ['Check ownership and terrain','Confirm the joining pilot owns the aircraft and required map.'],
+  ['Check slot blockers','Review lives, dynamic slot, warehouse, script, or server rules that can deny the seat.'],
+  ['Test a clean slot','Add or use one unrestricted Client aircraft to separate slot logic from connectivity.'] ],
+ 'In cockpit, controls do not respond':[
+  ['Confirm the correct seat owns control','In multicrew, read back who has flight control and whether control transfer was accepted.'],
+  ['Run four-axis check','Move pitch, roll, rudder, and throttle while watching cockpit controls or the input indicator.'],
+  ['Check per-aircraft bindings','Open controls for the exact aircraft/seat, not the general or similarly named module profile.'],
+  ['Remove control collisions','Look for duplicate axes, game-mode bindings, or an unintended device commanding the same axis.'],
+  ['Re-slot once, then restart deliberately','Leave and re-enter the seat; if still failed, use the pre-briefed restart rule instead of random changes.'] ],
+ 'Voice works, in-game radios do not':[
+  ['Confirm the mission voice method','Read back whether the flight expects built-in voice, SRS, Discord, or plain DCS radio menus.'],
+  ['Check the active radio and transmit bind','Select the correct radio, frequency/preset, and matching push-to-talk control for this aircraft.'],
+  ['Check cockpit power and audio','Verify radio power, volume, intercom/audio panel routing, and easy-comms assumptions.'],
+  ['Prove one short call','Use a fixed test phrase and have one receiver confirm signal before changing channels.'],
+  ['Fall back without blocking launch','Move to the agreed voice fallback and log the radio issue for post-sortie repair.'] ],
+ 'Desync, lag, or repeated disconnects':[
+  ['Name the scope','Is one pilot affected, everyone affected, or only after a specific mission event?'],
+  ['Stop avoidable traffic','Pause downloads, streaming, cloud sync, and high-bandwidth screen sharing on affected connections.'],
+  ['Check ping and packet stability','Compare the affected pilot with another participant or a known public server.'],
+  ['Reduce mission load','Test fewer scripts/units or a stock mission to separate network instability from mission performance.'],
+  ['Choose a session-safe fallback','Move hosting, change server, reduce the mission, or postpone—do not spend the whole flight guessing.'] ]
+};
+const defaults={meta:{sessionName:'Private co-op',hostName:'',mission:'',map:'',version:'',mode:'Private hosted mission',joinPath:'Direct IP',comms:'',notes:''},gates:{},pilots:[{id:'p1',name:'Host',seat:'Lead / host',joined:false,slotted:false,controls:false,voice:false}],symptom:Object.keys(ladders)[0],triage:[],events:[]};
+let state=load();
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+function clean(v){const x=v&&typeof v==='object'?v:{};return {meta:{...defaults.meta,...(x.meta||{})},gates:x.gates&&typeof x.gates==='object'?x.gates:{},pilots:Array.isArray(x.pilots)&&x.pilots.length?x.pilots.map((p,i)=>({id:String(p.id||Date.now()+i),name:String(p.name||'').slice(0,28),seat:String(p.seat||'').slice(0,28),joined:!!p.joined,slotted:!!p.slotted,controls:!!p.controls,voice:!!p.voice})):[...defaults.pilots],symptom:ladders[x.symptom]?x.symptom:defaults.symptom,triage:Array.isArray(x.triage)?x.triage.map(Boolean):[],events:Array.isArray(x.events)?x.events.slice(0,100):[]}}
+function load(){try{return clean(JSON.parse(localStorage.getItem(KEY)))}catch{return clean(defaults)}}
+let timer;function save(){clearTimeout(timer);$('#saveState').textContent='LOCAL / SAVING';timer=setTimeout(()=>{localStorage.setItem(KEY,JSON.stringify(state));$('#saveState').textContent='LOCAL / SAVED'},100)}
+function esc(s){return String(s).replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]))}
+function toast(s){const t=$('#toast');t.textContent=s;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1700)}
+function stamp(){return new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}
+function log(text,type='note'){state.events.unshift({id:String(Date.now()),time:stamp(),text:String(text).slice(0,160),type});state.events=state.events.slice(0,100);save();renderEvents()}
+const metaIds=Object.keys(defaults.meta);
+function syncMeta(){metaIds.forEach(id=>{$('#'+id).value=state.meta[id]||''})}
+function renderGates(){const complete=gateDefs.filter(g=>state.gates[g.id]==='done').length;$('#gateCount').textContent=`${complete} / ${gateDefs.length}`;$('#gates').innerHTML=gateDefs.map(g=>{const status=state.gates[g.id]||'open',symbol=status==='done'?'✓':status==='block'?'!':'○';return `<article class="gate ${status==='done'?'done':status==='block'?'block':'warn'}"><button class="gatebtn" data-gate="${g.id}" aria-label="Cycle ${esc(g.title)} status">${symbol}</button><div><h3>${esc(g.title)}</h3><p>${esc(g.detail)}</p></div><span class="${g.critical?'critical':'optional'}">${g.critical?'critical':'advisory'}</span></article>`}).join('');$$('[data-gate]').forEach(b=>b.onclick=()=>cycleGate(b.dataset.gate))}
+function cycleGate(id){const old=state.gates[id]||'open',next=old==='open'?'done':old==='done'?'block':'open';state.gates[id]=next;const title=gateDefs.find(g=>g.id===id).title;log(`${title}: ${next}`,'gate');save();renderGates();renderLaunch()}
+function pilotReady(p){return p.joined&&p.slotted&&p.controls&&p.voice}
+function renderRoster(){const box=$('#roster');$('#pilotCount').textContent=`${state.pilots.length} crew`;box.innerHTML=state.pilots.map(p=>`<div class="pilot"><input aria-label="Pilot name" data-pname="${p.id}" maxlength="28" value="${esc(p.name)}" placeholder="Pilot"><input aria-label="Seat or role" data-pseat="${p.id}" maxlength="28" value="${esc(p.seat)}" placeholder="Seat / role"><button class="statebtn ${p.joined?'on':''}" data-flag="joined" data-id="${p.id}" title="Joined">J</button><button class="statebtn ${p.slotted?'on':''}" data-flag="slotted" data-id="${p.id}" title="Slotted">S</button><button class="statebtn ${p.controls?'on':''}" data-flag="controls" data-id="${p.id}" title="Controls checked">C</button><button class="statebtn ${p.voice?'on':''}" data-flag="voice" data-id="${p.id}" title="Voice checked">V</button><button class="statebtn" data-remove="${p.id}" title="Remove pilot">×</button></div>`).join('');$$('[data-pname]').forEach(el=>el.oninput=e=>updatePilot(el.dataset.pname,'name',e.target.value));$$('[data-pseat]').forEach(el=>el.oninput=e=>updatePilot(el.dataset.pseat,'seat',e.target.value));$$('[data-flag]').forEach(b=>b.onclick=()=>togglePilot(b.dataset.id,b.dataset.flag));$$('[data-remove]').forEach(b=>b.onclick=()=>removePilot(b.dataset.remove))}
+function updatePilot(id,key,value){const p=state.pilots.find(x=>x.id===id);if(p){p[key]=value;save();renderLaunch()}}
+function togglePilot(id,key){const p=state.pilots.find(x=>x.id===id);if(!p)return;p[key]=!p[key];if(p[key])log(`${p.name||'Crew'}: ${key} confirmed`,'crew');save();renderRoster();renderLaunch()}
+function removePilot(id){if(state.pilots.length===1){toast('Keep at least one crew row');return}const p=state.pilots.find(x=>x.id===id);state.pilots=state.pilots.filter(x=>x.id!==id);log(`${p?.name||'Crew row'} removed`,'crew');save();renderRoster();renderLaunch()}
+function addPilot(){state.pilots.push({id:String(Date.now()),name:'',seat:'',joined:false,slotted:false,controls:false,voice:false});save();renderRoster();renderLaunch();setTimeout(()=>$$('[data-pname]').at(-1)?.focus(),0)}
+function readiness(){const critical=gateDefs.filter(g=>g.critical),gateReady=critical.every(g=>state.gates[g.id]==='done'),blocked=gateDefs.some(g=>state.gates[g.id]==='block'),readyPilots=state.pilots.filter(pilotReady).length,pilotsReady=readyPilots===state.pilots.length&&state.pilots.length>0;return {ready:gateReady&&pilotsReady&&!blocked,gateReady,blocked,readyPilots}}
+function renderLaunch(){const r=readiness(),bar=$('#launchBar');bar.classList.toggle('ready',r.ready);bar.classList.toggle('blocked',!r.ready);$('#launchCount').textContent=`${r.readyPilots} / ${state.pilots.length} READY`;if(r.ready){$('#launchTitle').textContent='Crew ready — unpause on host call';$('#launchReason').textContent='Critical host gates and all crew checks are complete.'}else if(r.blocked){$('#launchTitle').textContent='Stop — explicit blocker logged';$('#launchReason').textContent='Resolve every blocked gate before launch.'}else if(!r.gateReady){$('#launchTitle').textContent='Hold the unpause';$('#launchReason').textContent='Complete every critical host gate, then finish crew checks.'}else{$('#launchTitle').textContent='Host gates green — crew not ready';$('#launchReason').textContent='Each crew row needs joined, slotted, controls, and voice.'}}
+function renderTriage(){const sel=$('#symptom');sel.innerHTML=Object.keys(ladders).map(k=>`<option>${esc(k)}</option>`).join('');sel.value=state.symptom;const steps=ladders[state.symptom];state.triage=steps.map((_,i)=>!!state.triage[i]);$('#ladder').innerHTML=steps.map((s,i)=>`<div class="step ${state.triage[i]?'done':''}" role="button" tabindex="0" data-step="${i}" aria-pressed="${state.triage[i]}"><div class="stepnum">${state.triage[i]?'✓':i+1}</div><div><strong>${esc(s[0])}</strong><p>${esc(s[1])}</p></div></div>`).join('');$$('[data-step]').forEach(el=>{const go=()=>{const i=+el.dataset.step;state.triage[i]=!state.triage[i];save();renderTriage()};el.onclick=go;el.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();go()}}});const done=state.triage.filter(Boolean).length;$('#triageResult').textContent=done===steps.length?'Ladder complete. Record the working fix or choose the session-safe fallback.':`Complete in order. ${done} of ${steps.length} checks marked; stop when the fault is isolated.`}
+function renderEvents(){const box=$('#eventLog');$('#eventCount').textContent=`${state.events.length} event${state.events.length===1?'':'s'}`;box.innerHTML=state.events.length?state.events.map(e=>`<div class="event"><time>${esc(e.time)}</time><span>${esc(e.text)}</span><button class="icon small ghost" data-delevent="${e.id}" aria-label="Delete event">×</button></div>`).join(''):'<div class="empty">Gate, crew, launch, and manual events will build a lightweight session record here.</div>';$$('[data-delevent]').forEach(b=>b.onclick=()=>{state.events=state.events.filter(e=>e.id!==b.dataset.delevent);save();renderEvents()})}
+function addNote(){const text=prompt('Session event or observation:');if(text&&text.trim())log(text.trim(),'note')}
+function exportData(){const data={app:'Host Check',version:1,exported:new Date().toISOString(),...state};const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=(state.meta.sessionName||'host-check').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')+'.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500);toast('Session exported')}
+function importData(file){const r=new FileReader();r.onload=()=>{try{state=clean(JSON.parse(r.result));syncMeta();save();render();toast('Session imported')}catch{toast('Import failed: invalid JSON')}};r.readAsText(file)}
+function resetAll(){if(!confirm('Clear this local session and start a new one?'))return;state=clean(defaults);syncMeta();save();render();toast('New session ready')}
+function render(){renderGates();renderRoster();renderTriage();renderEvents();renderLaunch()}
+metaIds.forEach(id=>$('#'+id).addEventListener('input',e=>{state.meta[id]=e.target.value;save()}));
+$('#addPilot').onclick=addPilot;$('#clearGates').onclick=()=>{if(confirm('Clear all host gate states?')){state.gates={};save();renderGates();renderLaunch()}};$('#symptom').onchange=e=>{state.symptom=e.target.value;state.triage=[];save();renderTriage()};$('#resetTriage').onclick=()=>{state.triage=[];save();renderTriage()};$('#noteBtn').onclick=addNote;$('#launchBtn').onclick=()=>{const r=readiness();log(r.ready?'UNPAUSE / LAUNCH CALLED':'UNPAUSE ATTEMPTED WHILE NOT READY',r.ready?'launch':'block');toast(r.ready?'Launch logged':'Not ready — event logged')};$('#exportBtn').onclick=exportData;$('#importBtn').onclick=()=>$('#fileInput').click();$('#fileInput').onchange=e=>{if(e.target.files[0])importData(e.target.files[0]);e.target.value=''};$('#printBtn').onclick=()=>window.print();$('#newBtn').onclick=resetAll;
+document.addEventListener('keydown',e=>{if(e.target.matches('input,textarea,select'))return;if(e.key.toLowerCase()==='l'){e.preventDefault();addNote()}});
+syncMeta();render();
+})();
+</script>
+</body>
+</html>

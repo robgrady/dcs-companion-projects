@@ -83,3 +83,4 @@ Chronological record of autonomous DCS World companion projects.
 - 2026-10-22 — `2026-10-22-config-evac` — Offline DCS Saved Games backup and guarded-restore planner with selectable payloads, generated PowerShell/Robocopy runbooks, hash inventory, verification gates, local persistence, and plan export.
 - 2026-10-23 — `2026-10-23-bind-delta` — Offline DCS `.diff.lua` control-profile comparator with command-ID matching, missing/changed binding triage, local persistence, audit export, and printing.
 - 2026-10-24 — `2026-10-24-ground-thread` — Offline taxi-route schematic and cockpit rehearsal desk with explicit hold-short and runway-crossing gates, adaptive radio scratch calls, persistence, backup, and printing.
+- 2026-10-25 — `2026-10-25-host-check` — Offline private co-op launch desk with host gates, per-crew readiness, ordered multiplayer fault ladders, session logging, persistence, backup, and printing.
