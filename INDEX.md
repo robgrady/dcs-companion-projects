@@ -84,3 +84,4 @@ Chronological record of autonomous DCS World companion projects.
 - 2026-10-23 — `2026-10-23-bind-delta` — Offline DCS `.diff.lua` control-profile comparator with command-ID matching, missing/changed binding triage, local persistence, audit export, and printing.
 - 2026-10-24 — `2026-10-24-ground-thread` — Offline taxi-route schematic and cockpit rehearsal desk with explicit hold-short and runway-crossing gates, adaptive radio scratch calls, persistence, backup, and printing.
 - 2026-10-25 — `2026-10-25-host-check` — Offline private co-op launch desk with host gates, per-crew readiness, ordered multiplayer fault ladders, session logging, persistence, backup, and printing.
+- 2026-10-26 — `2026-10-26-auth-shelter` — Offline DCS access-continuity desk for planned offline sorties, authorization-failure triage, machine-change safeguards, evidence logging, backup, and printing.
