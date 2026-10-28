@@ -1,0 +1,358 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="dark">
+<title>Comms Proof — DCS Voice Readiness Desk</title>
+<style>
+:root{
+  --bg:#101412;--panel:#171d19;--panel-2:#1d2520;--ink:#eef4ed;--muted:#9eaba1;
+  --line:#354038;--accent:#d7e56d;--accent-ink:#171b0b;--warn:#f0b45b;--bad:#ef756d;
+  --good:#79c997;--focus:#f5f0bd;--radius:10px;--shadow:0 18px 46px rgba(0,0,0,.28);
+  --mono:"SFMono-Regular",Consolas,"Liberation Mono",monospace;
+  --sans:"Avenir Next",Avenir,"Segoe UI",sans-serif;
+}
+*{box-sizing:border-box}
+html{background:var(--bg);color:var(--ink);font-family:var(--sans);scroll-behavior:smooth}
+body{margin:0;min-height:100vh;background:
+  linear-gradient(rgba(255,255,255,.018) 1px,transparent 1px),
+  linear-gradient(90deg,rgba(255,255,255,.018) 1px,transparent 1px),var(--bg);
+  background-size:32px 32px}
+button,input,select,textarea{font:inherit}
+button,input,select,textarea{outline:none}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,[tabindex]:focus-visible{box-shadow:0 0 0 3px var(--focus);border-color:transparent!important}
+button{min-height:44px;border:1px solid var(--line);border-radius:8px;background:var(--panel-2);color:var(--ink);padding:.65rem .9rem;cursor:pointer;font-weight:700}
+button:hover{border-color:#66756a;background:#242e27}
+button.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+button.primary:hover{filter:brightness(1.06)}
+button.ghost{background:transparent}
+button.danger{color:#ffd6d2;border-color:#824944}
+input,select,textarea{width:100%;border:1px solid var(--line);border-radius:8px;background:#111713;color:var(--ink);padding:.72rem .8rem;min-height:44px}
+textarea{min-height:94px;resize:vertical;line-height:1.45}
+label{display:grid;gap:.38rem;color:var(--muted);font-size:.82rem;font-weight:700;letter-spacing:.02em}
+.shell{max-width:1440px;margin:auto;padding:18px}
+.topbar{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:18px;align-items:center;border-bottom:1px solid var(--line);padding:5px 0 17px}
+.brand{display:flex;align-items:center;gap:13px}
+.mark{width:44px;height:44px;border:1px solid #73806f;border-radius:50%;display:grid;place-items:center;font:800 .72rem var(--mono);color:var(--accent);position:relative}
+.mark:after{content:"";position:absolute;width:4px;height:4px;border-radius:50%;background:var(--accent);right:2px;top:19px;box-shadow:0 0 12px var(--accent)}
+h1{font-size:clamp(1.25rem,2vw,1.65rem);margin:0;letter-spacing:.01em}
+.subtitle{margin:.18rem 0 0;color:var(--muted);font-size:.86rem}
+.top-actions{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end}
+.layout{display:grid;grid-template-columns:300px minmax(0,1fr);gap:18px;margin-top:18px}
+.sidebar{display:grid;align-content:start;gap:12px;position:sticky;top:18px;height:max-content}
+.card{background:rgba(23,29,25,.97);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
+.pad{padding:16px}
+.eyebrow{font:800 .72rem var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--accent)}
+.mode-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:10px}
+.mode{font-size:.78rem;padding:.55rem .4rem;min-height:42px}
+.mode.active{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.score{display:grid;grid-template-columns:82px 1fr;gap:13px;align-items:center;margin-top:12px}
+.ring{width:82px;aspect-ratio:1;border-radius:50%;display:grid;place-items:center;background:conic-gradient(var(--accent) calc(var(--p)*1%),#29332c 0);position:relative}
+.ring:before{content:"";position:absolute;inset:8px;border-radius:50%;background:var(--panel)}
+.ring strong{position:relative;font:800 1.45rem var(--mono)}
+.status{font-weight:800;margin-bottom:3px}.small{font-size:.79rem;color:var(--muted);line-height:1.45}
+.stage-nav{display:grid;gap:5px}
+.stage-nav button{display:grid;grid-template-columns:24px 1fr auto;align-items:center;text-align:left;background:transparent;border-color:transparent;font-size:.84rem;padding:.55rem .6rem}
+.stage-nav button:hover{background:var(--panel-2)}
+.stage-nav button.active{background:var(--panel-2);border-color:var(--line)}
+.stage-no{font:800 .7rem var(--mono);color:var(--muted)}
+.stage-count{font:700 .68rem var(--mono);color:var(--muted)}
+.sidebar-note{border-top:1px solid var(--line);padding-top:12px;margin-top:3px}
+.main{min-width:0;display:grid;gap:14px}
+.notice{display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:start;padding:13px 15px;background:#252318;border:1px solid #625c31;border-radius:var(--radius)}
+.notice b{color:#fff5b1}.notice p{margin:2px 0 0;color:#c6c1a0;font-size:.82rem;line-height:1.45}
+.stage{display:none}.stage.active{display:block}
+.stage-head{display:flex;justify-content:space-between;gap:18px;align-items:end;padding:20px 20px 14px;border-bottom:1px solid var(--line)}
+.stage-head h2{margin:3px 0 0;font-size:clamp(1.3rem,2.4vw,2rem);font-weight:750;letter-spacing:-.02em}
+.stage-head p{max-width:660px;margin:0;color:var(--muted);font-size:.87rem;line-height:1.5}
+.stage-body{padding:18px 20px 21px}
+.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}
+.full{grid-column:1/-1}
+.checklist{display:grid;gap:8px;margin-top:16px}
+.check{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:12px;align-items:start;border:1px solid var(--line);border-radius:9px;padding:12px;background:#131915;cursor:pointer}
+.check:hover{background:#182019}.check input{width:20px;height:20px;min-height:0;margin:1px 0;accent-color:var(--accent)}
+.check-title{font-size:.9rem;font-weight:750;color:var(--ink)}
+.check-help{font-size:.77rem;color:var(--muted);line-height:1.4;margin-top:3px}
+.tag{font:800 .64rem var(--mono);text-transform:uppercase;letter-spacing:.08em;border:1px solid var(--line);border-radius:999px;padding:.28rem .45rem;color:var(--muted);white-space:nowrap}
+.tag.req{color:var(--accent);border-color:#66702f}
+.stage-foot{display:flex;justify-content:space-between;gap:10px;margin-top:18px;padding-top:16px;border-top:1px solid var(--line)}
+.diagnostic-grid{display:grid;grid-template-columns:minmax(220px,.7fr) minmax(0,1.3fr);gap:14px}
+.symptoms{display:grid;gap:7px}
+.symptom{text-align:left;background:#111713;font-size:.84rem;font-weight:700}
+.symptom.active{border-color:var(--accent);color:var(--accent)}
+.path{display:grid;gap:9px;counter-reset:fix}
+.fix{counter-increment:fix;display:grid;grid-template-columns:34px 1fr;gap:10px;padding:12px;border:1px solid var(--line);border-radius:8px;background:#131915}
+.fix:before{content:counter(fix);display:grid;place-items:center;width:28px;height:28px;border-radius:50%;background:#2a342d;color:var(--accent);font:800 .75rem var(--mono)}
+.fix b{font-size:.87rem}.fix p{margin:3px 0 0;color:var(--muted);font-size:.77rem;line-height:1.42}
+.matrix{width:100%;border-collapse:collapse;font-size:.8rem}
+.matrix th,.matrix td{border-bottom:1px solid var(--line);padding:10px 8px;text-align:left;vertical-align:middle}
+.matrix th{font:800 .66rem var(--mono);text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.matrix select{min-width:120px;padding:.45rem;min-height:40px}
+.result-pass{color:var(--good)}.result-fail{color:var(--bad)}
+.summary{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(250px,.75fr);gap:14px}
+.brief{background:#0d120f;border:1px solid #4c5a50;border-radius:8px;padding:16px;font:500 .78rem/1.65 var(--mono);white-space:pre-wrap;min-height:360px;color:#dfe8df}
+.actions{display:grid;align-content:start;gap:8px}.actions h3{font-size:.93rem;margin:0 0 4px}.actions button{width:100%}
+.kicker{padding:12px;border:1px solid var(--line);border-radius:8px;background:#121814;color:var(--muted);font-size:.77rem;line-height:1.45}
+.progress-dots{display:flex;gap:5px}.dot{width:8px;height:8px;border-radius:50%;background:#39433c}.dot.on{background:var(--accent)}
+.toast{position:fixed;right:18px;bottom:18px;background:var(--ink);color:#121713;border-radius:8px;padding:11px 14px;font-size:.82rem;font-weight:800;box-shadow:var(--shadow);transform:translateY(80px);opacity:0;transition:.2s;z-index:4}.toast.show{transform:none;opacity:1}
+.hidden{display:none!important}
+@media(max-width:900px){.layout{grid-template-columns:1fr}.sidebar{position:static}.stage-nav{grid-template-columns:repeat(3,1fr)}.stage-nav button{grid-template-columns:1fr;text-align:center}.stage-no,.stage-count{display:none}.diagnostic-grid,.summary{grid-template-columns:1fr}}
+@media(max-width:620px){.shell{padding:10px}.topbar{grid-template-columns:1fr}.top-actions{justify-content:flex-start}.stage-nav{grid-template-columns:repeat(2,1fr)}.form-grid{grid-template-columns:1fr}.full{grid-column:auto}.stage-head{display:grid;align-items:start}.stage-body,.stage-head{padding-left:14px;padding-right:14px}.check{grid-template-columns:auto 1fr}.tag{grid-column:2}.matrix{display:block;overflow-x:auto}.mode-grid{grid-template-columns:1fr}.stage-foot{flex-direction:column}.stage-foot button{width:100%}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+@media print{body{background:#fff;color:#111}.topbar,.sidebar,.notice,.stage:not([data-stage="5"]),.actions,.stage-foot{display:none!important}.layout,.summary{display:block}.card,.brief{box-shadow:none;border:0;background:#fff;color:#111}.shell{max-width:none;padding:0}.stage[data-stage="5"]{display:block!important}.stage-head{border-bottom:2px solid #111}.brief{white-space:pre-wrap;font-size:10pt}}
+</style>
+</head>
+<body>
+<div class="shell">
+  <header class="topbar">
+    <div class="brand"><div class="mark" aria-hidden="true">TX</div><div><h1>COMMS PROOF</h1><p class="subtitle">DCS voice readiness desk · prove the route before the sortie</p></div></div>
+    <div class="top-actions"><button class="ghost" id="exportBtn">Export</button><button class="ghost" id="importBtn">Import</button><button class="danger" id="resetBtn">Reset</button><input class="hidden" id="fileInput" type="file" accept="application/json"></div>
+  </header>
+
+  <div class="layout">
+    <aside class="sidebar" aria-label="Readiness navigation">
+      <section class="card pad">
+        <div class="eyebrow">Voice route</div>
+        <div class="mode-grid" role="group" aria-label="Voice route">
+          <button class="mode" data-mode="native">DCS native</button><button class="mode" data-mode="srs">SRS</button><button class="mode" data-mode="dual">Dual stack</button>
+        </div>
+        <div class="score"><div class="ring" id="ring" style="--p:0"><strong id="score">0</strong></div><div><div class="status" id="statusText">Not proven</div><div class="small" id="statusHelp">Complete required gates and record a two-way test.</div></div></div>
+      </section>
+      <nav class="card pad stage-nav" aria-label="Setup stages" id="stageNav"></nav>
+      <section class="card pad small"><div class="eyebrow">Rule</div><div class="sidebar-note">A green microphone meter proves only the input device. Readiness requires a complete path: device → bind → radio state → transmit → reply.</div></section>
+    </aside>
+
+    <main class="main">
+      <div class="notice"><span aria-hidden="true">●</span><div><b>Patch watch · DCS 2.9.30.28536</b><p>The September 30, 2026 changelog fixed dynamic-radio numbering and status logic, and explicitly asked pilots to verify VoiceChat hotkeys. This desk treats bindings as a fresh gate, not an inherited assumption.</p></div></div>
+
+      <section class="stage card active" data-stage="0">
+        <header class="stage-head"><div><div class="eyebrow">Stage 01</div><h2>Declare the route</h2></div><p>Choose what the server and flight actually use. Dual stack is valid only when transmit controls are separated to prevent accidental double transmission.</p></header>
+        <div class="stage-body">
+          <div class="form-grid">
+            <label>Server / squadron<input data-field="server" placeholder="e.g. private co-op flight"></label>
+            <label>Aircraft / seat<input data-field="aircraft" placeholder="e.g. F/A-18C pilot"></label>
+            <label>Primary channel or frequency<input data-field="primary" placeholder="e.g. package common / 251.000"></label>
+            <label>Backup contact path<select data-field="backup"><option>Text chat</option><option>Discord</option><option>Room mode</option><option>Second radio</option><option>None declared</option></select></label>
+            <label class="full">Flight contract<textarea data-field="contract" placeholder="Who must hear whom, on which route, before taxi?"></textarea></label>
+          </div>
+          <div class="checklist" id="checks0"></div>
+          <div class="stage-foot"><span></span><button class="primary next">Continue to devices</button></div>
+        </div>
+      </section>
+
+      <section class="stage card" data-stage="1">
+        <header class="stage-head"><div><div class="eyebrow">Stage 02</div><h2>Lock the audio path</h2></div><p>Record explicit devices. “Default” is convenient, but a Windows or headset change can silently reroute DCS or SRS.</p></header>
+        <div class="stage-body">
+          <div class="form-grid">
+            <label>Microphone input<input data-field="mic" placeholder="Exact device name"></label>
+            <label>Voice output<input data-field="output" placeholder="Headset / communications device"></label>
+            <label>Game audio output<input data-field="gameOutput" placeholder="Same device or separate route"></label>
+            <label>Mic start state<select data-field="micState"><option>Push to talk</option><option>Muted</option><option>Voice activated</option><option>Unknown</option></select></label>
+          </div>
+          <div class="checklist" id="checks1"></div>
+          <div class="stage-foot"><button class="prev">Back</button><button class="primary next">Continue to bindings</button></div>
+        </div>
+      </section>
+
+      <section class="stage card" data-stage="2">
+        <header class="stage-head"><div><div class="eyebrow">Stage 03</div><h2>Prove the controls</h2></div><p>Bind by function, then test for collisions. Aircraft-specific VoIP commands can take priority over generic radio VoIP commands.</p></header>
+        <div class="stage-body">
+          <div class="form-grid">
+            <label>Radio 1 PTT<input data-field="ptt1" placeholder="e.g. HOTAS comm switch forward"></label>
+            <label>Radio 2 PTT<input data-field="ptt2" placeholder="e.g. HOTAS comm switch aft"></label>
+            <label>Voice overlay / panel<input data-field="overlayBind" placeholder="Key or button"></label>
+            <label class="srs-only">SRS overlay / connect control<input data-field="srsBind" placeholder="Key or button"></label>
+          </div>
+          <div class="checklist" id="checks2"></div>
+          <div class="stage-foot"><button class="prev">Back</button><button class="primary next">Continue to cockpit</button></div>
+        </div>
+      </section>
+
+      <section class="stage card" data-stage="3">
+        <header class="stage-head"><div><div class="eyebrow">Stage 04</div><h2>Set the cockpit</h2></div><p>A healthy software path still fails when the aircraft radio is off, tuned elsewhere, volume is down, or the wrong radio is selected.</p></header>
+        <div class="stage-body">
+          <div class="form-grid">
+            <label>Radio count used<input data-field="radioCount" type="number" min="1" max="10" value="2"></label>
+            <label>Guard / secondary plan<input data-field="secondary" placeholder="Optional second radio use"></label>
+            <label class="full">Cockpit-specific note<textarea data-field="cockpitNote" placeholder="Power, selector, volume, encryption, seat coordination, or known module quirk"></textarea></label>
+          </div>
+          <div class="checklist" id="checks3"></div>
+          <div class="stage-foot"><button class="prev">Back</button><button class="primary next">Run live proof</button></div>
+        </div>
+      </section>
+
+      <section class="stage card" data-stage="4">
+        <header class="stage-head"><div><div class="eyebrow">Stage 05</div><h2>Run a two-way proof</h2></div><p>Use a real partner or server response. Log each leg separately so “I heard a click” cannot be mistaken for complete communications.</p></header>
+        <div class="stage-body">
+          <div style="overflow-x:auto"><table class="matrix"><thead><tr><th>Test leg</th><th>Expected evidence</th><th>Result</th><th>Note</th></tr></thead><tbody id="testRows"></tbody></table></div>
+          <div class="form-grid" style="margin-top:16px"><label class="full">Live-test note<textarea data-field="testNote" placeholder="Partner, server, aircraft state, and anything that changed during the proof"></textarea></label></div>
+          <div class="stage-foot"><button class="prev">Back</button><button class="primary next">Diagnose / brief</button></div>
+        </div>
+      </section>
+
+      <section class="stage card" data-stage="5">
+        <header class="stage-head"><div><div class="eyebrow">Stage 06</div><h2>Resolve or release</h2></div><p>Select the observed symptom for an ordered fault path, then carry the generated proof card into the sortie.</p></header>
+        <div class="stage-body">
+          <div class="diagnostic-grid">
+            <div class="symptoms" id="symptoms"></div><div class="path" id="fixPath" aria-live="polite"></div>
+          </div>
+          <div class="summary" style="margin-top:20px">
+            <pre class="brief" id="brief"></pre>
+            <div class="actions"><h3>Proof card</h3><button class="primary" id="copyBtn">Copy card</button><button id="printBtn">Print card</button><button id="downloadBtn">Download .txt</button><div class="kicker" id="releaseGate"></div></div>
+          </div>
+          <div class="stage-foot"><button class="prev">Back</button><button id="reviewBtn">Review incomplete gates</button></div>
+        </div>
+      </section>
+    </main>
+  </div>
+</div>
+<div class="toast" id="toast" role="status"></div>
+<script>
+(()=>{
+const KEY='dcs-comms-proof-v1';
+const defaults={mode:'native',stage:0,fields:{backup:'Text chat',micState:'Push to talk',radioCount:'2'},checks:{},tests:{},symptom:'noReply'};
+let state=load();
+const stages=['Route','Devices','Bindings','Cockpit','Live proof','Resolve'];
+const checkDefs={
+0:[
+ ['routeKnown','Server or flight confirms the intended voice system','Do not assume native Voice Chat and SRS users can hear each other.','required'],
+ ['channelKnown','Primary channel or frequency is known','Record the route before joining the cockpit.','required'],
+ ['backupKnown','Backup contact path is declared','Use it to coordinate troubleshooting without blocking the flight.','recommended']
+],
+1:[
+ ['voiceEnabled','Voice system is enabled and connected','For native chat, enable Voice Chat in DCS Audio. For SRS, confirm client connection.','required'],
+ ['inputSelected','Exact microphone is selected','Avoid stale VR, webcam, controller, or virtual-cable inputs.','required'],
+ ['outputSelected','Exact voice output is selected','A mic meter does not prove receive audio.','required'],
+ ['micMeter','Microphone test shows clean level','Speak normally; avoid clipping and noise-gate cutoffs.','required'],
+ ['masterVolume','Voice master volume is audible','Check the voice panel or client volume, not only Windows volume.','required']
+],
+2:[
+ ['pttMapped','Required PTT controls are mapped','Test each radio function used by this aircraft.','required'],
+ ['overlayMapped','Voice panel or overlay can be opened','The overlay provides transmit and route evidence.','required'],
+ ['bindFresh','Bindings were rechecked after the current patch','DCS 2.9.30.28536 specifically requested a hotkey review.','required'],
+ ['noCollision','No bind collision or double-transmit path found','Especially important when native Voice Chat and SRS run together.','required'],
+ ['seatPriority','Aircraft-specific versus generic VoIP priority is understood','Module-specific commands may override generic VoiceChat binds.','recommended']
+],
+3:[
+ ['radioPowered','Cockpit radio power is on','Confirm the modeled radio, not only the software overlay.','required'],
+ ['tuned','Correct frequency, preset, or room is selected','Both ends must share the same route.','required'],
+ ['volumeUp','Radio and receive volume are audible','Check cockpit volume knobs and voice-client volume.','required'],
+ ['txIndication','PTT produces a visible transmit indication','A click alone is weaker evidence than the overlay state.','required'],
+ ['seatReady','Crew-seat or intercom state is coordinated','Mark complete for single-seat aircraft after confirming not applicable.','recommended']
+]};
+const tests=[
+ ['tx','You transmit to partner','Overlay/client shows TX and partner repeats your words'],
+ ['rx','Partner transmits to you','You hear clear speech and repeat the message'],
+ ['radio2','Second route / radio check','Correct radio indication and no cross-transmit'],
+ ['backup','Backup path check','Both pilots can coordinate if primary fails']
+];
+const symptomDefs={
+ noReply:{label:'I transmit, nobody replies',steps:[
+  ['Prove audience and route','Confirm another person is present on the same voice system, room, coalition, and frequency.'],
+  ['Watch the transmit indicator','If no TX indication appears, return to bindings and aircraft-specific VoIP priority.'],
+  ['Separate the stacks','If running dual stack, disable one transmit path and test native Voice Chat and SRS independently.'],
+  ['Use the backup path','Ask the partner to confirm whether your carrier click or speech arrives.'],
+  ['Swap one variable','Change only the microphone input or PTT binding, then repeat the same test.']
+ ]},
+ hearNothing:{label:'They hear me; I hear nothing',steps:[
+  ['Check the voice output device','Select the intended headset explicitly; do not rely on a stale default device.'],
+  ['Raise voice and cockpit volumes','Check software master volume plus the modeled radio receive volume.'],
+  ['Confirm receive route','Verify same frequency, room, coalition, and radio selection.'],
+  ['Run a controlled output swap','Temporarily select a known speaker or headset to isolate routing from radio setup.'],
+  ['Retest with one partner','Avoid diagnosing against an empty or silent public channel.']
+ ]},
+ roomOnly:{label:'Room mode works; radio mode fails',steps:[
+  ['Confirm an aircraft radio is available','Spawn in a cockpit with a powered, supported radio and open the VoiceChat panel.'],
+  ['Power and tune the modeled radio','Room mode bypasses cockpit tuning; radio mode does not.'],
+  ['Use the correct radio PTT','Test aircraft-specific VoIP commands before generic radio commands.'],
+  ['Verify the panel shows radio mode','Record the selected radio and TX indicator during the test.'],
+  ['Compare with a clean mission','Use a simple multiplayer mission to isolate mission settings from local setup.']
+ ]},
+ doubleTx:{label:'I transmit on two systems at once',steps:[
+  ['Stop and separate PTT bindings','Give native Voice Chat and SRS unique controls.'],
+  ['Choose a primary route','Use only the system required by the server or flight.'],
+  ['Disable unused automatic transmit','Check hot-mic, voice activation, and client auto-connect behavior.'],
+  ['Test each stack alone','Prove native, then SRS, before enabling both.'],
+  ['Document the dual-stack contract','Record which button talks on which system.']
+ ]},
+ overlayMissing:{label:'Voice panel / overlay will not appear',steps:[
+  ['Confirm the voice feature is enabled','For native chat, check the DCS Audio Voice Chat option.'],
+  ['Rebind the panel command','Clear and reassign the control, then check for conflicts.'],
+  ['Check multi-monitor placement','A panel can be off the main viewport after display-layout changes.'],
+  ['Restart after the setting change','Re-enter multiplayer and test the panel before cockpit setup.'],
+  ['Use logs or support evidence','Record version, monitor layout, binding, and exact behavior before escalation.']
+ ]},
+ static:{label:'Only static / click / broken audio',steps:[
+  ['Verify both ends share the exact route','A carrier click can occur even when tuning or selection is wrong.'],
+  ['Check radio and master volume','Low speech under loud effects can sound like static only.'],
+  ['Run the microphone test','Look for clipping, an aggressive noise gate, or the wrong input device.'],
+  ['Remove audio processing temporarily','Bypass virtual mixers, enhancements, or headset spatial processing for one test.'],
+  ['Capture a minimal reproduction','Record aircraft, seat, radio, frequency, server, and whether room mode works.']
+ ]}
+};
+function load(){try{return merge(defaults,JSON.parse(localStorage.getItem(KEY)||'{}'))}catch(e){return structuredClone(defaults)}}
+function merge(a,b){const out=structuredClone(a);for(const k in b){if(b[k]&&typeof b[k]==='object'&&!Array.isArray(b[k])) out[k]=merge(out[k]||{},b[k]);else out[k]=b[k]}return out}
+function save(){localStorage.setItem(KEY,JSON.stringify(state));renderScore();renderNav();renderBrief()}
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1700)}
+function renderNav(){const n=document.getElementById('stageNav');n.innerHTML=stages.map((s,i)=>{const done=stageDone(i);return `<button data-go="${i}" class="${state.stage===i?'active':''}"><span class="stage-no">0${i+1}</span><span>${s}</span><span class="stage-count">${done?'READY':'—'}</span></button>`}).join('');n.querySelectorAll('button').forEach(b=>b.onclick=()=>go(+b.dataset.go))}
+function renderChecks(){for(const stage in checkDefs){const el=document.getElementById('checks'+stage);el.innerHTML=checkDefs[stage].map(([id,title,help,level])=>`<label class="check"><input type="checkbox" data-check="${id}" ${state.checks[id]?'checked':''}><span><span class="check-title">${title}</span><span class="check-help">${help}</span></span><span class="tag ${level==='required'?'req':''}">${level}</span></label>`).join('')}}
+function renderTests(){const tbody=document.getElementById('testRows');tbody.innerHTML=tests.map(([id,title,evidence])=>`<tr><td><b>${title}</b></td><td>${evidence}</td><td><select data-test="${id}"><option value="untested">Untested</option><option value="pass">Pass</option><option value="fail">Fail</option><option value="na">N/A</option></select></td><td><input data-test-note="${id}" aria-label="${title} note" placeholder="Evidence"></td></tr>`).join('');tests.forEach(([id])=>{tbody.querySelector(`[data-test="${id}"]`).value=state.tests[id]?.result||'untested';tbody.querySelector(`[data-test-note="${id}"]`).value=state.tests[id]?.note||''})}
+function renderSymptoms(){const el=document.getElementById('symptoms');el.innerHTML=Object.entries(symptomDefs).map(([id,x])=>`<button class="symptom ${state.symptom===id?'active':''}" data-symptom="${id}">${x.label}</button>`).join('');el.querySelectorAll('button').forEach(b=>b.onclick=()=>{state.symptom=b.dataset.symptom;save();renderSymptoms();renderFix()});renderFix()}
+function renderFix(){const x=symptomDefs[state.symptom];document.getElementById('fixPath').innerHTML=x.steps.map(([a,b])=>`<div class="fix"><div><b>${a}</b><p>${b}</p></div></div>`).join('')}
+function requiredIds(){return Object.values(checkDefs).flat().filter(x=>x[3]==='required').map(x=>x[0])}
+function score(){const req=requiredIds(),checks=req.filter(id=>state.checks[id]).length;const essential=['tx','rx'];const testPass=essential.filter(id=>state.tests[id]?.result==='pass').length;return Math.round((checks/req.length)*75+(testPass/essential.length)*25)}
+function stageDone(i){if(i<4){const defs=checkDefs[i]||[];return defs.filter(x=>x[3]==='required').every(x=>state.checks[x[0]])}if(i===4)return ['tx','rx'].every(id=>state.tests[id]?.result==='pass');return score()===100}
+function renderScore(){const s=score();document.getElementById('score').textContent=s;document.getElementById('ring').style.setProperty('--p',s);let a='Not proven',b='Complete required gates and record a two-way test.';if(s>=100){a='Released';b='Required gates and both live directions are proven.'}else if(s>=75){a='Live proof due';b='Setup is nearly complete; prove transmit and receive.'}else if(s>=40){a='Setup in work';b='Continue through unresolved required gates.'}document.getElementById('statusText').textContent=a;document.getElementById('statusHelp').textContent=b;document.getElementById('releaseGate').innerHTML=s===100?'<b class="result-pass">RELEASED</b><br>Two-way communications are proven for the recorded route.':'<b class="result-fail">HOLD</b><br>Do not treat communications as ready until required gates and two-way proof pass.'}
+function go(i){state.stage=Math.max(0,Math.min(5,i));document.querySelectorAll('.stage').forEach(x=>x.classList.toggle('active',+x.dataset.stage===state.stage));renderNav();save();window.scrollTo({top:0,behavior:'smooth'})}
+function applyMode(){document.querySelectorAll('.mode').forEach(b=>b.classList.toggle('active',b.dataset.mode===state.mode));document.querySelectorAll('.srs-only').forEach(x=>x.classList.toggle('hidden',state.mode==='native'))}
+function titleMode(){return state.mode==='native'?'DCS NATIVE VOICE CHAT':state.mode==='srs'?'SIMPLE RADIO STANDALONE (SRS)':'DUAL STACK — NATIVE + SRS'}
+function renderBrief(){const f=state.fields,s=score(),incomplete=requiredIds().filter(id=>!state.checks[id]);const failed=tests.filter(([id])=>state.tests[id]?.result==='fail').map(x=>x[1]);const lines=[
+'COMMS PROOF CARD',
+'================',
+`STATUS: ${s===100?'RELEASED':'HOLD'} · ${s}%`,
+`ROUTE: ${titleMode()}`,
+`SERVER: ${f.server||'Not recorded'}`,
+`AIRCRAFT / SEAT: ${f.aircraft||'Not recorded'}`,
+`PRIMARY: ${f.primary||'Not recorded'}`,
+`BACKUP: ${f.backup||'Not recorded'}`,
+'',
+`MIC: ${f.mic||'Not recorded'}`,
+`VOICE OUT: ${f.output||'Not recorded'}`,
+`PTT 1: ${f.ptt1||'Not recorded'}`,
+`PTT 2: ${f.ptt2||'Not recorded'}`,
+'',
+'LIVE PROOF',
+...tests.map(([id,title])=>`- ${title}: ${(state.tests[id]?.result||'untested').toUpperCase()}${state.tests[id]?.note?' — '+state.tests[id].note:''}`),
+'',
+`CONTRACT: ${f.contract||'Not recorded'}`,
+`COCKPIT NOTE: ${f.cockpitNote||'None'}`,
+`TEST NOTE: ${f.testNote||'None'}`,
+'',
+`OPEN REQUIRED GATES: ${incomplete.length}`,
+`FAILED TEST LEGS: ${failed.length?failed.join('; '):'None'}`,
+'',
+`GENERATED: ${new Date().toLocaleString()}`
+];document.getElementById('brief').textContent=lines.join('\n')}
+function bind(){
+ document.querySelectorAll('[data-field]').forEach(el=>{el.value=state.fields[el.dataset.field]??el.value??'';el.addEventListener('input',()=>{state.fields[el.dataset.field]=el.value;save()})});
+ document.querySelectorAll('[data-check]').forEach(el=>el.onchange=()=>{state.checks[el.dataset.check]=el.checked;save()});
+ document.querySelectorAll('[data-test]').forEach(el=>el.onchange=()=>{const id=el.dataset.test;state.tests[id]=state.tests[id]||{};state.tests[id].result=el.value;save()});
+ document.querySelectorAll('[data-test-note]').forEach(el=>el.oninput=()=>{const id=el.dataset.testNote;state.tests[id]=state.tests[id]||{};state.tests[id].note=el.value;save()});
+ document.querySelectorAll('.mode').forEach(b=>b.onclick=()=>{state.mode=b.dataset.mode;applyMode();save()});
+ document.querySelectorAll('.next').forEach(b=>b.onclick=()=>go(state.stage+1));document.querySelectorAll('.prev').forEach(b=>b.onclick=()=>go(state.stage-1));
+ document.getElementById('copyBtn').onclick=async()=>{try{await navigator.clipboard.writeText(document.getElementById('brief').textContent);toast('Proof card copied')}catch(e){toast('Clipboard unavailable — select card text')}};
+ document.getElementById('printBtn').onclick=()=>window.print();
+ document.getElementById('downloadBtn').onclick=()=>download('comms-proof-card.txt',document.getElementById('brief').textContent,'text/plain');
+ document.getElementById('exportBtn').onclick=()=>download('comms-proof-backup.json',JSON.stringify(state,null,2),'application/json');
+ document.getElementById('importBtn').onclick=()=>document.getElementById('fileInput').click();
+ document.getElementById('fileInput').onchange=e=>{const file=e.target.files[0];if(!file)return;const r=new FileReader();r.onload=()=>{try{state=merge(defaults,JSON.parse(r.result));localStorage.setItem(KEY,JSON.stringify(state));location.reload()}catch(err){toast('Import file is not valid')}};r.readAsText(file)};
+ document.getElementById('resetBtn').onclick=()=>{if(confirm('Reset the complete Comms Proof desk?')){localStorage.removeItem(KEY);location.reload()}};
+ document.getElementById('reviewBtn').onclick=()=>{const first=[0,1,2,3,4].find(i=>!stageDone(i));go(first??0)};
+}
+function download(name,text,type){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type}));a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500);toast('Downloaded '+name)}
+renderChecks();renderTests();renderSymptoms();renderNav();applyMode();bind();renderScore();renderBrief();go(state.stage);
+})();
+</script>
+</body>
+</html>
