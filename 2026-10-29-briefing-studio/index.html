@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="dark">
+<title>Briefing Studio — DCS Mission Brief Builder</title>
+<style>
+:root{--bg:#12130f;--panel:#1a1c16;--panel2:#22251d;--ink:#f2f0df;--muted:#aaa996;--line:#404338;--paper:#dfd7b9;--paper-ink:#25261f;--accent:#e0a84a;--good:#8ebf76;--bad:#d97768;--focus:#fff0a8;--route:#70b7c9;--threat:#d97768;--target:#e0a84a;--friendly:#8ebf76;--note:#d9d3b9;--sans:"Avenir Next",Avenir,"Segoe UI",sans-serif;--mono:"SFMono-Regular",Consolas,"Liberation Mono",monospace;--radius:8px;--shadow:0 18px 50px rgba(0,0,0,.3)}
+*{box-sizing:border-box}html{background:var(--bg);color:var(--ink);font-family:var(--sans)}body{margin:0;min-height:100vh;background:linear-gradient(rgba(255,255,255,.016) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.016) 1px,transparent 1px),var(--bg);background-size:28px 28px}button,input,select,textarea{font:inherit}button,input,select,textarea{outline:none}button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,[tabindex]:focus-visible{box-shadow:0 0 0 3px var(--focus);border-color:transparent!important}button{min-height:44px;border:1px solid var(--line);border-radius:7px;background:var(--panel2);color:var(--ink);padding:.62rem .86rem;font-weight:750;cursor:pointer}button:hover{border-color:#737766;background:#2b2f25}button.primary{background:var(--accent);border-color:var(--accent);color:#211a0c}button.primary:hover{filter:brightness(1.06)}button.danger{color:#ffd8d1;border-color:#75473f}button.ghost{background:transparent}button.small{min-height:36px;padding:.35rem .58rem;font-size:.76rem}input,select,textarea{width:100%;min-height:44px;border:1px solid var(--line);border-radius:7px;background:#11130f;color:var(--ink);padding:.7rem .78rem}textarea{min-height:108px;resize:vertical;line-height:1.5}label{display:grid;gap:.38rem;color:var(--muted);font-size:.78rem;font-weight:750;letter-spacing:.02em}.shell{max-width:1540px;margin:auto;padding:16px}.topbar{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:18px;align-items:center;padding:5px 0 15px;border-bottom:1px solid var(--line)}.brand{display:flex;align-items:center;gap:13px}.mark{width:46px;height:46px;border:1px solid #8b7a55;border-radius:50%;display:grid;place-items:center;font:900 .7rem var(--mono);color:var(--accent);position:relative}.mark:before,.mark:after{content:"";position:absolute;background:#8b7a55}.mark:before{width:58px;height:1px}.mark:after{height:58px;width:1px}.mark span{background:var(--bg);z-index:1;padding:3px}.brand h1{font-size:clamp(1.2rem,2vw,1.62rem);margin:0;letter-spacing:.04em}.subtitle{margin:.15rem 0 0;color:var(--muted);font-size:.82rem}.top-actions{display:flex;flex-wrap:wrap;gap:7px;justify-content:flex-end}.tabs{display:flex;gap:6px;margin:14px 0}.tab.active{background:var(--paper);color:var(--paper-ink);border-color:var(--paper)}.view{display:none}.view.active{display:block}.compose{display:grid;grid-template-columns:260px minmax(360px,.8fr) minmax(430px,1.2fr);gap:14px}.card{background:rgba(26,28,22,.98);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}.pad{padding:14px}.eyebrow{font:850 .66rem var(--mono);letter-spacing:.13em;text-transform:uppercase;color:var(--accent)}.card h2,.card h3{margin:.3rem 0}.smallcopy{font-size:.76rem;line-height:1.45;color:var(--muted)}.page-panel{display:grid;align-content:start;gap:10px;position:sticky;top:12px;height:max-content;max-height:calc(100vh - 115px);overflow:auto}.page-list{display:grid;gap:6px}.page-item{display:grid;grid-template-columns:28px minmax(0,1fr) auto;gap:8px;align-items:center;text-align:left;background:#151712;padding:.55rem .55rem;min-height:52px}.page-item.active{border-color:var(--accent);background:#27251a}.page-num{font:800 .68rem var(--mono);color:var(--muted)}.page-title{font-size:.8rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.page-type{font:750 .59rem var(--mono);color:var(--accent);text-transform:uppercase}.stack{display:grid;gap:11px}.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.full{grid-column:1/-1}.section{padding-top:12px;border-top:1px solid var(--line)}.section:first-child{padding-top:0;border-top:0}.inline{display:flex;gap:7px;align-items:end}.inline>*{flex:1}.inline button{flex:0 0 auto}.marker-controls{display:grid;grid-template-columns:130px 1fr auto;gap:7px;align-items:end}.marker-list{display:grid;gap:5px;margin-top:9px}.marker-row{display:grid;grid-template-columns:12px minmax(0,1fr) auto;gap:8px;align-items:center;padding:7px 8px;border:1px solid #36392f;border-radius:6px;background:#151712;font-size:.75rem}.swatch{width:9px;height:9px;border-radius:50%;background:var(--c)}.marker-row button{min-height:30px;padding:.2rem .45rem}.canvas-card{padding:12px;display:grid;align-content:start;gap:9px;min-width:0}.canvas-head{display:flex;justify-content:space-between;gap:12px;align-items:start}.canvas-wrap{position:relative;aspect-ratio:16/9;background:#0d0f0c;border:1px solid #555849;border-radius:6px;overflow:hidden;cursor:crosshair}.canvas-wrap.empty{cursor:default}.canvas-wrap img{width:100%;height:100%;object-fit:contain;display:block}.canvas-wrap canvas{position:absolute;inset:0;width:100%;height:100%}.empty-canvas{position:absolute;inset:0;display:grid;place-items:center;text-align:center;padding:20%;color:#818375;font:700 .8rem/1.5 var(--mono);background:repeating-linear-gradient(45deg,#12140f,#12140f 12px,#161912 12px,#161912 24px)}.canvas-note{font-size:.72rem;color:var(--muted);line-height:1.4}.qa-strip{display:flex;flex-wrap:wrap;gap:6px}.pill{border:1px solid var(--line);border-radius:999px;padding:.34rem .56rem;font:750 .65rem var(--mono);color:var(--muted)}.pill.pass{color:var(--good);border-color:#4f6b43}.pill.fail{color:#ef9c8e;border-color:#744a42}.rehearse-layout{display:grid;grid-template-columns:minmax(0,1fr) 280px;gap:14px}.stage{min-height:660px;background:#0d0e0b;border:1px solid var(--line);border-radius:var(--radius);display:grid;grid-template-rows:1fr auto;overflow:hidden}.slide{position:relative;display:grid;grid-template-columns:minmax(0,1.2fr) minmax(290px,.8fr);gap:0;background:var(--paper);color:var(--paper-ink);min-height:600px}.slide-visual{position:relative;background:#292b24;min-height:360px;overflow:hidden;display:grid;place-items:center}.slide-visual img{width:100%;height:100%;object-fit:contain}.slide-visual canvas{position:absolute;inset:0;width:100%;height:100%}.visual-placeholder{font:750 .78rem var(--mono);color:#999b8c;text-transform:uppercase;letter-spacing:.12em}.slide-copy{padding:clamp(28px,4vw,58px);display:flex;flex-direction:column}.slide-kicker{font:850 .65rem var(--mono);letter-spacing:.14em;text-transform:uppercase;color:#79561b}.slide h2{font-size:clamp(2rem,4vw,4.2rem);line-height:.97;letter-spacing:-.045em;margin:.7rem 0 1.3rem;max-width:12ch}.slide-body{white-space:pre-wrap;font-size:clamp(.95rem,1.45vw,1.35rem);line-height:1.55;max-width:42ch}.slide-meta{margin-top:auto;padding-top:30px;border-top:1px solid #aaa58f;display:flex;justify-content:space-between;gap:10px;font:750 .67rem var(--mono);text-transform:uppercase}.deck-nav{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:10px 12px;background:var(--panel)}.deck-count{font:750 .75rem var(--mono);color:var(--muted)}.gate-list{display:grid;gap:7px}.gate{display:grid;grid-template-columns:18px 1fr;gap:8px;font-size:.77rem;line-height:1.4;color:var(--muted)}.gate:before{content:"×";color:var(--bad);font-weight:900}.gate.pass:before{content:"✓";color:var(--good)}.package-layout{display:grid;grid-template-columns:minmax(0,1fr) 310px;gap:14px}.brief-output{white-space:pre-wrap;background:#0e100d;border:1px solid var(--line);border-radius:7px;padding:18px;min-height:620px;font:500 .78rem/1.65 var(--mono);color:#e3e0cf}.actions{display:grid;align-content:start;gap:8px}.notice{padding:11px;border:1px solid #625437;background:#252116;border-radius:7px;font-size:.76rem;line-height:1.45;color:#d9cbac}.toast{position:fixed;right:18px;bottom:18px;background:var(--paper);color:var(--paper-ink);padding:10px 13px;border-radius:7px;font-size:.8rem;font-weight:800;box-shadow:var(--shadow);transform:translateY(70px);opacity:0;transition:.2s;z-index:20}.toast.show{transform:none;opacity:1}.hidden{display:none!important}
+@media(max-width:1120px){.compose{grid-template-columns:230px 1fr}.canvas-card{grid-column:1/-1;margin-left:244px}.rehearse-layout,.package-layout{grid-template-columns:1fr}.rehearse-layout aside{display:grid;grid-template-columns:1fr 1fr;gap:12px}}
+@media(max-width:780px){.shell{padding:10px}.topbar{grid-template-columns:1fr}.top-actions{justify-content:flex-start}.compose{grid-template-columns:1fr}.page-panel{position:static;max-height:none}.canvas-card{grid-column:auto;margin-left:0}.page-list{grid-template-columns:repeat(2,minmax(0,1fr))}.slide{grid-template-columns:1fr;grid-template-rows:minmax(220px,45vh) auto}.slide h2{font-size:2.4rem}.stage{min-height:0}.rehearse-layout aside{grid-template-columns:1fr}.form-grid,.marker-controls{grid-template-columns:1fr}.full{grid-column:auto}.tabs{overflow:auto}.tab{white-space:nowrap}}
+@media(max-width:480px){.page-list{grid-template-columns:1fr}.brand .mark{display:none}.slide-copy{padding:24px}.deck-nav{flex-wrap:wrap}.top-actions button{flex:1}.inline{flex-wrap:wrap}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+@media print{body{background:white}.topbar,.tabs,.page-panel,.editor,.canvas-card,.deck-nav,.rehearse-layout aside,.package-layout aside,.toast{display:none!important}.shell{max-width:none;padding:0}.view{display:none!important}#packageView{display:block!important}.package-layout{display:block}.brief-output{border:0;background:white;color:black;font-size:10pt;min-height:0;padding:0}.card{box-shadow:none;border:0}}
+</style>
+</head>
+<body>
+<div class="shell">
+<header class="topbar">
+  <div class="brand"><div class="mark" aria-hidden="true"><span>BRF</span></div><div><h1>BRIEFING STUDIO</h1><p class="subtitle">DCS mission brief composer · build the story before opening the cockpit</p></div></div>
+  <div class="top-actions"><button class="ghost" id="exportBtn">Export JSON</button><button class="ghost" id="importBtn">Import</button><button class="danger" id="resetBtn">Reset</button><input class="hidden" id="importFile" type="file" accept="application/json"></div>
+</header>
+<nav class="tabs" aria-label="Workspace views"><button class="tab active" data-view="composeView">1 · Compose</button><button class="tab" data-view="rehearseView">2 · Rehearse</button><button class="tab" data-view="packageView">3 · Package</button></nav>
+
+<main>
+<section class="view active" id="composeView">
+<div class="compose">
+  <aside class="card pad page-panel" aria-label="Briefing pages">
+    <div><div class="eyebrow">Brief sequence</div><h2>Pages</h2><p class="smallcopy">One decision per page. Reorder until the flight can retell the mission without reading.</p></div>
+    <div class="page-list" id="pageList"></div>
+    <button class="primary" id="addPageBtn">Add page</button>
+    <div class="qa-strip" id="qaStrip"></div>
+  </aside>
+
+  <section class="card pad editor stack" aria-label="Selected page editor">
+    <div class="section">
+      <div class="eyebrow">Mission header</div>
+      <div class="form-grid" style="margin-top:9px">
+        <label>Mission name<input id="missionName" placeholder="e.g. Copper Echo"></label>
+        <label>Aircraft / role<input id="aircraft" placeholder="e.g. F-4E strike lead"></label>
+        <label>Map / area<input id="map" placeholder="e.g. northern Syria"></label>
+        <label>Package / callsign<input id="callsign" placeholder="e.g. Ford 1 / Colt 2"></label>
+      </div>
+    </div>
+    <div class="section">
+      <div class="eyebrow">Selected page</div>
+      <div class="form-grid" style="margin-top:9px">
+        <label>Page type<select id="pageType"><option>Situation</option><option>Objective</option><option>Route</option><option>Threats</option><option>Target</option><option>Comms</option><option>Weather</option><option>ROE</option><option>Contingency</option><option>Custom</option></select></label>
+        <label>Title<input id="pageTitle" placeholder="Short, spoken-language title"></label>
+        <label class="full">Briefing copy<textarea id="pageBody" placeholder="What must the flight know or decide on this page?"></textarea></label>
+      </div>
+      <div class="inline" style="margin-top:9px"><button id="moveUpBtn">Move earlier</button><button id="moveDownBtn">Move later</button><button class="danger" id="deletePageBtn">Delete page</button></div>
+    </div>
+    <div class="section">
+      <div class="eyebrow">Visual</div>
+      <p class="smallcopy">Load a local image or Mission Editor screenshot. It is downscaled for offline storage; nothing is uploaded.</p>
+      <div class="inline"><label>Image file<input id="imageInput" type="file" accept="image/*"></label><button id="clearImageBtn">Clear image</button></div>
+    </div>
+    <div class="section">
+      <div class="eyebrow">Map marks</div>
+      <p class="smallcopy">Choose a symbol, name it, then click the visual. Route points connect in placement order.</p>
+      <div class="marker-controls"><label>Kind<select id="markerKind"><option value="route">Route</option><option value="target">Target</option><option value="threat">Threat</option><option value="friendly">Friendly</option><option value="note">Note</option></select></label><label>Label<input id="markerLabel" placeholder="IP, SA-6, target…"></label><button class="primary" id="armMarkerBtn">Arm click</button></div>
+      <div class="marker-list" id="markerList"></div>
+    </div>
+  </section>
+
+  <section class="card canvas-card" aria-label="Briefing visual editor">
+    <div class="canvas-head"><div><div class="eyebrow">Visual board</div><h3 id="canvasTitle">Situation</h3></div><div class="pill" id="armStatus">Click placement off</div></div>
+    <div class="canvas-wrap empty" id="canvasWrap"><div class="empty-canvas" id="emptyCanvas">LOAD A LOCAL IMAGE<br>then place route, threat, target, friendly, or note marks</div><img id="canvasImage" alt="Selected briefing visual"><canvas id="editorCanvas" aria-label="Visual marker placement area"></canvas></div>
+    <div class="canvas-note">Tip: use numbered route points and short labels. The briefing should orient the flight, not reproduce the entire Mission Editor.</div>
+  </section>
+</div>
+</section>
+
+<section class="view" id="rehearseView">
+<div class="rehearse-layout">
+  <section class="stage" aria-label="Briefing rehearsal deck">
+    <div class="slide" id="slide">
+      <div class="slide-visual"><div class="visual-placeholder" id="previewPlaceholder">No visual on this page</div><img id="previewImage" alt="Briefing page visual"><canvas id="previewCanvas"></canvas></div>
+      <article class="slide-copy"><div class="slide-kicker" id="previewType"></div><h2 id="previewTitle"></h2><div class="slide-body" id="previewBody"></div><div class="slide-meta"><span id="previewMission"></span><span id="previewPage"></span></div></article>
+    </div>
+    <div class="deck-nav"><button id="prevSlideBtn">← Previous</button><span class="deck-count" id="deckCount"></span><button class="primary" id="nextSlideBtn">Next →</button></div>
+  </section>
+  <aside class="stack">
+    <section class="card pad"><div class="eyebrow">Rehearsal test</div><h3>Can the flight answer?</h3><div class="gate-list" id="gateList"></div></section>
+    <section class="card pad"><div class="eyebrow">Page check</div><p class="smallcopy">Use arrow keys to move. Each page should have one job, readable copy, and only the visual marks needed for that job.</p><div class="notice">This companion prepares content and local visuals. It does not modify a <code>.miz</code> file or promise direct import into DCS.</div></section>
+  </aside>
+</div>
+</section>
+
+<section class="view" id="packageView">
+<div class="package-layout">
+  <pre class="brief-output" id="briefOutput"></pre>
+  <aside class="card pad actions"><div class="eyebrow">Handoff</div><h3>Brief package</h3><p class="smallcopy">Copy the text into your mission notes, use the preview as a rehearsal deck, or print a compact authoring record.</p><button class="primary" id="copyBtn">Copy text package</button><button id="downloadBtn">Download .txt</button><button id="printBtn">Print package</button><div class="notice" id="packageNotice"></div></aside>
+</div>
+</section>
+</main>
+</div>
+<div class="toast" id="toast" role="status"></div>
+<script>
+(()=>{
+'use strict';
+const KEY='dcs-briefing-studio-v1';
+const colors={route:'#70b7c9',threat:'#d97768',target:'#e0a84a',friendly:'#8ebf76',note:'#d9d3b9'};
+const required=['Situation','Objective','Route','Threats','Comms','Contingency'];
+const starterPages=[
+ {id:id(),type:'Situation',title:'Why we are flying',body:'State the operational situation in two or three sentences. Name the change that makes this sortie necessary.',image:'',markers:[]},
+ {id:id(),type:'Objective',title:'What success looks like',body:'Define the primary objective, the observable success condition, and what is explicitly out of scope.',image:'',markers:[]},
+ {id:id(),type:'Route',title:'How the package gets there',body:'Call the departure, major route gates, ingress reference, egress direction, and recovery plan.',image:'',markers:[]},
+ {id:id(),type:'Threats',title:'What can stop us',body:'List only mission-relevant threats, where they matter, and the planned avoidance or response.',image:'',markers:[]},
+ {id:id(),type:'Comms',title:'How we coordinate',body:'Record package common, intra-flight, support contacts, and the lost-comms fallback.',image:'',markers:[]},
+ {id:id(),type:'Contingency',title:'When the plan changes',body:'Define abort cues, divert or recovery options, and who owns the decision to continue.',image:'',markers:[]}
+];
+const defaults={mission:{name:'',aircraft:'',map:'',callsign:''},pages:starterPages,selected:starterPages[0].id,slide:0,armed:false};
+let state=load();
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const els={pageList:$('#pageList'),qa:$('#qaStrip'),missionName:$('#missionName'),aircraft:$('#aircraft'),map:$('#map'),callsign:$('#callsign'),type:$('#pageType'),title:$('#pageTitle'),body:$('#pageBody'),image:$('#imageInput'),kind:$('#markerKind'),label:$('#markerLabel'),markerList:$('#markerList'),wrap:$('#canvasWrap'),img:$('#canvasImage'),canvas:$('#editorCanvas'),empty:$('#emptyCanvas'),canvasTitle:$('#canvasTitle'),arm:$('#armStatus'),pimg:$('#previewImage'),pcanvas:$('#previewCanvas'),pp:$('#previewPlaceholder'),ptype:$('#previewType'),ptitle:$('#previewTitle'),pbody:$('#previewBody'),pmission:$('#previewMission'),ppage:$('#previewPage'),deck:$('#deckCount'),gates:$('#gateList'),brief:$('#briefOutput'),notice:$('#packageNotice'),toast:$('#toast')};
+function id(){return Math.random().toString(36).slice(2,10)}
+function load(){try{const raw=localStorage.getItem(KEY);if(!raw)return structuredClone(defaults);const data=JSON.parse(raw);if(!Array.isArray(data.pages)||!data.pages.length)throw Error();data.pages.forEach(p=>{p.markers=Array.isArray(p.markers)?p.markers:[];p.image=p.image||''});return {...structuredClone(defaults),...data,mission:{...defaults.mission,...data.mission}}}catch(e){return structuredClone(defaults)}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(state))}catch(e){toast('Storage full — export JSON, then remove large images.')} }
+function page(){return state.pages.find(p=>p.id===state.selected)||state.pages[0]}
+function safe(v){return String(v||'').trim()}
+function toast(msg){els.toast.textContent=msg;els.toast.classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(()=>els.toast.classList.remove('show'),2100)}
+function persistRender(){save();render()}
+function render(){
+ const p=page();state.selected=p.id;
+ els.missionName.value=state.mission.name;els.aircraft.value=state.mission.aircraft;els.map.value=state.mission.map;els.callsign.value=state.mission.callsign;
+ els.type.value=p.type;els.title.value=p.title;els.body.value=p.body;els.canvasTitle.textContent=p.title||p.type;
+ els.pageList.innerHTML=state.pages.map((x,i)=>`<button class="page-item ${x.id===p.id?'active':''}" data-page="${x.id}"><span class="page-num">${String(i+1).padStart(2,'0')}</span><span><span class="page-title">${escapeHtml(x.title||'Untitled page')}</span><span class="page-type">${escapeHtml(x.type)}</span></span><span aria-hidden="true">›</span></button>`).join('');
+ const present=new Set(state.pages.filter(x=>safe(x.title)&&safe(x.body)).map(x=>x.type));
+ els.qa.innerHTML=required.map(x=>`<span class="pill ${present.has(x)?'pass':'fail'}">${present.has(x)?'✓':'×'} ${x}</span>`).join('');
+ els.markerList.innerHTML=p.markers.length?p.markers.map((m,i)=>`<div class="marker-row"><span class="swatch" style="--c:${colors[m.kind]}"></span><span>${escapeHtml(m.label||`${m.kind} ${i+1}`)} · ${m.kind}</span><button class="small" data-remove-marker="${m.id}" aria-label="Remove ${escapeHtml(m.label||m.kind)}">×</button></div>`).join(''):'<div class="smallcopy">No marks on this page.</div>';
+ els.wrap.classList.toggle('empty',!p.image);els.empty.classList.toggle('hidden',!!p.image);els.img.classList.toggle('hidden',!p.image);els.img.src=p.image||'';
+ els.arm.textContent=state.armed?'Click placement armed':'Click placement off';els.arm.className=`pill ${state.armed?'pass':''}`;
+ drawWhenReady(els.img,els.canvas,p);
+ renderPreview();renderPackage();
+}
+function escapeHtml(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+function drawWhenReady(img,canvas,p){const go=()=>drawMarks(canvas,p);if(img.complete)requestAnimationFrame(go);else img.onload=go}
+function drawMarks(canvas,p){const box=canvas.getBoundingClientRect(),dpr=window.devicePixelRatio||1;if(!box.width)return;canvas.width=Math.round(box.width*dpr);canvas.height=Math.round(box.height*dpr);const c=canvas.getContext('2d');c.scale(dpr,dpr);const w=box.width,h=box.height;const routes=p.markers.filter(m=>m.kind==='route');if(routes.length>1){c.strokeStyle=colors.route;c.lineWidth=2.5;c.setLineDash([8,5]);c.beginPath();routes.forEach((m,i)=>{const x=m.x*w,y=m.y*h;i?c.lineTo(x,y):c.moveTo(x,y)});c.stroke();c.setLineDash([])}p.markers.forEach((m,i)=>{const x=m.x*w,y=m.y*h;c.fillStyle=colors[m.kind]||colors.note;c.strokeStyle='#151610';c.lineWidth=2;c.beginPath();if(m.kind==='target'){c.moveTo(x,y-10);c.lineTo(x+10,y);c.lineTo(x,y+10);c.lineTo(x-10,y);c.closePath()}else{c.arc(x,y,9,0,Math.PI*2)}c.fill();c.stroke();const label=m.kind==='route'?String(routes.indexOf(m)+1):m.kind==='threat'?'!':m.kind==='target'?'T':m.kind==='friendly'?'F':'i';c.fillStyle='#151610';c.font='800 10px '+getComputedStyle(document.documentElement).getPropertyValue('--mono');c.textAlign='center';c.textBaseline='middle';c.fillText(label,x,y+.5);if(m.label){c.font='750 11px '+getComputedStyle(document.documentElement).getPropertyValue('--sans');const tw=c.measureText(m.label).width;c.fillStyle='rgba(15,16,13,.88)';c.fillRect(x+12,y-10,tw+10,20);c.fillStyle='#f4f1df';c.textAlign='left';c.fillText(m.label,x+17,y+.5)}})}
+function renderPreview(){state.slide=Math.max(0,Math.min(state.slide,state.pages.length-1));const p=state.pages[state.slide];els.ptype.textContent=p.type;els.ptitle.textContent=p.title||'Untitled page';els.pbody.textContent=p.body||'No briefing copy yet.';els.pmission.textContent=[state.mission.name,state.mission.aircraft].filter(Boolean).join(' · ')||'Mission briefing';els.ppage.textContent=`Page ${state.slide+1} / ${state.pages.length}`;els.deck.textContent=`${String(state.slide+1).padStart(2,'0')} of ${String(state.pages.length).padStart(2,'0')}`;els.pimg.src=p.image||'';els.pimg.classList.toggle('hidden',!p.image);els.pp.classList.toggle('hidden',!!p.image);drawWhenReady(els.pimg,els.pcanvas,p);const present=new Set(state.pages.filter(x=>safe(x.title)&&safe(x.body)).map(x=>x.type));const gateData=[['Situation is stated',present.has('Situation')],['Success is observable',present.has('Objective')],['Route and recovery are briefed',present.has('Route')],['Threat response is explicit',present.has('Threats')],['Comms fallback exists',present.has('Comms')],['Abort or contingency is defined',present.has('Contingency')],['Mission header is complete',Object.values(state.mission).every(safe)]];els.gates.innerHTML=gateData.map(([t,ok])=>`<div class="gate ${ok?'pass':''}">${t}</div>`).join('')}
+function renderPackage(){const lines=[];lines.push('DCS MISSION BRIEF PACKAGE');lines.push('=========================');lines.push(`MISSION: ${safe(state.mission.name)||'[not set]'}`);lines.push(`AIRCRAFT / ROLE: ${safe(state.mission.aircraft)||'[not set]'}`);lines.push(`MAP / AREA: ${safe(state.mission.map)||'[not set]'}`);lines.push(`PACKAGE / CALLSIGN: ${safe(state.mission.callsign)||'[not set]'}`);lines.push('');state.pages.forEach((p,i)=>{lines.push(`${String(i+1).padStart(2,'0')} · ${p.type.toUpperCase()} · ${safe(p.title)||'UNTITLED'}`);lines.push('-'.repeat(44));lines.push(safe(p.body)||'[no briefing copy]');if(p.markers.length){lines.push('MARKS: '+p.markers.map(m=>`${m.kind.toUpperCase()}:${safe(m.label)||'unlabeled'}`).join(' | '))}lines.push(`VISUAL: ${p.image?'local image attached in Briefing Studio':'none'}`);lines.push('')});lines.push('AUTHORING NOTE');lines.push('This package was prepared offline. Verify final wording, imagery, frequencies, coordinates, ROE, and mission behavior in the installed DCS build before release.');els.brief.textContent=lines.join('\n');const present=new Set(state.pages.filter(x=>safe(x.title)&&safe(x.body)).map(x=>x.type));const missing=required.filter(x=>!present.has(x));els.notice.innerHTML=missing.length?`<b>Not release-ready.</b><br>Missing complete pages: ${missing.join(', ')}.`:'<b>Core sequence complete.</b><br>Rehearse the deck, then verify all operational details in DCS.'}
+function bindInputs(){[['missionName','name'],['aircraft','aircraft'],['map','map'],['callsign','callsign']].forEach(([eid,key])=>$('#'+eid).addEventListener('input',e=>{state.mission[key]=e.target.value;save();renderPreview();renderPackage()}));els.type.addEventListener('change',e=>{page().type=e.target.value;persistRender()});els.title.addEventListener('input',e=>{page().title=e.target.value;save();els.canvasTitle.textContent=e.target.value||page().type;renderPreview();renderPackage();renderPageListOnly()});els.body.addEventListener('input',e=>{page().body=e.target.value;save();renderPreview();renderPackage()})}
+function renderPageListOnly(){const p=page();$$('[data-page]').forEach((b,i)=>{if(b.dataset.page===p.id){b.querySelector('.page-title').textContent=p.title||'Untitled page';b.querySelector('.page-type').textContent=p.type}})}
+function move(delta){const i=state.pages.findIndex(p=>p.id===state.selected),j=i+delta;if(j<0||j>=state.pages.length)return;[state.pages[i],state.pages[j]]=[state.pages[j],state.pages[i]];state.slide=j;persistRender()}
+function addPage(){const p={id:id(),type:'Custom',title:'New briefing page',body:'',image:'',markers:[]};state.pages.push(p);state.selected=p.id;state.slide=state.pages.length-1;persistRender();requestAnimationFrame(()=>els.title.select())}
+function removePage(){if(state.pages.length===1){toast('A briefing needs at least one page.');return}const i=state.pages.findIndex(p=>p.id===state.selected);state.pages.splice(i,1);state.selected=state.pages[Math.max(0,i-1)].id;state.slide=Math.min(state.slide,state.pages.length-1);persistRender()}
+function imageFile(file){if(!file)return;const reader=new FileReader();reader.onload=()=>{const img=new Image();img.onload=()=>{const maxW=1600,maxH=900,scale=Math.min(1,maxW/img.width,maxH/img.height),c=document.createElement('canvas');c.width=Math.round(img.width*scale);c.height=Math.round(img.height*scale);c.getContext('2d').drawImage(img,0,0,c.width,c.height);page().image=c.toDataURL('image/jpeg',.84);save();render();toast('Visual stored locally.');};img.src=reader.result};reader.readAsDataURL(file)}
+function download(name,text,type='text/plain'){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type}));a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500)}
+function slug(){return (safe(state.mission.name)||'dcs-brief').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')}
+$$('.tab').forEach(b=>b.addEventListener('click',()=>{$$('.tab').forEach(x=>x.classList.toggle('active',x===b));$$('.view').forEach(v=>v.classList.toggle('active',v.id===b.dataset.view));if(b.dataset.view==='rehearseView')setTimeout(renderPreview,50)}));
+els.pageList.addEventListener('click',e=>{const b=e.target.closest('[data-page]');if(!b)return;state.selected=b.dataset.page;state.slide=state.pages.findIndex(p=>p.id===state.selected);persistRender()});
+els.markerList.addEventListener('click',e=>{const b=e.target.closest('[data-remove-marker]');if(!b)return;page().markers=page().markers.filter(m=>m.id!==b.dataset.removeMarker);persistRender()});
+$('#addPageBtn').onclick=addPage;$('#deletePageBtn').onclick=removePage;$('#moveUpBtn').onclick=()=>move(-1);$('#moveDownBtn').onclick=()=>move(1);
+$('#armMarkerBtn').onclick=()=>{if(!page().image){toast('Load an image first.');return}state.armed=!state.armed;persistRender()};
+els.wrap.addEventListener('click',e=>{if(!state.armed||!page().image)return;const r=els.canvas.getBoundingClientRect(),x=(e.clientX-r.left)/r.width,y=(e.clientY-r.top)/r.height;page().markers.push({id:id(),kind:els.kind.value,label:safe(els.label.value),x:Math.max(0,Math.min(1,x)),y:Math.max(0,Math.min(1,y))});els.label.value='';state.armed=false;persistRender()});
+els.image.onchange=e=>imageFile(e.target.files[0]);$('#clearImageBtn').onclick=()=>{page().image='';page().markers=[];persistRender()};
+$('#prevSlideBtn').onclick=()=>{state.slide=(state.slide-1+state.pages.length)%state.pages.length;save();renderPreview()};$('#nextSlideBtn').onclick=()=>{state.slide=(state.slide+1)%state.pages.length;save();renderPreview()};
+document.addEventListener('keydown',e=>{if(!$('#rehearseView').classList.contains('active')||['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName))return;if(e.key==='ArrowLeft')$('#prevSlideBtn').click();if(e.key==='ArrowRight'||e.key===' ') {e.preventDefault();$('#nextSlideBtn').click()}});
+$('#copyBtn').onclick=async()=>{try{await navigator.clipboard.writeText(els.brief.textContent);toast('Package copied.')}catch(e){toast('Clipboard blocked; select the package text manually.')}};$('#downloadBtn').onclick=()=>download(slug()+'-brief.txt',els.brief.textContent);$('#printBtn').onclick=()=>window.print();
+$('#exportBtn').onclick=()=>download(slug()+'-briefing-studio.json',JSON.stringify(state,null,2),'application/json');$('#importBtn').onclick=()=>$('#importFile').click();$('#importFile').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const d=JSON.parse(r.result);if(!Array.isArray(d.pages)||!d.pages.length)throw Error();state={...structuredClone(defaults),...d,mission:{...defaults.mission,...d.mission}};state.pages.forEach(p=>{p.id=p.id||id();p.markers=Array.isArray(p.markers)?p.markers:[];p.image=p.image||''});state.selected=state.pages.some(p=>p.id===state.selected)?state.selected:state.pages[0].id;persistRender();toast('Brief imported.')}catch(err){toast('That file is not a valid Briefing Studio export.')}};r.readAsText(f);e.target.value=''};
+$('#resetBtn').onclick=()=>{if(!confirm('Reset this entire briefing? Export first if you may need it.'))return;state=structuredClone(defaults);localStorage.removeItem(KEY);render();toast('Briefing reset.')};
+window.addEventListener('resize',()=>{drawMarks(els.canvas,page());renderPreview()});
+bindInputs();render();
+})();
+</script>
+</body>
+</html>

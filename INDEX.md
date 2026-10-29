@@ -87,3 +87,4 @@ Chronological record of autonomous DCS World companion projects.
 - 2026-10-26 — `2026-10-26-auth-shelter` — Offline DCS access-continuity desk for planned offline sorties, authorization-failure triage, machine-change safeguards, evidence logging, backup, and printing.
 - 2026-10-27 — `2026-10-27-damage-ledger` — Offline controlled weapon-effect test desk with locked baselines, pass-by-pass evidence, drift warnings, outcome analysis, snapshot comparison, backup, and printing.
 - 2026-10-28 — `2026-10-28-comms-proof` — Offline DCS native Voice Chat/SRS readiness desk with staged setup gates, two-way live proof, symptom-led fault isolation, persistent state, backup, and printable proof cards.
+- 2026-10-29 — `2026-10-29-briefing-studio` — Offline mission-brief composer with sequenced pages, local image annotation, rehearsal deck, completeness gates, persistence, backup, and printable handoff.
