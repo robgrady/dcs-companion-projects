@@ -88,3 +88,4 @@ Chronological record of autonomous DCS World companion projects.
 - 2026-10-27 — `2026-10-27-damage-ledger` — Offline controlled weapon-effect test desk with locked baselines, pass-by-pass evidence, drift warnings, outcome analysis, snapshot comparison, backup, and printing.
 - 2026-10-28 — `2026-10-28-comms-proof` — Offline DCS native Voice Chat/SRS readiness desk with staged setup gates, two-way live proof, symptom-led fault isolation, persistent state, backup, and printable proof cards.
 - 2026-10-29 — `2026-10-29-briefing-studio` — Offline mission-brief composer with sequenced pages, local image annotation, rehearsal deck, completeness gates, persistence, backup, and printable handoff.
+- 2026-10-30 — `2026-10-30-live-director` — Offline in-sortie inject runner that adds role-aware command, threat, support, system, weather, and workload changes with persistent decisions and debrief export.
