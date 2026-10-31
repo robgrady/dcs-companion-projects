@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="dark">
+<title>Spotcheck — DCS visual contact test bench</title>
+<style>
+:root{
+  --bg:#111411;--panel:#191d18;--panel2:#20251f;--ink:#edf0e6;--muted:#a7aea0;
+  --line:#394036;--line2:#4b5547;--amber:#f0b44a;--amber2:#ffd681;--green:#8fcf87;
+  --red:#ef806d;--cyan:#8bc8c9;--radius:6px;--shadow:0 18px 48px rgba(0,0,0,.28);
+  --sans:"Avenir Next","Trebuchet MS",Arial,sans-serif;--cond:"Arial Narrow","Avenir Next Condensed",sans-serif;
+  --mono:"SFMono-Regular",Consolas,"Liberation Mono",monospace;
+}
+*{box-sizing:border-box}html{background:var(--bg);color:var(--ink);font-family:var(--sans)}
+body{margin:0;min-height:100vh;background:linear-gradient(180deg,#0e110e 0,#151915 42rem,#101310 100%)}
+button,input,select,textarea{font:inherit}button{cursor:pointer}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,[tabindex]:focus-visible{outline:3px solid var(--amber2);outline-offset:2px}
+.skip{position:absolute;left:-9999px}.skip:focus{left:12px;top:12px;z-index:100;background:#fff;color:#000;padding:10px}
+header{border-bottom:1px solid var(--line);background:rgba(14,17,14,.94);position:sticky;top:0;z-index:20}
+.topbar{max-width:1480px;margin:auto;min-height:72px;padding:12px 22px;display:flex;gap:18px;align-items:center}
+.brand{display:flex;align-items:center;gap:12px;min-width:240px}.reticle{width:34px;height:34px;border:1px solid var(--amber);border-radius:50%;position:relative}.reticle:before,.reticle:after{content:"";position:absolute;background:var(--amber)}.reticle:before{width:42px;height:1px;left:-5px;top:16px}.reticle:after{height:42px;width:1px;top:-5px;left:16px}.reticle i{position:absolute;width:4px;height:4px;background:var(--amber2);border-radius:50%;left:14px;top:14px}
+.brand h1{font:700 22px/1 var(--cond);letter-spacing:.08em;text-transform:uppercase;margin:0}.brand small{display:block;color:var(--muted);font:11px/1.2 var(--mono);margin-top:5px;letter-spacing:.04em}
+.tabs{display:flex;gap:4px;margin-left:auto}.tab{min-height:44px;padding:0 16px;border:1px solid transparent;background:transparent;color:var(--muted);border-radius:var(--radius);font-weight:700}.tab:hover{background:var(--panel2);color:var(--ink)}.tab[aria-selected="true"]{border-color:var(--line2);background:var(--panel);color:var(--amber2)}
+.header-actions{display:flex;gap:8px}.quiet,.primary,.danger{min-height:44px;border-radius:var(--radius);padding:0 14px;font-weight:800}.quiet{border:1px solid var(--line2);background:var(--panel);color:var(--ink)}.quiet:hover{background:#293027}.primary{border:1px solid #f4c267;background:var(--amber);color:#17120a}.primary:hover{background:#ffc96a}.danger{border:1px solid #874b41;background:#321c18;color:#ffb6aa}
+main{max-width:1480px;margin:auto;padding:20px 22px 54px}.view[hidden]{display:none!important}
+.statusline{display:flex;align-items:center;gap:10px;color:var(--muted);font:12px var(--mono);margin:0 0 16px}.lamp{width:9px;height:9px;border-radius:50%;background:var(--green);box-shadow:0 0 0 4px rgba(143,207,135,.1)}
+.lab-grid{display:grid;grid-template-columns:minmax(280px,350px) minmax(520px,1fr) minmax(250px,320px);gap:16px;align-items:start}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}.panel-head{padding:14px 16px 11px;border-bottom:1px solid var(--line);display:flex;align-items:end;justify-content:space-between;gap:12px}.panel-head h2,.panel-head h3{font:800 15px/1.1 var(--cond);text-transform:uppercase;letter-spacing:.09em;margin:0}.panel-head span{font:11px var(--mono);color:var(--muted)}.panel-body{padding:16px}
+fieldset{border:0;padding:0;margin:0 0 18px}legend{font:800 11px var(--mono);letter-spacing:.09em;text-transform:uppercase;color:var(--amber2);margin:0 0 10px}.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:11px}.full{grid-column:1/-1}label{display:grid;gap:6px;color:var(--muted);font-size:12px;font-weight:700}input,select,textarea{width:100%;min-height:44px;border:1px solid var(--line2);background:#0f120f;color:var(--ink);border-radius:4px;padding:9px 10px}textarea{min-height:78px;resize:vertical}.inline{display:flex;gap:8px;align-items:center}.inline input{flex:1}.suffix{font:11px var(--mono);color:var(--muted);min-width:26px}.check{display:flex;align-items:center;gap:9px;min-height:44px}.check input{width:19px;min-height:19px;accent-color:var(--amber)}
+.range-line{display:grid;grid-template-columns:1fr 48px;gap:8px;align-items:center}.range-line input[type=range]{padding:0;accent-color:var(--amber)}.value{font:12px var(--mono);text-align:right;color:var(--ink)}
+.presets{display:flex;flex-wrap:wrap;gap:7px}.chip{min-height:36px;padding:0 10px;border:1px solid var(--line2);background:#131713;color:var(--muted);border-radius:18px;font-size:12px;font-weight:800}.chip[aria-pressed="true"]{color:#191309;background:var(--amber);border-color:var(--amber)}
+.arena-shell{overflow:hidden}.arena-head{padding:12px 14px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px}.arena-head strong{font:12px var(--mono);letter-spacing:.05em}.arena-head .phase{color:var(--amber2)}.arena-head .counter{margin-left:auto;color:var(--muted);font:11px var(--mono)}
+.arena{position:relative;height:min(62vh,650px);min-height:470px;overflow:hidden;isolation:isolate;background-color:#617886;user-select:none;touch-action:manipulation}
+.arena[data-scene="sky"]{background:linear-gradient(#8196a1 0%,#687f8c 63%,#596f7b 100%)}
+.arena[data-scene="haze"]{background:linear-gradient(#a6a79f,#838d8c 52%,#777d78);filter:saturate(.66)}
+.arena[data-scene="terrain"]{background:linear-gradient(#778d96 0 38%,#6b725f 38% 45%,#4b5742 45% 100%)}
+.arena[data-scene="terrain"]:before{content:"";position:absolute;inset:45% 0 0;background:repeating-linear-gradient(103deg,rgba(18,25,16,.22) 0 2px,transparent 2px 11px),repeating-linear-gradient(18deg,rgba(171,151,102,.11) 0 3px,transparent 3px 18px);opacity:.75}
+.arena[data-scene="cloud"]{background:radial-gradient(ellipse at 25% 28%,#bec4c0 0 10%,transparent 10.5%),radial-gradient(ellipse at 74% 55%,#aeb9b8 0 13%,transparent 13.5%),linear-gradient(#7c939e,#637b87)}
+.scan-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);background-size:60px 60px;pointer-events:none;z-index:1}
+.target{position:absolute;z-index:4;width:var(--dot,2px);height:var(--dot,2px);background:rgb(var(--tone,22 24 20));border-radius:45%;transform:translate(-50%,-50%);box-shadow:0 0 var(--soft,0px) rgba(10,12,10,.85);opacity:0;pointer-events:none}.target.active{opacity:var(--target-opacity,1)}.target.cross{border-radius:0}.target.cross:after{content:"";position:absolute;background:inherit;width:45%;height:280%;left:28%;top:-90%}.target.wedge{clip-path:polygon(0 32%,100% 0,75% 52%,100% 100%,0 68%);width:calc(var(--dot) * 2.6)}
+.reveal{position:absolute;z-index:5;width:48px;height:48px;border:2px solid var(--amber2);border-radius:50%;transform:translate(-50%,-50%);opacity:0;pointer-events:none}.reveal.show{animation:ping 1.5s ease-out both}.reveal:before,.reveal:after{content:"";position:absolute;background:var(--amber2)}.reveal:before{width:66px;height:1px;top:22px;left:-11px}.reveal:after{height:66px;width:1px;left:22px;top:-11px}@keyframes ping{0%{opacity:1;scale:.6}100%{opacity:0;scale:1.45}}
+.arena-overlay{position:absolute;inset:0;z-index:8;display:grid;place-items:center;background:rgba(13,16,13,.76);padding:30px}.arena-overlay[hidden]{display:none}.brief{text-align:left;max-width:540px;background:#151915;border:1px solid var(--line2);padding:24px;border-radius:var(--radius);box-shadow:var(--shadow)}.brief .eyebrow{font:11px var(--mono);color:var(--amber2);letter-spacing:.1em}.brief h2{font:800 clamp(27px,4vw,46px)/.95 var(--cond);letter-spacing:.02em;text-transform:uppercase;margin:10px 0}.brief p{color:var(--muted);line-height:1.55}.key{display:inline-grid;place-items:center;min-width:28px;height:26px;padding:0 6px;border:1px solid var(--line2);border-bottom-width:3px;border-radius:4px;color:var(--ink);font:12px var(--mono);background:#0e110e}
+.contact-bar{display:grid;grid-template-columns:1fr auto;gap:10px;padding:12px;background:#121512;border-top:1px solid var(--line)}.contact{min-height:58px;border:1px solid #e5ae4d;border-radius:4px;background:var(--amber);color:#161109;font:900 17px var(--cond);letter-spacing:.1em;text-transform:uppercase}.contact:hover{background:#ffd071}.contact:disabled{cursor:not-allowed;filter:grayscale(.7);opacity:.55}.miss{min-width:104px;min-height:58px;border:1px solid var(--line2);background:#20251f;color:var(--ink);border-radius:4px;font-weight:800}
+.metric-stack{display:grid;gap:10px}.metric{border-bottom:1px solid var(--line);padding:0 0 11px}.metric:last-child{border-bottom:0}.metric b{font:800 28px/1 var(--mono);display:block;color:var(--ink);letter-spacing:-.05em}.metric small{color:var(--muted);font:10px var(--mono);text-transform:uppercase;letter-spacing:.08em}.metric.good b{color:var(--green)}.metric.warn b{color:var(--amber2)}
+.result-list{display:grid;gap:7px;max-height:240px;overflow:auto}.result-row{display:grid;grid-template-columns:30px 1fr auto;gap:8px;align-items:center;padding:8px;background:#121512;border:1px solid #2a3028;border-radius:4px}.result-row .n{font:11px var(--mono);color:var(--muted)}.result-row strong{font-size:12px}.result-row span:last-child{font:11px var(--mono);color:var(--amber2)}
+.note{font-size:12px;line-height:1.5;color:var(--muted)}.callout{padding:12px;border:1px dashed var(--line2);background:#131713;border-radius:4px;color:var(--muted);font-size:12px;line-height:1.5}.callout strong{color:var(--ink)}
+.evidence-grid{display:grid;grid-template-columns:minmax(300px,390px) 1fr;gap:16px}.profile-list{display:grid;gap:8px}.profile-card{border:1px solid var(--line);background:#131713;padding:12px;border-radius:4px;text-align:left;color:var(--ink);min-height:68px}.profile-card:hover{border-color:var(--amber)}.profile-card.active{border-color:var(--amber);box-shadow:inset 3px 0 var(--amber)}.profile-card strong{display:block}.profile-card small{display:block;color:var(--muted);margin-top:4px}.ledger-wrap{overflow:auto}table{border-collapse:collapse;width:100%;min-width:760px}th,td{text-align:left;border-bottom:1px solid var(--line);padding:10px 9px;font-size:12px}th{font:800 10px var(--mono);color:var(--muted);text-transform:uppercase;letter-spacing:.06em}td.mono{font-family:var(--mono)}.empty{padding:40px 20px;text-align:center;color:var(--muted)}
+.summary-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}.summary-cell{border:1px solid var(--line);background:#131713;padding:13px;border-radius:4px}.summary-cell b{font:800 24px var(--mono);display:block}.summary-cell span{font:10px var(--mono);text-transform:uppercase;color:var(--muted)}
+.settings-grid{display:grid;grid-template-columns:minmax(320px,480px) 1fr;gap:16px}.about-copy{max-width:760px;line-height:1.65;color:#cad0c3}.about-copy h2{font:800 34px/1 var(--cond);text-transform:uppercase;letter-spacing:.04em;color:var(--ink)}.about-copy h3{color:var(--amber2);font:800 13px var(--mono);text-transform:uppercase;letter-spacing:.08em;margin-top:28px}.about-copy a{color:var(--cyan)}
+.toast{position:fixed;right:18px;bottom:18px;z-index:50;padding:12px 15px;background:#edf0e6;color:#111411;border-radius:4px;box-shadow:var(--shadow);font-weight:800;transform:translateY(150%);transition:.2s}.toast.show{transform:translateY(0)}
+@media(max-width:1120px){.lab-grid{grid-template-columns:300px 1fr}.right-rail{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:16px}.evidence-grid,.settings-grid{grid-template-columns:1fr}}
+@media(max-width:760px){.topbar{padding:10px 12px;flex-wrap:wrap}.brand{min-width:0}.brand small{display:none}.tabs{order:3;width:100%;overflow:auto;margin:0}.tab{flex:1;padding:0 9px}.header-actions{margin-left:auto}.header-actions .quiet{display:none}main{padding:14px 12px 40px}.lab-grid{grid-template-columns:1fr}.arena{min-height:440px;height:56vh}.right-rail{grid-template-columns:1fr}.form-grid{grid-template-columns:1fr}.full{grid-column:auto}.summary-grid{grid-template-columns:1fr 1fr}.contact-bar{position:sticky;bottom:0}.evidence-grid{grid-template-columns:1fr}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+@media print{header,.setup,.contact-bar,.right-rail .panel:last-child,.no-print{display:none!important}body{background:#fff;color:#111}main{max-width:none;padding:0}.panel{box-shadow:none;border-color:#999}.lab-grid{display:block}.arena-shell{display:none}.view[hidden]{display:none!important}#evidenceView{display:block!important}.evidence-grid{display:block}.profile-list{display:none}table{min-width:0}.summary-cell,.panel,.result-row{background:#fff;color:#111}.summary-cell span,th,.note{color:#444}}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to application</a>
+<header>
+  <div class="topbar">
+    <div class="brand"><span class="reticle" aria-hidden="true"><i></i></span><div><h1>Spotcheck</h1><small>VISUAL CONTACT TEST BENCH · OFFLINE</small></div></div>
+    <nav class="tabs" aria-label="Application views">
+      <button class="tab" data-view="labView" aria-selected="true">Live drill</button>
+      <button class="tab" data-view="evidenceView" aria-selected="false">Evidence</button>
+      <button class="tab" data-view="settingsView" aria-selected="false">Test profile</button>
+      <button class="tab" data-view="aboutView" aria-selected="false">Field notes</button>
+    </nav>
+    <div class="header-actions"><button class="quiet" id="fullscreenBtn">Full screen</button><button class="primary" id="quickStart">Start drill</button></div>
+  </div>
+</header>
+<main id="main">
+<section id="labView" class="view">
+  <p class="statusline"><span class="lamp"></span><span id="statusText">Bench ready · results stay on this device</span></p>
+  <div class="lab-grid">
+    <aside class="panel setup" aria-labelledby="setupTitle">
+      <div class="panel-head"><h2 id="setupTitle">Drill contract</h2><span>01 / SET</span></div>
+      <div class="panel-body">
+        <fieldset><legend>Target presentation</legend>
+          <div class="form-grid">
+            <label>Backdrop<select id="scene"><option value="sky">Open sky</option><option value="haze">Haze layer</option><option value="terrain">Terrain clutter</option><option value="cloud">Broken cloud</option><option value="mixed">Mixed sequence</option></select></label>
+            <label>Target mark<select id="shape"><option value="dot">Round dot</option><option value="cross">Airframe cross</option><option value="wedge">Planform wedge</option><option value="mixed">Mixed</option></select></label>
+            <label>Mark size<div class="range-line"><input id="dotSize" type="range" min="1" max="8" value="2"><output class="value" id="dotSizeOut">2 px</output></div></label>
+            <label>Contrast<div class="range-line"><input id="contrast" type="range" min="10" max="100" value="68"><output class="value" id="contrastOut">68%</output></div></label>
+            <label>Movement<select id="movement"><option value="static">Static</option><option value="slow">Slow crossing</option><option value="fast">Fast crossing</option><option value="mixed">Mixed</option></select></label>
+            <label>Exposure<select id="exposure"><option value="8000">8 seconds</option><option value="5000" selected>5 seconds</option><option value="3000">3 seconds</option><option value="1500">1.5 seconds</option></select></label>
+          </div>
+        </fieldset>
+        <fieldset><legend>Run</legend>
+          <div class="form-grid">
+            <label>Trials<select id="trialCount"><option>5</option><option selected>10</option><option>15</option><option>20</option></select></label>
+            <label>Start delay<select id="delay"><option value="600">Short</option><option value="1200" selected>Variable</option><option value="2200">Long</option></select></label>
+            <label class="full">Run label<input id="runLabel" maxlength="48" value="Baseline scan"></label>
+          </div>
+        </fieldset>
+        <div class="presets" aria-label="Quick target presets">
+          <button class="chip" data-preset="hard">1 px / terrain</button><button class="chip" data-preset="standard" aria-pressed="true">2 px / mixed</button><button class="chip" data-preset="easy">4 px / sky</button>
+        </div>
+      </div>
+    </aside>
+
+    <section class="panel arena-shell" aria-labelledby="arenaTitle">
+      <div class="arena-head"><strong id="arenaTitle">CONTACT WINDOW</strong><span class="phase" id="phaseText">STANDBY</span><span class="counter" id="trialCounter">0 / 10</span></div>
+      <div class="arena" id="arena" data-scene="sky" aria-label="Visual contact test field">
+        <div class="scan-grid"></div><div class="target" id="target"></div><div class="reveal" id="reveal"></div>
+        <div class="arena-overlay" id="overlay"><div class="brief"><span class="eyebrow">VISUAL SCAN DISCIPLINE</span><h2>Find the mark.<br>Log the evidence.</h2><p>A small contact will appear after a variable delay. Press <span class="key">Space</span> or the CONTACT button the moment you see it. Use MISS only when the exposure closes without a contact.</p><button class="primary" id="startBtn">Begin 10-trial drill</button></div></div>
+      </div>
+      <div class="contact-bar"><button class="contact" id="contactBtn" disabled>Contact · Space</button><button class="miss" id="missBtn" disabled>Miss</button></div>
+    </section>
+
+    <aside class="right-rail">
+      <section class="panel" aria-labelledby="liveTitle"><div class="panel-head"><h2 id="liveTitle">Live wire</h2><span>02 / ACT</span></div><div class="panel-body metric-stack">
+        <div class="metric" id="reactionMetric"><b id="reaction">—</b><small>last response</small></div>
+        <div class="metric"><b id="hitRate">—</b><small>contact rate</small></div>
+        <div class="metric"><b id="median">—</b><small>median acquired</small></div>
+        <div class="metric"><b id="falseStarts">0</b><small>false starts</small></div>
+      </div></section>
+      <section class="panel" aria-labelledby="resultsTitle"><div class="panel-head"><h2 id="resultsTitle">Run trace</h2><span id="traceCount">0 entries</span></div><div class="panel-body"><div class="result-list" id="resultList"><p class="note">No trials recorded. Keep your eyes in the contact window; use the response controls without chasing the cursor.</p></div></div></section>
+      <section class="panel"><div class="panel-head"><h2>Test discipline</h2><span>NOT A TWEAK GUIDE</span></div><div class="panel-body"><div class="callout"><strong>Change one DCS/display variable at a time.</strong> Repeat the same Spotcheck contract before and after, then compare contact rate and median response. Browser marks do not reproduce DCS rendering.</div></div></section>
+    </aside>
+  </div>
+</section>
+
+<section id="evidenceView" class="view" hidden>
+  <p class="statusline"><span class="lamp"></span>Saved run evidence · local browser storage</p>
+  <div class="evidence-grid">
+    <aside class="panel"><div class="panel-head"><h2>Test profiles</h2><span id="profileCount">0 PROFILES</span></div><div class="panel-body"><div class="profile-list" id="profileList"></div><button class="quiet full" id="newProfileBtn" style="width:100%;margin-top:12px">New profile</button></div></aside>
+    <section class="panel"><div class="panel-head"><h2>Run ledger</h2><span id="ledgerTitle">CURRENT PROFILE</span></div><div class="panel-body">
+      <div class="summary-grid"><div class="summary-cell"><b id="sumRuns">0</b><span>runs</span></div><div class="summary-cell"><b id="sumTrials">0</b><span>trials</span></div><div class="summary-cell"><b id="sumRate">—</b><span>contact rate</span></div><div class="summary-cell"><b id="sumMedian">—</b><span>median</span></div></div>
+      <div class="ledger-wrap"><table><thead><tr><th>Date</th><th>Run</th><th>Contract</th><th>Hits</th><th>Median</th><th>False</th><th></th></tr></thead><tbody id="ledgerBody"></tbody></table><div class="empty" id="ledgerEmpty">Complete a drill to build evidence for this profile.</div></div>
+      <div class="inline no-print" style="margin-top:14px;flex-wrap:wrap"><button class="quiet" id="exportJson">Export backup</button><button class="quiet" id="exportCsv">Export CSV</button><button class="quiet" id="printBtn">Print summary</button></div>
+    </div></section>
+  </div>
+</section>
+
+<section id="settingsView" class="view" hidden>
+  <p class="statusline"><span class="lamp"></span>Record the exact environment behind each comparison</p>
+  <div class="settings-grid">
+    <section class="panel"><div class="panel-head"><h2>Active profile</h2><span>03 / RECORD</span></div><div class="panel-body">
+      <div class="form-grid">
+        <label class="full">Profile name<input id="profileName" maxlength="50"></label>
+        <label>Display mode<select id="displayMode"><option>Monitor</option><option>Ultrawide monitor</option><option>VR headset</option><option>Projector</option></select></label>
+        <label>Display / headset<input id="displayName" maxlength="60" placeholder="e.g. 32-inch 4K"></label>
+        <label>Render resolution<input id="resolution" maxlength="30" placeholder="3840 × 2160"></label>
+        <label>Refresh rate<input id="refresh" maxlength="20" placeholder="120 Hz"></label>
+        <label>AA / upscaler<select id="aa"><option>None</option><option>MSAA</option><option>TAA</option><option>DLAA</option><option>DLSS</option><option>FSR</option><option>Other</option></select></label>
+        <label>Pixel density / scale<input id="pixelDensity" maxlength="30" placeholder="1.0 / 100%"></label>
+        <label>Spotting dots<select id="dots"><option>Off</option><option>1 px</option><option>2 px</option><option>Server-controlled / unknown</option></select></label>
+        <label>View posture<select id="posture"><option>Seated, normal zoom</option><option>Seated, zoomed</option><option>VR seated</option><option>Other</option></select></label>
+        <label class="full">Notes<textarea id="profileNotes" placeholder="Lighting, glasses, DCS build, server, mission density, settings changed…"></textarea></label>
+      </div>
+      <div class="inline" style="margin-top:14px"><button class="primary" id="saveProfile">Save profile</button><button class="danger" id="deleteProfile">Delete</button></div>
+    </div></section>
+    <section class="panel"><div class="panel-head"><h2>A/B protocol</h2><span>ONE VARIABLE</span></div><div class="panel-body about-copy">
+      <h2>Make “I can’t see contacts” measurable.</h2>
+      <p>Spotcheck is a controlled browser drill, not a model of DCS World’s spotting renderer. Its job is to keep the visual task stable while you compare your own attention, display posture, and setting profiles.</p>
+      <h3>Recommended loop</h3>
+      <ol><li>Save the current DCS and display state as Profile A.</li><li>Run the same 10- or 20-trial contract twice.</li><li>Change exactly one variable in DCS or the display stack.</li><li>Create Profile B, repeat the identical contract, and compare contact rate plus median acquisition time.</li><li>Confirm any apparent improvement in an actual DCS test mission before keeping it.</li></ol>
+      <div class="callout"><strong>Do not infer realism from a better score.</strong> A result only says that a browser mark was easier to acquire under that profile and test posture.</div>
+    </div></section>
+  </div>
+</section>
+
+<section id="aboutView" class="view" hidden>
+  <article class="panel"><div class="panel-body about-copy">
+    <h2>Field notes</h2>
+    <p>Community reports about DCS visual spotting vary sharply by monitor resolution, VR headset, pixel density, anti-aliasing or upscaling choice, multiplayer server policy, background clutter, and mission conditions. Spotcheck gives one player a repeatable baseline without claiming to settle those rendering debates.</p>
+    <h3>Keyboard</h3><p><span class="key">Space</span> records contact during a live exposure. <span class="key">M</span> records a miss. <span class="key">Esc</span> ends a run. <span class="key">Alt</span> + <span class="key">1–4</span> switches views.</p>
+    <h3>Privacy and offline use</h3><p>No network requests, accounts, analytics, remote fonts, or external libraries are used. Profiles and run evidence remain in this browser’s local storage unless you export a backup.</p>
+    <h3>Limits</h3><p>CSS pixels, browser scaling, VR browser behavior, and display processing differ from DCS’s renderer. The generated marks do not represent a particular aircraft, angular size, range, lighting model, LOD transition, dot implementation, or server setting. This is simulation-only attention and comparison tooling.</p>
+  </div></article>
+</section>
+</main>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script>
+(()=>{
+'use strict';
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const STORE='dcsSpotcheck.v1';
+const defaults={profiles:[{id:'default',name:'Primary setup',displayMode:'Monitor',displayName:'',resolution:'',refresh:'',aa:'None',pixelDensity:'',dots:'Server-controlled / unknown',posture:'Seated, normal zoom',notes:'',created:Date.now()}],activeProfile:'default',runs:[],draft:{scene:'mixed',shape:'dot',dotSize:'2',contrast:'68',movement:'static',exposure:'5000',trialCount:'10',delay:'1200',runLabel:'Baseline scan'}};
+let state=load();
+let run=null, targetTimer=null, exposureTimer=null, moveFrame=null;
+function load(){try{const x=JSON.parse(localStorage.getItem(STORE));return x&&Array.isArray(x.profiles)?{...defaults,...x,draft:{...defaults.draft,...(x.draft||{})}}:structuredClone(defaults)}catch(e){return structuredClone(defaults)}}
+function save(){localStorage.setItem(STORE,JSON.stringify(state))}
+function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('show');clearTimeout(t._x);t._x=setTimeout(()=>t.classList.remove('show'),2200)}
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7)}
+function activeProfile(){return state.profiles.find(p=>p.id===state.activeProfile)||state.profiles[0]}
+function median(vals){if(!vals.length)return null;const a=[...vals].sort((x,y)=>x-y),m=Math.floor(a.length/2);return a.length%2?a[m]:Math.round((a[m-1]+a[m])/2)}
+function fmtMs(v){return v==null?'—':v<1000?v+' ms':(v/1000).toFixed(2)+' s'}
+function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function download(name,text,type='application/json'){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type}));a.download=name;document.body.append(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},100)}
+function setView(id){$$('.view').forEach(v=>v.hidden=v.id!==id);$$('.tab').forEach(b=>b.setAttribute('aria-selected',String(b.dataset.view===id)));if(id==='evidenceView')renderEvidence();if(id==='settingsView')renderProfileForm();window.scrollTo(0,0)}
+$$('.tab').forEach(b=>b.addEventListener('click',()=>setView(b.dataset.view)));
+$$('.tab').forEach((b,i)=>document.addEventListener('keydown',e=>{if(e.altKey&&e.key===String(i+1)){e.preventDefault();setView(b.dataset.view)}}));
+const fields=['scene','shape','dotSize','contrast','movement','exposure','trialCount','delay','runLabel'];
+function syncDraft(){fields.forEach(k=>{const el=$('#'+k);el.value=state.draft[k]??el.value});rangeLabels();$('#trialCounter').textContent=`0 / ${$('#trialCount').value}`;updateStartLabel()}
+function captureDraft(){fields.forEach(k=>state.draft[k]=$('#'+k).value);save();updateStartLabel()}
+fields.forEach(k=>$('#'+k).addEventListener('input',captureDraft));
+function rangeLabels(){$('#dotSizeOut').textContent=$('#dotSize').value+' px';$('#contrastOut').textContent=$('#contrast').value+'%'}
+$('#dotSize').addEventListener('input',rangeLabels);$('#contrast').addEventListener('input',rangeLabels);
+function updateStartLabel(){$('#startBtn').textContent=`Begin ${$('#trialCount').value}-trial drill`}
+$$('.chip').forEach(c=>c.addEventListener('click',()=>{const p=c.dataset.preset;if(p==='hard'){$('#scene').value='terrain';$('#dotSize').value='1';$('#contrast').value='45';$('#movement').value='slow'}if(p==='standard'){$('#scene').value='mixed';$('#dotSize').value='2';$('#contrast').value='68';$('#movement').value='static'}if(p==='easy'){$('#scene').value='sky';$('#dotSize').value='4';$('#contrast').value='88';$('#movement').value='static'}$$('.chip').forEach(x=>x.setAttribute('aria-pressed',String(x===c)));rangeLabels();captureDraft()}));
+function randomChoice(a){return a[Math.floor(Math.random()*a.length)]}
+function currentTrialSpec(){return{scene:state.draft.scene==='mixed'?randomChoice(['sky','haze','terrain','cloud']):state.draft.scene,shape:state.draft.shape==='mixed'?randomChoice(['dot','cross','wedge']):state.draft.shape,movement:state.draft.movement==='mixed'?randomChoice(['static','slow','fast']):state.draft.movement,size:+state.draft.dotSize,contrast:+state.draft.contrast,exposure:+state.draft.exposure}}
+function startRun(){if(run)endRun(false);captureDraft();run={id:uid(),profileId:state.activeProfile,label:state.draft.runLabel.trim()||'Untitled run',started:Date.now(),targetCount:+state.draft.trialCount,results:[],falseStarts:0,waiting:false,live:false,current:null};$('#overlay').hidden=true;$('#contactBtn').disabled=false;$('#missBtn').disabled=false;$('#phaseText').textContent='ARMED';$('#statusText').textContent='Drill live · focus the contact window';$('#resultList').innerHTML='';updateLive();nextTrial()}
+function nextTrial(){clearTimers();if(!run)return;if(run.results.length>=run.targetCount){completeRun();return}run.waiting=true;run.live=false;run.current=currentTrialSpec();const a=$('#arena'),t=$('#target');a.dataset.scene=run.current.scene;t.className='target '+run.current.shape;t.style.setProperty('--dot',run.current.size+'px');const tone=Math.round(128-(run.current.contrast*1.05));t.style.setProperty('--tone',`${tone} ${tone+2} ${Math.max(8,tone-2)}`);t.style.setProperty('--target-opacity',Math.max(.28,run.current.contrast/100));t.style.setProperty('--soft',run.current.size>3?'0px':'.3px');const x=8+Math.random()*84,y=10+Math.random()*80;t.style.left=x+'%';t.style.top=y+'%';run.current.x=x;run.current.y=y;$('#phaseText').textContent='SEARCH';$('#trialCounter').textContent=`${run.results.length+1} / ${run.targetCount}`;const base=+state.draft.delay;targetTimer=setTimeout(showTarget,base+Math.random()*(base+800))}
+function showTarget(){if(!run)return;run.waiting=false;run.live=true;run.current.shown=performance.now();$('#target').classList.add('active');if(run.current.movement!=='static')animateTarget(run.current.movement);exposureTimer=setTimeout(()=>record('miss'),run.current.exposure)}
+function animateTarget(speed){const t=$('#target'),a=$('#arena');let last=performance.now(),vx=(Math.random()>.5?1:-1)*(speed==='fast'?32:12),vy=(Math.random()-.5)*(speed==='fast'?12:5);function frame(now){if(!run||!run.live)return;const dt=(now-last)/1000;last=now;let x=parseFloat(t.style.left)/100*a.clientWidth+vx*dt,y=parseFloat(t.style.top)/100*a.clientHeight+vy*dt;if(x<8||x>a.clientWidth-8)vx*=-1;if(y<8||y>a.clientHeight-8)vy*=-1;x=Math.max(8,Math.min(a.clientWidth-8,x));y=Math.max(8,Math.min(a.clientHeight-8,y));t.style.left=(x/a.clientWidth*100)+'%';t.style.top=(y/a.clientHeight*100)+'%';run.current.x=parseFloat(t.style.left);run.current.y=parseFloat(t.style.top);moveFrame=requestAnimationFrame(frame)}moveFrame=requestAnimationFrame(frame)}
+function record(kind){if(!run)return;if(run.waiting&&kind==='hit'){run.falseStarts++;$('#falseStarts').textContent=run.falseStarts;$('#reaction').textContent='EARLY';$('#reactionMetric').className='metric warn';toast('False start · target not yet presented');return}if(!run.live&&kind!=='miss')return;if(run.waiting&&kind==='miss'){clearTimers();run.waiting=false}const ms=kind==='hit'&&run.current.shown?Math.round(performance.now()-run.current.shown):null;run.live=false;run.waiting=false;clearTimers();$('#target').classList.remove('active');revealTarget();const r={...run.current,result:kind,ms,at:Date.now()};run.results.push(r);$('#reaction').textContent=kind==='hit'?fmtMs(ms):'MISS';$('#reactionMetric').className='metric '+(kind==='hit'?'good':'warn');renderTrace();updateLive();$('#phaseText').textContent=kind==='hit'?'CONTACT':'NO CONTACT';setTimeout(nextTrial,900)}
+function revealTarget(){const r=$('#reveal');r.style.left=run.current.x+'%';r.style.top=run.current.y+'%';r.classList.remove('show');void r.offsetWidth;r.classList.add('show')}
+function updateLive(){if(!run){$('#hitRate').textContent='—';$('#median').textContent='—';return}const hits=run.results.filter(x=>x.result==='hit'),rate=run.results.length?Math.round(hits.length/run.results.length*100):null;$('#hitRate').textContent=rate==null?'—':rate+'%';$('#median').textContent=fmtMs(median(hits.map(x=>x.ms)));$('#falseStarts').textContent=run.falseStarts;$('#traceCount').textContent=`${run.results.length} entries`}
+function renderTrace(){const list=$('#resultList');list.innerHTML=run.results.map((r,i)=>`<div class="result-row"><span class="n">${String(i+1).padStart(2,'0')}</span><strong>${esc(r.scene)} · ${r.size}px · ${esc(r.movement)}</strong><span>${r.result==='hit'?fmtMs(r.ms):'MISS'}</span></div>`).reverse().join('')}
+function completeRun(){clearTimers();run.ended=Date.now();state.runs.unshift(run);save();$('#phaseText').textContent='COMPLETE';$('#statusText').textContent='Run complete · evidence saved';$('#overlay').hidden=false;$('#overlay .eyebrow').textContent='RUN COMPLETE';const hits=run.results.filter(x=>x.result==='hit');$('#overlay h2').innerHTML=`${hits.length} of ${run.results.length}<br>contacts logged.`;$('#overlay p').innerHTML=`Median acquisition: <strong>${fmtMs(median(hits.map(x=>x.ms)))}</strong>. False starts: <strong>${run.falseStarts}</strong>. The run is saved under ${esc(activeProfile().name)}.`;$('#startBtn').textContent='Run same contract again';$('#contactBtn').disabled=true;$('#missBtn').disabled=true;run=null;renderEvidence()}
+function endRun(show=true){if(!run)return;clearTimers();run=null;$('#target').classList.remove('active');$('#overlay').hidden=false;$('#phaseText').textContent='STANDBY';$('#contactBtn').disabled=true;$('#missBtn').disabled=true;$('#statusText').textContent='Bench ready · results stay on this device';if(show)toast('Run ended without saving')}
+function clearTimers(){clearTimeout(targetTimer);clearTimeout(exposureTimer);cancelAnimationFrame(moveFrame)}
+$('#startBtn').addEventListener('click',startRun);$('#quickStart').addEventListener('click',()=>{setView('labView');startRun()});$('#contactBtn').addEventListener('click',()=>record('hit'));$('#missBtn').addEventListener('click',()=>record('miss'));
+document.addEventListener('keydown',e=>{if(['INPUT','SELECT','TEXTAREA','BUTTON'].includes(document.activeElement.tagName))return;if(e.code==='Space'){e.preventDefault();record('hit')}if(e.key.toLowerCase()==='m')record('miss');if(e.key==='Escape')endRun()});
+$('#fullscreenBtn').addEventListener('click',async()=>{try{if(!document.fullscreenElement)await document.documentElement.requestFullscreen();else await document.exitFullscreen()}catch(e){toast('Full screen is unavailable in this browser')}});
+function renderProfiles(){const box=$('#profileList');$('#profileCount').textContent=`${state.profiles.length} PROFILE${state.profiles.length===1?'':'S'}`;box.innerHTML=state.profiles.map(p=>{const n=state.runs.filter(r=>r.profileId===p.id).length;return`<button class="profile-card ${p.id===state.activeProfile?'active':''}" data-id="${p.id}"><strong>${esc(p.name)}</strong><small>${esc(p.displayMode)} · ${n} saved run${n===1?'':'s'}</small></button>`}).join('');$$('.profile-card').forEach(b=>b.addEventListener('click',()=>{state.activeProfile=b.dataset.id;save();renderEvidence();renderProfileForm()}))}
+function renderEvidence(){renderProfiles();const p=activeProfile(),runs=state.runs.filter(r=>r.profileId===p.id);$('#ledgerTitle').textContent=p.name.toUpperCase();const trials=runs.flatMap(r=>r.results),hits=trials.filter(x=>x.result==='hit');$('#sumRuns').textContent=runs.length;$('#sumTrials').textContent=trials.length;$('#sumRate').textContent=trials.length?Math.round(hits.length/trials.length*100)+'%':'—';$('#sumMedian').textContent=fmtMs(median(hits.map(x=>x.ms)));$('#ledgerEmpty').hidden=!!runs.length;$('#ledgerBody').innerHTML=runs.map(r=>{const h=r.results.filter(x=>x.result==='hit'),contract=`${r.current?.size||r.results[0]?.size||state.draft.dotSize}px · ${r.results[0]?.scene||state.draft.scene} · ${r.results[0]?.movement||state.draft.movement}`;return`<tr><td class="mono">${new Date(r.started).toLocaleDateString()}</td><td>${esc(r.label)}</td><td>${esc(contract)}</td><td class="mono">${h.length}/${r.results.length}</td><td class="mono">${fmtMs(median(h.map(x=>x.ms)))}</td><td class="mono">${r.falseStarts}</td><td><button class="quiet delete-run" data-id="${r.id}" aria-label="Delete ${esc(r.label)}">Delete</button></td></tr>`}).join('');$$('.delete-run').forEach(b=>b.addEventListener('click',()=>{state.runs=state.runs.filter(r=>r.id!==b.dataset.id);save();renderEvidence();toast('Run deleted')}))}
+const profileFields=['profileName','displayMode','displayName','resolution','refresh','aa','pixelDensity','dots','posture','profileNotes'];
+function renderProfileForm(){const p=activeProfile();$('#profileName').value=p.name||'';$('#displayMode').value=p.displayMode||'Monitor';$('#displayName').value=p.displayName||'';$('#resolution').value=p.resolution||'';$('#refresh').value=p.refresh||'';$('#aa').value=p.aa||'None';$('#pixelDensity').value=p.pixelDensity||'';$('#dots').value=p.dots||'Server-controlled / unknown';$('#posture').value=p.posture||'Seated, normal zoom';$('#profileNotes').value=p.notes||''}
+$('#saveProfile').addEventListener('click',()=>{const p=activeProfile();p.name=$('#profileName').value.trim()||'Unnamed profile';p.displayMode=$('#displayMode').value;p.displayName=$('#displayName').value.trim();p.resolution=$('#resolution').value.trim();p.refresh=$('#refresh').value.trim();p.aa=$('#aa').value;p.pixelDensity=$('#pixelDensity').value.trim();p.dots=$('#dots').value;p.posture=$('#posture').value;p.notes=$('#profileNotes').value.trim();save();renderProfiles();toast('Profile saved')});
+$('#newProfileBtn').addEventListener('click',()=>{const p={...defaults.profiles[0],id:uid(),name:`Test profile ${state.profiles.length+1}`,created:Date.now()};state.profiles.push(p);state.activeProfile=p.id;save();setView('settingsView');renderProfileForm();$('#profileName').select()});
+$('#deleteProfile').addEventListener('click',()=>{if(state.profiles.length===1){toast('Keep at least one profile');return}const id=state.activeProfile;state.profiles=state.profiles.filter(p=>p.id!==id);state.runs=state.runs.filter(r=>r.profileId!==id);state.activeProfile=state.profiles[0].id;save();renderProfileForm();toast('Profile and its runs deleted')});
+$('#exportJson').addEventListener('click',()=>download(`spotcheck-backup-${new Date().toISOString().slice(0,10)}.json`,JSON.stringify(state,null,2)));
+$('#exportCsv').addEventListener('click',()=>{const rows=[['profile','date','run','trial','scene','shape','size_px','contrast_pct','movement','result','reaction_ms','false_starts']];state.runs.forEach(r=>{const p=state.profiles.find(x=>x.id===r.profileId);r.results.forEach((x,i)=>rows.push([p?.name||'',new Date(r.started).toISOString(),r.label,i+1,x.scene,x.shape,x.size,x.contrast,x.movement,x.result,x.ms??'',r.falseStarts]))});const csv=rows.map(row=>row.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\n');download(`spotcheck-evidence-${new Date().toISOString().slice(0,10)}.csv`,csv,'text/csv')});
+$('#printBtn').addEventListener('click',()=>window.print());
+syncDraft();renderProfileForm();renderEvidence();
+})();
+</script>
+</body>
+</html>
