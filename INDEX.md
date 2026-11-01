@@ -90,3 +90,4 @@ Chronological record of autonomous DCS World companion projects.
 - 2026-10-29 — `2026-10-29-briefing-studio` — Offline mission-brief composer with sequenced pages, local image annotation, rehearsal deck, completeness gates, persistence, backup, and printable handoff.
 - 2026-10-30 — `2026-10-30-live-director` — Offline in-sortie inject runner that adds role-aware command, threat, support, system, weather, and workload changes with persistent decisions and debrief export.
 - 2026-10-31 — `2026-10-31-spotcheck` — Offline visual-contact test bench with controlled spotting drills, named monitor/VR profiles, persistent A/B evidence, JSON/CSV export, and printable summaries.
+- 2026-11-01 — `2026-11-01-groove-tape` — Offline carrier-pattern timing desk with live Break/Abeam/90/Groove marks, traps/bolters/waveoffs, persistent pass evidence, debriefs, backup, CSV export, and printing.
