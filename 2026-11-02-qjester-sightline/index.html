@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#111512">
+<title>QJester Sightline — F-14B(U) Context-Key Trainer</title>
+<style>
+:root{
+  --bg:#101411;--panel:#171d19;--panel-2:#1d241f;--ink:#eef2e8;--muted:#a9b2a7;
+  --line:#384239;--line-strong:#697569;--phosphor:#b8e36c;--phosphor-dim:#718f43;
+  --amber:#f0ba62;--red:#ee816f;--blue:#7eb8bd;--shadow:0 16px 42px rgba(0,0,0,.28);
+  --radius:6px;--mono:"SFMono-Regular",Consolas,"Liberation Mono",monospace;
+  --human:Arial,"Helvetica Neue",sans-serif;
+}
+*{box-sizing:border-box}
+html{color-scheme:dark;background:var(--bg)}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 var(--human)}
+button,input,select,textarea{font:inherit}
+button,input,select{min-height:44px}
+button{border:1px solid var(--line-strong);border-radius:var(--radius);background:var(--panel-2);color:var(--ink);padding:.65rem .85rem;cursor:pointer}
+button:hover{border-color:var(--phosphor);color:#fff}
+button:active{transform:translateY(1px)}
+button:focus-visible,input:focus-visible,select:focus-visible,[tabindex]:focus-visible{outline:3px solid var(--amber);outline-offset:3px}
+button.primary{background:var(--phosphor);border-color:var(--phosphor);color:#17200f;font-weight:800}
+button.ghost{background:transparent}
+button.danger:hover{border-color:var(--red)}
+button[disabled]{opacity:.45;cursor:not-allowed;transform:none}
+header{border-bottom:1px solid var(--line);background:#0d110e;position:sticky;top:0;z-index:20}
+.topbar{max-width:1500px;margin:auto;min-height:66px;padding:10px 18px;display:flex;align-items:center;gap:18px}
+.brand{display:flex;align-items:baseline;gap:12px;min-width:max-content}
+.brand b{font:800 18px/1 var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--phosphor)}
+.brand span{font-size:12px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase}
+.mode-switch{display:flex;gap:4px;margin-left:auto}
+.mode-switch button{min-height:38px;padding:.35rem .75rem;font:700 12px var(--mono);letter-spacing:.05em}
+.mode-switch button[aria-pressed="true"]{background:var(--ink);color:#111;border-color:var(--ink)}
+.header-actions{display:flex;gap:8px}
+main{max-width:1500px;margin:auto;padding:18px;display:grid;grid-template-columns:280px minmax(420px,1fr) 330px;gap:14px;align-items:start}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
+.panel-head{padding:13px 14px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:10px}
+.panel-head h2,.panel-head h3{font:800 13px/1.2 var(--mono);letter-spacing:.08em;text-transform:uppercase;margin:0}
+.panel-body{padding:14px}
+.kicker{font:700 11px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--phosphor)}
+.scenario-list{padding:8px;display:grid;gap:6px}
+.scenario-item{width:100%;text-align:left;display:grid;grid-template-columns:30px 1fr auto;align-items:center;gap:8px;padding:9px;background:transparent;border-color:transparent}
+.scenario-item:hover{background:var(--panel-2);border-color:var(--line)}
+.scenario-item.active{background:#222c23;border-color:var(--phosphor-dim)}
+.scenario-item .num{font:700 12px var(--mono);color:var(--muted)}
+.scenario-item .label{font-weight:700;line-height:1.2}
+.scenario-item .tag{font:700 10px var(--mono);color:var(--muted);border:1px solid var(--line);padding:3px 5px;border-radius:3px}
+.scenario-item .mark{font:900 13px var(--mono);color:var(--phosphor)}
+.progress-block{padding:14px;border-top:1px solid var(--line)}
+.progress-row{display:flex;justify-content:space-between;font:12px var(--mono);color:var(--muted);margin-bottom:7px}
+.progress-track{height:7px;background:#0d110e;border:1px solid var(--line);border-radius:99px;overflow:hidden}
+.progress-fill{height:100%;background:var(--phosphor);width:0;transition:width .2s ease}
+.stage-panel{overflow:hidden}
+.mission-strip{min-height:80px;padding:13px 16px;background:#121713;border-bottom:1px solid var(--line);display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center}
+.mission-strip h1{font:800 clamp(20px,2.2vw,29px)/1.05 var(--human);margin:3px 0 5px;letter-spacing:-.02em}
+.mission-strip p{margin:0;color:var(--muted);max-width:70ch}
+.mode-chip{font:800 12px var(--mono);letter-spacing:.08em;border:1px solid var(--amber);color:var(--amber);padding:8px 10px;border-radius:4px;white-space:nowrap}
+.stage-wrap{position:relative;background:#080b09;padding:14px;min-height:540px}
+.cockpit{position:relative;min-height:510px;border:1px solid #4d594d;background:
+  radial-gradient(circle at 50% 44%,rgba(115,147,81,.08),transparent 44%),
+  linear-gradient(#111712 0 61%,#090c0a 61%);overflow:hidden}
+.horizon{position:absolute;left:8%;right:8%;top:45%;height:1px;background:#577049;box-shadow:0 -80px 0 rgba(85,112,73,.14)}
+.hud-frame{position:absolute;left:22%;right:22%;top:8%;height:49%;border:2px solid #6b786a;border-bottom-width:8px;clip-path:polygon(8% 0,92% 0,100% 100%,0 100%)}
+.hud-glow{position:absolute;inset:7% 20% 41%;border:1px solid rgba(184,227,108,.14);background:rgba(99,145,75,.035)}
+.center-cross{position:absolute;left:50%;top:35%;width:36px;height:36px;transform:translate(-50%,-50%)}
+.center-cross:before,.center-cross:after{content:"";position:absolute;background:var(--phosphor);opacity:.65}
+.center-cross:before{left:17px;top:0;width:2px;height:36px}.center-cross:after{left:0;top:17px;width:36px;height:2px}
+.pit-label{position:absolute;font:700 11px var(--mono);color:var(--phosphor);text-shadow:0 0 8px rgba(184,227,108,.28);letter-spacing:.04em}
+.pit-label.master{left:5%;top:4%;font-size:13px}.pit-label.readout{right:5%;top:4%;text-align:right;color:var(--muted)}
+.instrument{position:absolute;bottom:4%;height:29%;border:2px solid #4a544b;background:#0c110d}
+.instrument.vdi{left:11%;width:32%}.instrument.ptid{right:11%;width:32%}
+.screen{position:absolute;inset:8px;border:1px solid #53654c;background:#061008;color:var(--phosphor);font:11px var(--mono);overflow:hidden}
+.screen-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(184,227,108,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(184,227,108,.06) 1px,transparent 1px);background-size:22px 22px}
+.screen-title{position:absolute;left:7px;top:6px;letter-spacing:.08em}.screen-range{position:absolute;left:5px;bottom:7px}.screen-page{position:absolute;right:5px;bottom:7px}.screen-sweep{position:absolute;left:50%;bottom:10%;width:1px;height:74%;background:rgba(184,227,108,.4);transform-origin:bottom;transform:rotate(24deg)}
+.instrument-name{position:absolute;left:0;right:0;bottom:-23px;text-align:center;font:700 10px var(--mono);color:#899489;letter-spacing:.08em}
+.hotspot{position:absolute;min-width:48px;min-height:48px;border:1px dashed rgba(184,227,108,.28);background:rgba(184,227,108,.035);border-radius:2px;color:transparent;padding:0;z-index:7}
+.hotspot:hover,.hotspot:focus-visible{background:rgba(184,227,108,.12);border-color:var(--phosphor);color:var(--phosphor)}
+.hotspot.selected{background:rgba(240,186,98,.16);border:2px solid var(--amber);color:var(--amber)}
+.hotspot.hint{animation:pulse 1.45s ease-in-out infinite;color:var(--phosphor);border-color:var(--phosphor)}
+.hotspot span{position:absolute;top:calc(100% + 5px);left:50%;transform:translateX(-50%);font:800 10px var(--mono);white-space:nowrap;text-shadow:0 2px 3px #000}
+.q-cursor{position:absolute;width:46px;height:46px;border:2px solid var(--amber);border-radius:50%;transform:translate(-50%,-50%);z-index:12;pointer-events:none;display:none;box-shadow:0 0 0 6px rgba(240,186,98,.1)}
+.q-cursor:before,.q-cursor:after{content:"";position:absolute;background:var(--amber)}
+.q-cursor:before{width:14px;height:2px;left:14px;top:20px}.q-cursor:after{width:2px;height:14px;left:20px;top:14px}
+.q-cursor.visible{display:block}
+.hold-meter{position:absolute;left:50%;top:50%;width:86px;height:86px;transform:translate(-50%,-50%);z-index:13;pointer-events:none;display:none}
+.hold-meter.visible{display:block}.hold-meter svg{width:100%;height:100%;transform:rotate(-90deg)}
+.hold-meter circle{fill:none;stroke-width:5}.hold-meter .base{stroke:#273027}.hold-meter .value{stroke:var(--amber);stroke-dasharray:226;stroke-dashoffset:226;stroke-linecap:round}
+.stage-footer{padding:12px 14px;border-top:1px solid var(--line);display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.key-button{min-width:160px;font:800 13px var(--mono);letter-spacing:.06em}
+.key-button.holding{background:var(--amber);color:#1f1608;border-color:var(--amber)}
+.stage-status{margin-left:auto;font:700 12px var(--mono);color:var(--muted)}
+.stage-status.good{color:var(--phosphor)}.stage-status.bad{color:var(--red)}
+.instructions{display:grid;gap:12px}
+.step{display:grid;grid-template-columns:26px 1fr;gap:9px;align-items:start}
+.step .step-n{width:24px;height:24px;border:1px solid var(--line-strong);display:grid;place-items:center;font:800 11px var(--mono);color:var(--muted)}
+.step.done .step-n{background:var(--phosphor);border-color:var(--phosphor);color:#111}
+.step strong{display:block;margin-bottom:2px}.step small{display:block;color:var(--muted);line-height:1.35}
+.feedback{border:1px solid var(--line);background:#101511;padding:12px;min-height:98px}
+.feedback[data-state="success"]{border-color:var(--phosphor-dim)}
+.feedback[data-state="error"]{border-color:var(--red)}
+.feedback h3{font:800 12px var(--mono);text-transform:uppercase;letter-spacing:.08em;margin:0 0 6px}
+.feedback p{margin:0;color:var(--muted)}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);border:1px solid var(--line)}
+.stat{padding:10px;border-right:1px solid var(--line)}.stat:last-child{border:0}.stat b{display:block;font:800 18px var(--mono);color:var(--phosphor)}.stat span{font:10px var(--mono);color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+.controls{display:grid;grid-template-columns:1fr 1fr;gap:8px}.controls .wide{grid-column:1/-1}
+.legend{display:grid;gap:7px;font-size:13px;color:var(--muted)}.legend b{color:var(--ink)}
+dialog{width:min(680px,calc(100% - 28px));max-height:88vh;border:1px solid var(--line-strong);border-radius:var(--radius);background:var(--panel);color:var(--ink);box-shadow:0 30px 90px #000;padding:0}
+dialog::backdrop{background:rgba(0,0,0,.72)}
+.dialog-head{position:sticky;top:0;background:var(--panel);display:flex;justify-content:space-between;align-items:center;padding:14px;border-bottom:1px solid var(--line);z-index:2}.dialog-head h2{margin:0;font-size:18px}.dialog-body{padding:16px}.reference-list{display:grid;gap:9px}.ref-item{border-bottom:1px solid var(--line);padding:0 0 10px}.ref-item:last-child{border:0}.ref-item b{display:block;color:var(--phosphor);margin-bottom:3px}.ref-item p{margin:0;color:var(--muted)}
+.setting{display:grid;gap:5px;margin-bottom:13px}.setting label{font-weight:700}.setting input,.setting select{width:100%;background:#0c110d;color:var(--ink);border:1px solid var(--line-strong);border-radius:var(--radius);padding:8px}
+.quiz-banner{display:none;padding:9px 14px;background:var(--amber);color:#211708;font:800 12px var(--mono);letter-spacing:.05em;justify-content:space-between}.quiz-banner.visible{display:flex}
+.toast{position:fixed;left:50%;bottom:22px;transform:translate(-50%,16px);background:var(--ink);color:#111;padding:10px 14px;border-radius:4px;font-weight:800;opacity:0;pointer-events:none;transition:.18s;z-index:50}.toast.show{opacity:1;transform:translate(-50%,0)}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+@keyframes pulse{50%{box-shadow:0 0 0 8px rgba(184,227,108,.10)}}
+@media(max-width:1100px){main{grid-template-columns:240px 1fr}.right-rail{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:14px}.right-rail>.panel{margin:0!important}.stage-wrap{min-height:500px}.cockpit{min-height:470px}}
+@media(max-width:760px){header{position:static}.topbar{align-items:flex-start;flex-wrap:wrap}.brand{width:100%}.mode-switch{margin-left:0}.header-actions{margin-left:auto}main{grid-template-columns:1fr;padding:10px}.left-rail{order:2}.stage-panel{order:1}.right-rail{order:3;grid-template-columns:1fr}.stage-wrap{padding:7px;min-height:450px}.cockpit{min-height:430px}.hud-frame{left:10%;right:10%}.instrument.vdi{left:3%;width:44%}.instrument.ptid{right:3%;width:44%}.mission-strip{grid-template-columns:1fr}.stage-status{width:100%;margin-left:0}.scenario-list{grid-template-columns:1fr 1fr}.scenario-item{grid-template-columns:24px 1fr}.scenario-item .tag{display:none}}
+@media(max-width:470px){.scenario-list{grid-template-columns:1fr}.header-actions button{padding:.5rem}.cockpit{min-height:390px}.instrument{height:27%}.hotspot{min-width:44px}.brand span{display:none}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+@media print{header,.left-rail,.stage-panel,.controls,.feedback,.stats,.dialog-head{display:none!important}body{background:#fff;color:#111}.right-rail{display:block}.panel{box-shadow:none;border:0;background:#fff}.panel-head,.panel-body{border-color:#bbb}.panel-head h2,.panel-head h3,.legend b,.step strong{color:#111}.legend,.step small{color:#333}dialog{display:block!important;position:static;width:auto;max-height:none;border:0;background:#fff;color:#111}.dialog-body{padding:0}.ref-item b{color:#111}.ref-item p{color:#333}}
+</style>
+</head>
+<body>
+<header>
+  <div class="topbar">
+    <div class="brand"><b>QJester Sightline</b><span>F-14B(U) context-key trainer</span></div>
+    <div class="mode-switch" role="group" aria-label="Training mode">
+      <button type="button" id="learnMode" aria-pressed="true">LEARN</button>
+      <button type="button" id="checkMode" aria-pressed="false">CHECK</button>
+    </div>
+    <div class="header-actions">
+      <button type="button" id="referenceBtn" class="ghost">Reference</button>
+      <button type="button" id="settingsBtn" class="ghost">Settings</button>
+    </div>
+  </div>
+</header>
+<main>
+  <aside class="panel left-rail" aria-label="Drill list">
+    <div class="panel-head"><h2>Context drills</h2><span id="completeCount" class="kicker">0 / 8</span></div>
+    <div id="scenarioList" class="scenario-list"></div>
+    <div class="progress-block">
+      <div class="progress-row"><span>QUALIFICATION</span><span id="progressText">0%</span></div>
+      <div class="progress-track" aria-hidden="true"><div id="progressFill" class="progress-fill"></div></div>
+      <p style="color:var(--muted);font-size:12px;margin:10px 0 0">Pass every context once in Check mode to complete the set.</p>
+    </div>
+  </aside>
+
+  <section class="panel stage-panel" aria-labelledby="scenarioTitle">
+    <div id="quizBanner" class="quiz-banner"><span>CHECK MODE · CUES HIDDEN</span><span id="quizClock">00.0 s</span></div>
+    <div class="mission-strip">
+      <div><div id="scenarioKicker" class="kicker">A/A · HUD</div><h1 id="scenarioTitle">Visual target handoff</h1><p id="scenarioBrief"></p></div>
+      <div id="masterModeChip" class="mode-chip">A/A PDCP</div>
+    </div>
+    <div class="stage-wrap">
+      <div id="cockpit" class="cockpit" role="group" aria-label="Simplified F-14 pilot sightline exercise">
+        <div class="horizon"></div><div class="hud-glow"></div><div class="hud-frame"></div><div class="center-cross"></div>
+        <div class="pit-label master" id="pitMaster">MASTER: A/A</div><div class="pit-label readout">QJESTER READY<br><span id="keyReadout">CONTEXT: V</span></div>
+        <div class="instrument vdi"><div class="screen"><div class="screen-grid"></div><span class="screen-title">VDI / LTS REPEAT</span><span class="screen-page">TV</span></div><span class="instrument-name">VDI</span></div>
+        <div class="instrument ptid"><div class="screen"><div class="screen-grid"></div><span class="screen-title">PTID / TACTICAL</span><span class="screen-range">100<br>50<br>25</span><span class="screen-page">TAC</span><span class="screen-sweep"></span></div><span class="instrument-name">HSD · PTID REPEAT</span></div>
+        <div id="hotspots"></div>
+        <div id="qCursor" class="q-cursor" aria-hidden="true"></div>
+        <div id="holdMeter" class="hold-meter" aria-hidden="true"><svg viewBox="0 0 84 84"><circle class="base" cx="42" cy="42" r="36"></circle><circle id="holdArc" class="value" cx="42" cy="42" r="36"></circle></svg></div>
+      </div>
+    </div>
+    <div class="stage-footer">
+      <button type="button" id="contextButton" class="key-button">HOLD <span id="keyName">V</span> · RELEASE</button>
+      <button type="button" id="clearAim" class="ghost">Clear aim</button>
+      <span id="stageStatus" class="stage-status" role="status" aria-live="polite">Select a sightline target.</span>
+    </div>
+  </section>
+
+  <aside class="right-rail" aria-label="Exercise controls and feedback">
+    <section class="panel">
+      <div class="panel-head"><h2>Execution</h2><span id="difficultyLabel" class="kicker">Guided</span></div>
+      <div class="panel-body instructions">
+        <div id="step1" class="step"><div class="step-n">1</div><div><strong>Set the context</strong><small id="contextText"></small></div></div>
+        <div id="step2" class="step"><div class="step-n">2</div><div><strong>Aim the sightline</strong><small id="aimText"></small></div></div>
+        <div id="step3" class="step"><div class="step-n">3</div><div><strong>Hold, then release</strong><small>Hold the context key long enough to place the QJester indicator, then release.</small></div></div>
+        <div id="feedback" class="feedback" data-state="idle"><h3 id="feedbackTitle">Awaiting input</h3><p id="feedbackText">Choose the object or area that communicates your intent to Jester.</p></div>
+        <div class="stats" role="group" aria-label="Training statistics"><div class="stat"><b id="attemptStat">0</b><span>Attempts</span></div><div class="stat"><b id="passStat">0</b><span>Passed</span></div><div class="stat"><b id="streakStat">0</b><span>Streak</span></div></div>
+        <div class="controls">
+          <button type="button" id="prevBtn">Previous</button><button type="button" id="nextBtn">Next</button>
+          <button type="button" id="randomBtn" class="wide primary">Random check</button>
+          <button type="button" id="resetProgress" class="wide danger ghost">Reset training record</button>
+        </div>
+      </div>
+    </section>
+    <section class="panel" style="margin-top:14px">
+      <div class="panel-head"><h3>Sightline rule</h3></div>
+      <div class="panel-body legend">
+        <div><b>Look at the desired object.</b> QJester interprets the pointed-at HUD, HSD/PTID, VDI, or outside-world context.</div>
+        <div><b>Hold and release.</b> A quick tap is intentionally scored as incomplete here.</div>
+        <div><b>Confirm the result.</b> The tool teaches expected command intent—not radar, pod, or AI success guarantees.</div>
+      </div>
+    </section>
+  </aside>
+</main>
+
+<dialog id="referenceDialog">
+  <div class="dialog-head"><h2>QJester context reference</h2><button type="button" data-close="referenceDialog">Close</button></div>
+  <div class="dialog-body">
+    <p style="margin-top:0;color:var(--muted)">Condensed from Heatblur's F-14B(U) Jester overview. Verify against the current manual and your bindings.</p>
+    <div id="referenceList" class="reference-list"></div>
+    <p style="font-size:12px;color:var(--muted);margin-bottom:0">Training aid only. The simplified cockpit is not a scale reproduction and does not emulate sensor state.</p>
+  </div>
+</dialog>
+<dialog id="settingsDialog">
+  <div class="dialog-head"><h2>Trainer settings</h2><button type="button" data-close="settingsDialog">Close</button></div>
+  <div class="dialog-body">
+    <div class="setting"><label for="keyInput">Context key shown in trainer</label><input type="text" id="keyInput" maxlength="1" value="V" autocomplete="off"><small style="color:var(--muted)">Visual label only; the browser still listens for this character key.</small></div>
+    <div class="setting"><label for="holdInput">Minimum hold time</label><select id="holdInput"><option value="300">0.30 seconds</option><option value="450" selected>0.45 seconds</option><option value="650">0.65 seconds</option><option value="850">0.85 seconds</option></select></div>
+    <div class="setting"><label><input id="soundInput" type="checkbox" style="min-height:auto;width:auto"> Enable quiet confirmation tones</label></div>
+    <button type="button" id="saveSettings" class="primary" style="width:100%">Save settings</button>
+  </div>
+</dialog>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+<script>
+(function(){
+'use strict';
+const scenarios=[
+ {id:'ptid-page',mode:'ALL',station:'HSD · PTID',title:'PTID page selection',brief:'Ask Jester to select the desired PTID page while the HSD shows TID repeat.',context:'HSD in TID repeat; PTID page options are visible.',aim:'Aim at the desired PTID page option.',target:'ptid-page',result:'Jester is prompted to select the pointed-at PTID page.',x:79,y:80,w:54,h:48,label:'PAGE OPTION'},
+ {id:'ptid-range',mode:'ALL',station:'HSD · PTID',title:'Tactical range scale',brief:'Change the PTID tactical display scale without opening a command wheel.',context:'PTID tactical page is repeated on the HSD.',aim:'Aim at a range-scale button on the left edge of the PTID.',target:'ptid-range',result:'Jester is prompted to change the TID scale to the pointed-at range option.',x:69,y:75,w:48,h:76,label:'RANGE SCALE'},
+ {id:'hud-tdb',mode:'A/A',station:'HUD',title:'Designate-box hook',brief:'Make a HUD Target Designate Box the RIO’s active hooked track.',context:'A/A PDCP mode; a Target Designate Box is visible in the HUD.',aim:'Aim directly at the HUD Target Designate Box.',target:'hud-tdb',result:'Jester is prompted to hook the track associated with the Target Designate Box.',x:58,y:25,w:58,h:58,label:'TDB'},
+ {id:'ptid-track',mode:'A/A',station:'HSD · PTID',title:'PTID track hook',brief:'Hook the specific TWS track you are inspecting on the PTID repeat.',context:'A/A PDCP mode; TWS tracks are visible on the PTID.',aim:'Aim at the desired TWS track symbol—not the display center.',target:'ptid-track',result:'Jester is prompted to hook the pointed-at TWS track.',x:79,y:72,w:50,h:50,label:'TWS TRACK'},
+ {id:'aa-scan',mode:'A/A',station:'OUTSIDE',title:'Directional radar scan',brief:'Point Jester’s radar search toward an empty volume of sky.',context:'A/A PDCP mode; no visual target or designate box is under the cursor.',aim:'Aim into the desired azimuth and elevation sector.',target:'aa-scan',result:'Jester is prompted to scan in the selected azimuth and elevation.',x:35,y:22,w:86,h:72,label:'SCAN SECTOR'},
+ {id:'aa-visual',mode:'A/A',station:'OUTSIDE',title:'Visual target handoff',brief:'Direct Jester to try to acquire a visually observed aircraft in TWS.',context:'A/A PDCP mode; an aircraft is visually acquired outside.',aim:'Aim directly at the visually acquired aircraft.',target:'aa-visual',result:'Jester is prompted to try to track the visual target in TWS.',x:64,y:36,w:52,h:52,label:'VISUAL TARGET'},
+ {id:'ag-aoi',mode:'A/G',station:'OUTSIDE',title:'Area-of-interest handoff',brief:'Send the LANTIRN pod toward an outside-world area of interest.',context:'A/G PDCP mode; the intended area is visible outside.',aim:'Aim at the terrain or object area you want the pod to inspect.',target:'ag-aoi',result:'Jester is prompted to slew the pod toward the area and establish an area track.',x:43,y:51,w:84,h:58,label:'AREA OF INTEREST'},
+ {id:'ag-lts',mode:'A/G',station:'VDI · LTS',title:'LTS repeat designation',brief:'Move the LANTIRN pod to a location indicated on the VDI LTS repeat.',context:'A/G PDCP mode; LTS video is repeated on the VDI.',aim:'Aim at the intended location within the VDI LTS repeat.',target:'ag-lts',result:'Jester is prompted to move the pod to the indicated VDI location.',x:31,y:76,w:54,h:54,label:'LTS POINT'}
+];
+const refs=[
+ ['All modes · PTID pages','Hold and release while looking at the desired PTID option on the HSD in TID repeat.'],
+ ['PTID tactical scale','Point at a range-scale option and hold/release to ask Jester to change scale.'],
+ ['A/A · HUD designate box','Point at a Target Designate Box and hold/release to ask Jester to hook that track.'],
+ ['A/A · PTID TWS track','Point at a TWS track and hold/release to ask Jester to hook it.'],
+ ['A/A · empty sky sector','Point in the desired azimuth/elevation and hold/release to ask Jester to scan there.'],
+ ['A/A · visual aircraft','Point at the visually acquired target and hold/release to ask Jester to try a TWS track.'],
+ ['A/G · outside area','Point at the area of interest and hold/release to ask Jester to slew and area-track it.'],
+ ['A/G · VDI LTS repeat','Point at the indicated VDI location and hold/release to ask Jester to move the pod there.']
+];
+const $=s=>document.querySelector(s);
+const state=load();
+let current=0,selected=null,holding=false,holdStart=0,holdRaf=0,runStart=performance.now(),timerRaf=0;
+const els={list:$('#scenarioList'),hotspots:$('#hotspots'),title:$('#scenarioTitle'),brief:$('#scenarioBrief'),kicker:$('#scenarioKicker'),chip:$('#masterModeChip'),pit:$('#pitMaster'),context:$('#contextText'),aim:$('#aimText'),feedback:$('#feedback'),feedbackTitle:$('#feedbackTitle'),feedbackText:$('#feedbackText'),status:$('#stageStatus'),cursor:$('#qCursor'),meter:$('#holdMeter'),arc:$('#holdArc'),button:$('#contextButton'),attempt:$('#attemptStat'),pass:$('#passStat'),streak:$('#streakStat'),complete:$('#completeCount'),progress:$('#progressFill'),progressText:$('#progressText'),clock:$('#quizClock'),banner:$('#quizBanner'),difficulty:$('#difficultyLabel')};
+function defaults(){return {mode:'learn',key:'V',hold:450,sound:false,attempts:0,passes:0,streak:0,qualified:{}}}
+function load(){try{return Object.assign(defaults(),JSON.parse(localStorage.getItem('qjester-sightline-v1')||'{}'))}catch(e){return defaults()}}
+function save(){localStorage.setItem('qjester-sightline-v1',JSON.stringify(state))}
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+function renderList(){els.list.innerHTML=scenarios.map((s,i)=>`<button type="button" class="scenario-item ${i===current?'active':''}" data-index="${i}" aria-current="${i===current?'true':'false'}"><span class="num">${String(i+1).padStart(2,'0')}</span><span class="label">${esc(s.title)}</span>${state.qualified[s.id]?'<span class="mark" aria-label="Passed">✓</span>':`<span class="tag">${esc(s.mode)}</span>`}</button>`).join('');els.list.querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>setScenario(+b.dataset.index)))}
+function renderScenario(){
+ const s=scenarios[current];selected=null;runStart=performance.now();
+ els.title.textContent=s.title;els.brief.textContent=s.brief;els.kicker.textContent=`${s.mode} · ${s.station}`;els.chip.textContent=s.mode==='ALL'?'ANY PDCP':`${s.mode} PDCP`;els.pit.textContent=`MASTER: ${s.mode==='ALL'?'A/A or A/G':s.mode}`;els.context.textContent=s.context;els.aim.textContent=s.aim;
+ els.hotspots.innerHTML=buildHotspots(s);els.hotspots.querySelectorAll('.hotspot').forEach(h=>h.addEventListener('click',()=>selectHotspot(h)));
+ els.cursor.classList.remove('visible');setFeedback('idle','Awaiting input',state.mode==='learn'?'Use the highlighted sightline target, then hold and release the context key.':'Find the correct sightline target without cues.');els.status.className='stage-status';els.status.textContent='Select a sightline target.';updateSteps(1);renderList();startClock();
+}
+function buildHotspots(s){
+ const decoys=[
+  {id:'hud-center',x:50,y:35,w:48,h:48,label:'HUD CENTER'},
+  {id:'vdi-bezel',x:20,y:69,w:48,h:48,label:'VDI BEZEL'},
+  {id:'ptid-center',x:77,y:74,w:48,h:48,label:'DISPLAY CENTER'}
+ ].filter(d=>d.id!==s.target).slice(0,2);
+ const all=[{id:s.target,x:s.x,y:s.y,w:s.w,h:s.h,label:s.label,correct:true},...decoys];
+ return all.map(h=>`<button type="button" class="hotspot ${h.correct&&state.mode==='learn'?'hint':''}" data-id="${h.id}" data-correct="${h.correct?'true':'false'}" style="left:calc(${h.x}% - ${h.w/2}px);top:calc(${h.y}% - ${h.h/2}px);width:${h.w}px;height:${h.h}px" aria-label="Aim at ${esc(h.label)}"><span>${esc(h.label)}</span></button>`).join('')
+}
+function selectHotspot(h){els.hotspots.querySelectorAll('.hotspot').forEach(x=>x.classList.remove('selected'));h.classList.add('selected');selected=h.dataset.id;const rect=h.getBoundingClientRect(),pit=$('#cockpit').getBoundingClientRect();els.cursor.style.left=`${rect.left-pit.left+rect.width/2}px`;els.cursor.style.top=`${rect.top-pit.top+rect.height/2}px`;els.cursor.classList.add('visible');els.status.textContent=`Sightline set: ${h.querySelector('span').textContent}`;updateSteps(2)}
+function beginHold(){if(holding)return;if(!selected){setFeedback('error','No sightline selected','Aim at an object, display control, or area before using the context key.');tone(false);return}holding=true;holdStart=performance.now();els.button.classList.add('holding');els.button.textContent=`HOLDING ${state.key}…`;els.meter.classList.add('visible');tickHold()}
+function tickHold(){if(!holding)return;const elapsed=performance.now()-holdStart,p=Math.min(elapsed/state.hold,1);els.arc.style.strokeDashoffset=String(226*(1-p));els.status.textContent=p>=1?'Indicator placed · release now':`Holding… ${(elapsed/1000).toFixed(1)} s`;holdRaf=requestAnimationFrame(tickHold)}
+function endHold(){if(!holding)return;holding=false;cancelAnimationFrame(holdRaf);const elapsed=performance.now()-holdStart;els.button.classList.remove('holding');els.button.innerHTML=`HOLD <span id="keyName">${esc(state.key)}</span> · RELEASE`;els.meter.classList.remove('visible');els.arc.style.strokeDashoffset='226';scoreAttempt(elapsed)}
+function scoreAttempt(elapsed){
+ state.attempts++;const s=scenarios[current],correct=selected===s.target&&elapsed>=state.hold;
+ if(correct){state.passes++;state.streak++;if(state.mode==='check')state.qualified[s.id]=true;setFeedback('success','Command intent correct',`${s.result} Hold: ${(elapsed/1000).toFixed(2)} s.`);els.status.className='stage-status good';els.status.textContent='PASS · Correct sightline and gesture.';updateSteps(3);tone(true);toast(state.mode==='check'?'Check passed and recorded':'Guided pass');}
+ else{state.streak=0;let reason=elapsed<state.hold?`Release was early at ${(elapsed/1000).toFixed(2)} s; minimum is ${(state.hold/1000).toFixed(2)} s.`:`That sightline communicates a different intent. ${s.aim}`;setFeedback('error','Command not established',reason);els.status.className='stage-status bad';els.status.textContent='RETRY · Reset the sightline and gesture.';tone(false)}
+ save();updateStats();renderList();
+}
+function setFeedback(kind,title,text){els.feedback.dataset.state=kind;els.feedbackTitle.textContent=title;els.feedbackText.textContent=text}
+function updateSteps(n){for(let i=1;i<=3;i++)$('#step'+i).classList.toggle('done',i<=n)}
+function updateStats(){els.attempt.textContent=state.attempts;els.pass.textContent=state.passes;els.streak.textContent=state.streak;const n=Object.keys(state.qualified).filter(id=>scenarios.some(s=>s.id===id)).length,p=Math.round(n/scenarios.length*100);els.complete.textContent=`${n} / ${scenarios.length}`;els.progress.style.width=p+'%';els.progressText.textContent=p+'%'}
+function setScenario(i){current=(i+scenarios.length)%scenarios.length;renderScenario()}
+function setMode(mode){state.mode=mode;save();$('#learnMode').setAttribute('aria-pressed',String(mode==='learn'));$('#checkMode').setAttribute('aria-pressed',String(mode==='check'));els.banner.classList.toggle('visible',mode==='check');els.difficulty.textContent=mode==='learn'?'Guided':'Uncued';renderScenario()}
+function startClock(){cancelAnimationFrame(timerRaf);function tick(){if(state.mode==='check')els.clock.textContent=((performance.now()-runStart)/1000).toFixed(1).padStart(4,'0')+' s';timerRaf=requestAnimationFrame(tick)}tick()}
+function randomCheck(){setMode('check');let i=current;while(i===current&&scenarios.length>1)i=Math.floor(Math.random()*scenarios.length);setScenario(i)}
+function tone(ok){if(!state.sound)return;try{const C=window.AudioContext||window.webkitAudioContext,a=new C(),o=a.createOscillator(),g=a.createGain();o.frequency.value=ok?720:190;g.gain.setValueAtTime(.04,a.currentTime);g.gain.exponentialRampToValueAtTime(.001,a.currentTime+.12);o.connect(g);g.connect(a.destination);o.start();o.stop(a.currentTime+.12)}catch(e){}}
+function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove('show'),1500)}
+function applySettings(){const key=($('#keyInput').value||'V').slice(0,1).toUpperCase();state.key=key;state.hold=+$('#holdInput').value;state.sound=$('#soundInput').checked;save();$('#keyReadout').textContent=`CONTEXT: ${key}`;$('#keyName').textContent=key;$('#settingsDialog').close();toast('Settings saved')}
+function openSettings(){$('#keyInput').value=state.key;$('#holdInput').value=String(state.hold);$('#soundInput').checked=state.sound;$('#settingsDialog').showModal()}
+function resetProgress(){if(!confirm('Reset all attempts, passes, streak, and qualification marks?'))return;Object.assign(state,{attempts:0,passes:0,streak:0,qualified:{}});save();updateStats();renderList();setFeedback('idle','Training record reset','Choose a sightline target to begin again.');toast('Training record cleared')}
+function keyDown(e){if(e.repeat||['INPUT','SELECT','TEXTAREA'].includes(document.activeElement.tagName))return;if(e.key.toUpperCase()===state.key){e.preventDefault();beginHold()}else if(e.key==='ArrowRight'){setScenario(current+1)}else if(e.key==='ArrowLeft'){setScenario(current-1)}}
+function keyUp(e){if(e.key.toUpperCase()===state.key){e.preventDefault();endHold()}}
+$('#learnMode').addEventListener('click',()=>setMode('learn'));$('#checkMode').addEventListener('click',()=>setMode('check'));$('#prevBtn').addEventListener('click',()=>setScenario(current-1));$('#nextBtn').addEventListener('click',()=>setScenario(current+1));$('#randomBtn').addEventListener('click',randomCheck);$('#clearAim').addEventListener('click',()=>{selected=null;els.hotspots.querySelectorAll('.hotspot').forEach(x=>x.classList.remove('selected'));els.cursor.classList.remove('visible');els.status.textContent='Sightline cleared.';updateSteps(1)});$('#contextButton').addEventListener('pointerdown',e=>{e.currentTarget.setPointerCapture(e.pointerId);beginHold()});$('#contextButton').addEventListener('pointerup',endHold);$('#contextButton').addEventListener('pointercancel',endHold);$('#referenceBtn').addEventListener('click',()=>$('#referenceDialog').showModal());$('#settingsBtn').addEventListener('click',openSettings);$('#saveSettings').addEventListener('click',applySettings);$('#resetProgress').addEventListener('click',resetProgress);document.querySelectorAll('[data-close]').forEach(b=>b.addEventListener('click',()=>$('#'+b.dataset.close).close()));document.addEventListener('keydown',keyDown);document.addEventListener('keyup',keyUp);
+$('#referenceList').innerHTML=refs.map(r=>`<div class="ref-item"><b>${esc(r[0])}</b><p>${esc(r[1])}</p></div>`).join('');
+$('#keyReadout').textContent=`CONTEXT: ${state.key}`;$('#keyName').textContent=state.key;setMode(state.mode);updateStats();
+})();
+</script>
+</body>
+</html>
