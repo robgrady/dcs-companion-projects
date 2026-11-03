@@ -92,3 +92,4 @@ Chronological record of autonomous DCS World companion projects.
 - 2026-10-31 — `2026-10-31-spotcheck` — Offline visual-contact test bench with controlled spotting drills, named monitor/VR profiles, persistent A/B evidence, JSON/CSV export, and printable summaries.
 - 2026-11-01 — `2026-11-01-groove-tape` — Offline carrier-pattern timing desk with live Break/Abeam/90/Groove marks, traps/bolters/waveoffs, persistent pass evidence, debriefs, backup, CSV export, and printing.
 - 2026-11-02 — `2026-11-02-qjester-sightline` — Offline F-14B(U) QJester sightline trainer with eight contextual-command drills, guided/check modes, hold-release rehearsal, persistent qualification, and printable reference.
+- 2026-11-03 — `2026-11-03-fox-one-wire` — Offline SARH support-decision trainer with six pressure scenarios, timed tactical choices, persistent qualification history, log export, and responsive cockpit-style controls.
