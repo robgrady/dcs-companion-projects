@@ -95,3 +95,4 @@ Chronological record of autonomous DCS World companion projects.
 - 2026-11-03 — `2026-11-03-fox-one-wire` — Offline SARH support-decision trainer with six pressure scenarios, timed tactical choices, persistent qualification history, log export, and responsive cockpit-style controls.
 - 2026-11-04 — `2026-11-04-target-weave` — Offline DCS AI strike-assignment desk with target ownership, duplicate-tasking and capacity checks, per-flight Mission Editor build cards, reserve reflow, persistence, backup, and printing.
 - 2026-11-05 — `2026-11-05-ramp-reply` — Offline DCS ground-crew call and fault-isolation desk with pre-call gates, acknowledgment/service separation, one-variable diagnostics, persistent proof history, backup, and printing.
+- 2026-11-06 — `2026-11-06-track-witness` — Offline DCS replay-divergence desk with original/replay timestamp capture, first-break diagnosis, timing drift, persistent cases, evidence export, and printing.
