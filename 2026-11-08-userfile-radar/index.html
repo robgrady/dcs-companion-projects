@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Userfile Radar is an offline catalog and readiness filter for DCS World community files.">
+<title>Userfile Radar — DCS Community File Desk</title>
+<style>
+:root{
+  color-scheme:dark;
+  --bg:#11130f;--panel:#181b15;--panel2:#20241c;--ink:#f2f0e7;--muted:#aaaD9f;
+  --line:#383d31;--line2:#4a5040;--accent:#d6b45f;--accent-ink:#17150d;
+  --good:#83b88c;--warn:#d6a15f;--bad:#cf756b;--focus:#f3d988;
+  --r:6px;--shadow:0 12px 36px rgba(0,0,0,.26);--sans:"Avenir Next","Segoe UI",sans-serif;
+  --mono:"SFMono-Regular",Consolas,"Liberation Mono",monospace;
+}
+*{box-sizing:border-box}html{background:var(--bg)}body{margin:0;min-height:100vh;background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.45}
+button,input,select,textarea{font:inherit}button{cursor:pointer}a{color:var(--accent)}
+:focus-visible{outline:3px solid var(--focus);outline-offset:2px}.skip{position:absolute;left:-999px}.skip:focus{left:12px;top:12px;z-index:99;background:var(--ink);color:var(--bg);padding:10px}
+.appbar{position:sticky;top:0;z-index:20;border-bottom:1px solid var(--line);background:rgba(17,19,15,.96);backdrop-filter:blur(8px)}
+.appbar-inner{max-width:1500px;margin:auto;padding:14px 22px;display:grid;grid-template-columns:auto minmax(260px,620px) auto;gap:20px;align-items:center}
+.brand{display:flex;align-items:center;gap:12px;white-space:nowrap}.brand-mark{width:30px;height:30px;border:1px solid var(--accent);position:relative;transform:rotate(45deg)}.brand-mark:after{content:"";position:absolute;inset:7px;border:1px solid var(--accent)}
+.brand strong{letter-spacing:.12em;text-transform:uppercase;font-size:.9rem}.brand small{display:block;color:var(--muted);font-family:var(--mono);font-size:.68rem;letter-spacing:.04em}
+.search-wrap{position:relative}.search-wrap label{position:absolute;left:-999px}.search-wrap input{width:100%;border:1px solid var(--line2);border-radius:var(--r);padding:11px 42px 11px 14px;background:#0d0f0c;color:var(--ink)}.key{position:absolute;right:10px;top:9px;border:1px solid var(--line);color:var(--muted);font-family:var(--mono);font-size:.72rem;padding:2px 6px;border-radius:3px}
+.actions{display:flex;gap:8px;justify-content:flex-end}.btn{min-height:42px;border:1px solid var(--line2);border-radius:var(--r);padding:9px 13px;background:var(--panel2);color:var(--ink);font-weight:650}.btn:hover{border-color:var(--accent)}.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}.btn.ghost{background:transparent}.btn.danger{color:#f2aaa2;border-color:#7a4944}.iconbtn{width:42px;padding:8px}
+.shell{max-width:1500px;margin:auto;padding:24px 22px 50px;display:grid;grid-template-columns:250px minmax(0,1fr);gap:26px}.rail{align-self:start;position:sticky;top:91px}.rail-section{padding:0 0 22px;margin-bottom:20px;border-bottom:1px solid var(--line)}.rail h2{font-size:.72rem;color:var(--muted);letter-spacing:.15em;text-transform:uppercase;margin:0 0 10px}.filter-list{display:grid;gap:4px}.filter-btn{width:100%;min-height:40px;border:0;border-radius:4px;background:transparent;color:var(--muted);padding:8px 10px;text-align:left;display:flex;justify-content:space-between;align-items:center}.filter-btn:hover{background:var(--panel);color:var(--ink)}.filter-btn.active{background:var(--panel2);color:var(--ink);box-shadow:inset 2px 0 var(--accent)}.count{font-family:var(--mono);font-size:.72rem;color:var(--muted)}
+.rail select{width:100%;background:var(--panel);border:1px solid var(--line2);color:var(--ink);border-radius:var(--r);padding:10px;margin-top:5px}.rail-note{font-size:.78rem;color:var(--muted)}
+.mainhead{display:flex;justify-content:space-between;gap:24px;align-items:end;border-bottom:1px solid var(--line);padding-bottom:18px;margin-bottom:18px}.eyebrow{font-family:var(--mono);font-size:.72rem;text-transform:uppercase;letter-spacing:.14em;color:var(--accent);margin:0 0 6px}.mainhead h1{font-size:clamp(1.6rem,3vw,2.5rem);line-height:1.05;margin:0;letter-spacing:-.035em}.mainhead p{margin:7px 0 0;color:var(--muted);max-width:700px}.summary{display:flex;gap:18px;text-align:right}.summary strong{display:block;font-family:var(--mono);font-size:1.2rem}.summary span{font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em}
+.notice{display:none;align-items:center;justify-content:space-between;gap:16px;border:1px solid #715f32;background:#262113;padding:12px 14px;border-radius:var(--r);margin-bottom:16px;color:#e7d6a8}.notice.show{display:flex}
+.toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:16px}.toolbar select{background:var(--panel);border:1px solid var(--line2);color:var(--ink);border-radius:var(--r);padding:9px 34px 9px 11px;min-height:42px}.toolbar .spacer{flex:1}.viewbtn[aria-pressed="true"]{color:var(--accent);border-color:var(--accent)}
+.results{display:grid;gap:10px}.results.grid{grid-template-columns:repeat(auto-fill,minmax(310px,1fr))}.card{border:1px solid var(--line);background:var(--panel);border-radius:var(--r);padding:16px;display:grid;grid-template-columns:1fr auto;gap:12px;transition:border-color .15s,background .15s}.grid .card{grid-template-columns:1fr;align-content:start}.card:hover{border-color:var(--line2);background:#1c2019}.card-main{min-width:0}.card-top{display:flex;gap:9px;align-items:center;flex-wrap:wrap;margin-bottom:6px}.status{font-family:var(--mono);font-size:.66rem;text-transform:uppercase;letter-spacing:.09em;border:1px solid var(--line2);border-radius:3px;padding:3px 6px;color:var(--muted)}.status.installed,.status.tested{border-color:#4e7857;color:#a8d6af}.status.downloaded{border-color:#74663d;color:#dcc782}.status.archived{opacity:.7}.type{font-size:.72rem;color:var(--muted)}.card h3{font-size:1.05rem;margin:0 0 5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.card h3 button{border:0;padding:0;background:transparent;color:var(--ink);font-weight:700;text-align:left}.card h3 button:hover{color:var(--accent)}.meta{display:flex;flex-wrap:wrap;gap:6px 14px;color:var(--muted);font-size:.78rem}.meta b{color:#d6d4ca;font-weight:600}.tags{display:flex;gap:5px;flex-wrap:wrap;margin-top:10px}.tag{font-family:var(--mono);font-size:.65rem;background:#272b22;color:#c6c9bb;padding:3px 6px;border-radius:3px}.gap{color:#edb87b}.card-side{display:flex;align-items:start;gap:5px}.grid .card-side{border-top:1px solid var(--line);padding-top:12px;justify-content:flex-end}.smallbtn{min-width:38px;min-height:38px;border:1px solid transparent;background:transparent;color:var(--muted);border-radius:4px}.smallbtn:hover{border-color:var(--line2);color:var(--ink)}
+.empty{border:1px dashed var(--line2);min-height:340px;display:grid;place-items:center;text-align:center;padding:40px;border-radius:var(--r);background:repeating-linear-gradient(-45deg,transparent,transparent 12px,rgba(255,255,255,.012) 12px,rgba(255,255,255,.012) 24px)}.empty-inner{max-width:460px}.empty .signal{width:68px;height:68px;border:1px solid var(--line2);border-radius:50%;margin:0 auto 20px;position:relative}.empty .signal:before,.empty .signal:after{content:"";position:absolute;border:1px solid var(--line2);border-radius:50%;inset:10px}.empty .signal:after{inset:23px;background:var(--accent);border:0}.empty h2{margin:0 0 8px}.empty p{color:var(--muted)}
+.dialog{width:min(720px,calc(100% - 24px));max-height:90vh;background:var(--panel);color:var(--ink);border:1px solid var(--line2);border-radius:8px;padding:0;box-shadow:var(--shadow)}.dialog::backdrop{background:rgba(5,6,4,.75)}.dialog-head{position:sticky;top:0;background:var(--panel);z-index:2;display:flex;justify-content:space-between;align-items:center;padding:18px 20px;border-bottom:1px solid var(--line)}.dialog-head h2{margin:0;font-size:1.2rem}.dialog-body{padding:20px;overflow:auto}.dialog-foot{position:sticky;bottom:0;background:var(--panel);display:flex;justify-content:flex-end;gap:9px;padding:15px 20px;border-top:1px solid var(--line)}
+.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.field{display:grid;gap:6px}.field.full{grid-column:1/-1}.field label,.group-label{font-size:.75rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-weight:700}.field input,.field select,.field textarea{width:100%;border:1px solid var(--line2);background:#11140f;color:var(--ink);border-radius:var(--r);padding:10px}.field textarea{min-height:92px;resize:vertical}.hint{font-size:.72rem;color:var(--muted)}
+.ownership{display:grid;grid-template-columns:1fr 1fr;gap:18px}.checkgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.check{display:flex;gap:8px;align-items:center;min-height:38px;background:#141711;border:1px solid var(--line);padding:6px 9px;border-radius:4px}.check input{accent-color:var(--accent)}
+.toast{position:fixed;right:20px;bottom:20px;z-index:90;background:var(--ink);color:var(--bg);padding:11px 15px;border-radius:4px;font-weight:700;box-shadow:var(--shadow);transform:translateY(90px);opacity:0;transition:.2s}.toast.show{transform:none;opacity:1}
+.footer{max-width:1500px;margin:auto;padding:0 22px 30px;color:var(--muted);font-size:.72rem;display:flex;justify-content:space-between}.footer code{font-family:var(--mono)}
+@media(max-width:900px){.appbar-inner{grid-template-columns:1fr auto}.search-wrap{grid-column:1/-1;grid-row:2}.shell{grid-template-columns:1fr}.rail{position:static;display:grid;grid-template-columns:1fr 1fr;gap:16px}.rail-section{margin:0}.mainhead{align-items:start}.summary{display:none}}
+@media(max-width:620px){.appbar-inner,.shell{padding-left:14px;padding-right:14px}.brand small{display:none}.actions .label{display:none}.rail{grid-template-columns:1fr}.mainhead{display:block}.toolbar .spacer{display:none}.toolbar{display:grid;grid-template-columns:1fr 1fr}.toolbar select{width:100%}.results.grid{grid-template-columns:1fr}.card{grid-template-columns:1fr}.card-side{border-top:1px solid var(--line);padding-top:8px;justify-content:flex-end}.formgrid,.ownership{grid-template-columns:1fr}.field.full{grid-column:auto}.footer{display:block}.dialog-foot{padding-bottom:max(15px,env(safe-area-inset-bottom))}}
+@media print{.appbar,.rail,.toolbar,.actions,.card-side,.footer,.notice{display:none!important}.shell{display:block;padding:0}.mainhead{margin:0 0 16px}.results,.results.grid{display:block}.card{break-inside:avoid;margin-bottom:8px;background:white;color:black;border:1px solid #777}.card h3 button,.meta b{color:black}.meta,.tag,.status{color:#444}.tag{border:1px solid #aaa;background:white}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to catalog</a>
+<header class="appbar">
+  <div class="appbar-inner">
+    <div class="brand"><span class="brand-mark" aria-hidden="true"></span><div><strong>Userfile Radar</strong><small>DCS community file desk / offline</small></div></div>
+    <div class="search-wrap"><label for="search">Search catalog</label><input id="search" type="search" autocomplete="off" placeholder="Search title, aircraft, map, creator, tags…"><span class="key" aria-hidden="true">/</span></div>
+    <div class="actions"><button class="btn ghost iconbtn" id="settingsBtn" title="Ownership settings" aria-label="Ownership settings">⚙</button><button class="btn primary" id="addBtn"><span aria-hidden="true">＋</span> <span class="label">Add file</span></button></div>
+  </div>
+</header>
+<div class="shell">
+  <aside class="rail" aria-label="Catalog filters">
+    <section class="rail-section"><h2>Workflow</h2><div class="filter-list" id="statusFilters"></div></section>
+    <section class="rail-section"><h2>Compatibility</h2><div class="filter-list"><button class="filter-btn" data-fit="all">All files <span class="count" id="allFitCount">0</span></button><button class="filter-btn" data-fit="ready">Ready for my install <span class="count" id="readyCount">0</span></button><button class="filter-btn" data-fit="gaps">Has ownership gaps <span class="count" id="gapCount">0</span></button></div><p class="rail-note">Set owned modules and terrains to expose missing requirements.</p></section>
+    <section class="rail-section"><h2>File type</h2><label class="skip" for="typeFilter">File type</label><select id="typeFilter"><option value="all">All types</option></select></section>
+  </aside>
+  <main id="main">
+    <div class="mainhead"><div><p class="eyebrow">Personal discovery layer</p><h1>Your useful DCS files, findable.</h1><p>Capture promising community files once, then filter by aircraft, terrain, dependencies, install state, and what you actually own.</p></div><div class="summary"><div><strong id="totalStat">0</strong><span>cataloged</span></div><div><strong id="readyStat">0</strong><span>ready</span></div></div></div>
+    <div class="notice" id="gapNotice"><span id="gapNoticeText"></span><button class="btn ghost" id="showGapsBtn">Review gaps</button></div>
+    <div class="toolbar">
+      <label class="skip" for="aircraftFilter">Aircraft</label><select id="aircraftFilter"><option value="all">All aircraft</option></select>
+      <label class="skip" for="mapFilter">Terrain</label><select id="mapFilter"><option value="all">All terrains</option></select>
+      <label class="skip" for="sortBy">Sort</label><select id="sortBy"><option value="updated">Recently updated</option><option value="added">Recently added</option><option value="title">Title A–Z</option><option value="creator">Creator A–Z</option></select>
+      <span class="spacer"></span>
+      <button class="btn ghost viewbtn" id="listView" aria-pressed="true" title="List view">☰</button><button class="btn ghost viewbtn" id="gridView" aria-pressed="false" title="Grid view">▦</button>
+      <button class="btn ghost" id="dataBtn">Data</button>
+    </div>
+    <section class="results" id="results" aria-live="polite"></section>
+  </main>
+</div>
+<footer class="footer"><span>Local-first. No uploads, analytics, or network requests.</span><span><code id="storageKeyLabel">dcs-userfile-radar-v1</code></span></footer>
+
+<dialog class="dialog" id="entryDialog" aria-labelledby="entryTitle">
+<form id="entryForm" method="dialog">
+<div class="dialog-head"><h2 id="entryTitle">Add community file</h2><button type="button" class="smallbtn" data-close="entryDialog" aria-label="Close">✕</button></div>
+<div class="dialog-body"><div class="formgrid">
+<input type="hidden" id="entryId">
+<div class="field full"><label for="title">Title *</label><input id="title" required maxlength="120" autocomplete="off"></div>
+<div class="field"><label for="creator">Creator</label><input id="creator" maxlength="80" autocomplete="off"></div>
+<div class="field"><label for="fileType">File type</label><select id="fileType"><option>Mission</option><option>Campaign</option><option>Livery</option><option>Mod</option><option>Utility</option><option>Document</option><option>Control profile</option><option>Static template</option><option>Other</option></select></div>
+<div class="field full"><label for="sourceUrl">Source URL</label><input id="sourceUrl" type="url" inputmode="url" autocomplete="url"></div>
+<div class="field"><label for="aircraft">Aircraft / module</label><input id="aircraft" maxlength="100" autocomplete="off"><span class="hint">Comma-separated for multiple modules.</span></div>
+<div class="field"><label for="terrain">Terrain / map</label><input id="terrain" maxlength="100" autocomplete="off"><span class="hint">Use “Any” when terrain-independent.</span></div>
+<div class="field"><label for="mode">Mode</label><select id="mode"><option>Single-player</option><option>Co-op</option><option>Multiplayer</option><option>Any</option></select></div>
+<div class="field"><label for="status">Workflow status</label><select id="status"><option value="watchlist">Watchlist</option><option value="downloaded">Downloaded</option><option value="installed">Installed</option><option value="tested">Tested</option><option value="archived">Archived</option></select></div>
+<div class="field"><label for="updated">Source updated</label><input id="updated" type="date"></div>
+<div class="field"><label for="verified">Last verified</label><input id="verified" type="date"></div>
+<div class="field full"><label for="dependencies">Other dependencies</label><input id="dependencies" maxlength="180" autocomplete="off"><span class="hint">Comma-separated assets, scripts, or add-ons not covered by aircraft and terrain.</span></div>
+<div class="field full"><label for="tags">Tags</label><input id="tags" maxlength="180" autocomplete="off"><span class="hint">Comma-separated roles, eras, qualities, or search terms.</span></div>
+<div class="field full"><label for="notes">Notes</label><textarea id="notes" maxlength="1200"></textarea></div>
+</div></div>
+<div class="dialog-foot"><button type="button" class="btn danger" id="deleteBtn" hidden>Delete</button><span style="flex:1"></span><button type="button" class="btn ghost" data-close="entryDialog">Cancel</button><button class="btn primary" value="save">Save file</button></div>
+</form></dialog>
+
+<dialog class="dialog" id="settingsDialog" aria-labelledby="settingsTitle">
+<div class="dialog-head"><h2 id="settingsTitle">My DCS install</h2><button type="button" class="smallbtn" data-close="settingsDialog" aria-label="Close">✕</button></div>
+<div class="dialog-body"><p style="margin-top:0;color:var(--muted)">Ownership is used only for local readiness checks. “Any” and blank requirements always pass.</p><div class="ownership"><section><p class="group-label">Aircraft / modules</p><div class="checkgrid" id="ownedAircraft"></div></section><section><p class="group-label">Terrains / maps</p><div class="checkgrid" id="ownedMaps"></div></section></div><div class="field" style="margin-top:18px"><label for="customOwned">Other owned names</label><textarea id="customOwned" placeholder="One exact module or terrain name per line"></textarea></div></div>
+<div class="dialog-foot"><button class="btn ghost" data-close="settingsDialog">Cancel</button><button class="btn primary" id="saveSettings">Save install</button></div>
+</dialog>
+
+<dialog class="dialog" id="dataDialog" aria-labelledby="dataTitle">
+<div class="dialog-head"><h2 id="dataTitle">Catalog data</h2><button type="button" class="smallbtn" data-close="dataDialog" aria-label="Close">✕</button></div>
+<div class="dialog-body"><p style="margin-top:0;color:var(--muted)">Export a portable backup, import a prior Userfile Radar JSON file, print the current filtered view, or clear local data.</p><div style="display:flex;flex-wrap:wrap;gap:10px"><button class="btn" id="exportBtn">Export JSON</button><label class="btn" for="importInput" style="display:inline-flex;align-items:center">Import JSON</label><input id="importInput" type="file" accept="application/json,.json" hidden><button class="btn" id="printBtn">Print current view</button><button class="btn danger" id="clearBtn">Clear catalog</button></div><p class="hint" id="dataSummary" style="margin-top:18px"></p></div>
+<div class="dialog-foot"><button class="btn primary" data-close="dataDialog">Done</button></div>
+</dialog>
+<div class="toast" id="toast" role="status"></div>
+<script>
+'use strict';
+const KEY='dcs-userfile-radar-v1';
+const STATUSES=['watchlist','downloaded','installed','tested','archived'];
+const STATUS_LABEL={watchlist:'Watchlist',downloaded:'Downloaded',installed:'Installed',tested:'Tested',archived:'Archived'};
+const COMMON_AIRCRAFT=['A-10C II','AH-64D','CH-47F','F-4E','F-14A/B','F-14B(U)','F-16C','F/A-18C','F-100D','G.91R','Mi-8MTV2','Mi-24P','MiG-29A','P-47D','Su-25T'];
+const COMMON_MAPS=['Afghanistan','Caucasus','Channel','Falklands','Germany','Iraq','Kola','Marianas','Nevada','Normandy 2','Persian Gulf','Sinai','Syria'];
+let state=load();let ui={status:'all',fit:'all',type:'all',aircraft:'all',map:'all',sort:'updated',search:'',view:localStorage.getItem(KEY+'-view')||'list'};
+function blankState(){return{version:1,entries:[],owned:[],created:new Date().toISOString()}}
+function load(){try{const x=JSON.parse(localStorage.getItem(KEY));return x&&Array.isArray(x.entries)?x:blankState()}catch{return blankState()}}
+function save(){localStorage.setItem(KEY,JSON.stringify(state))}
+function esc(s=''){return String(s).replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]))}
+function split(s){return String(s||'').split(',').map(x=>x.trim()).filter(Boolean)}
+function dateToday(){return new Date().toISOString().slice(0,10)}
+function norm(s){return String(s||'').trim().toLowerCase()}
+function requirementNames(e){return [...split(e.aircraft),...split(e.terrain)].filter(x=>!['any','none','n/a'].includes(norm(x)))}
+function gaps(e){const owned=new Set(state.owned.map(norm));return requirementNames(e).filter(x=>!owned.has(norm(x)))}
+function isReady(e){return gaps(e).length===0}
+function unique(field){return [...new Set(state.entries.flatMap(e=>split(e[field])).filter(Boolean))].sort((a,b)=>a.localeCompare(b))}
+function countStatus(s){return state.entries.filter(e=>e.status===s).length}
+function toast(msg){const t=document.querySelector('#toast');t.textContent=msg;t.classList.add('show');clearTimeout(toast.timer);toast.timer=setTimeout(()=>t.classList.remove('show'),2200)}
+function renderFilters(){
+ const box=document.querySelector('#statusFilters');box.innerHTML=`<button class="filter-btn ${ui.status==='all'?'active':''}" data-status="all">All workflow <span class="count">${state.entries.length}</span></button>`+STATUSES.map(s=>`<button class="filter-btn ${ui.status===s?'active':''}" data-status="${s}">${STATUS_LABEL[s]} <span class="count">${countStatus(s)}</span></button>`).join('');
+ document.querySelectorAll('[data-status]').forEach(b=>b.onclick=()=>{ui.status=b.dataset.status;render()});
+ const ready=state.entries.filter(isReady).length, gc=state.entries.length-ready;
+ document.querySelector('#allFitCount').textContent=state.entries.length;document.querySelector('#readyCount').textContent=ready;document.querySelector('#gapCount').textContent=gc;
+ document.querySelectorAll('[data-fit]').forEach(b=>{b.classList.toggle('active',ui.fit===b.dataset.fit);b.onclick=()=>{ui.fit=b.dataset.fit;render()}});
+ fillSelect('#typeFilter',['all',...unique('type')],ui.type,v=>v==='all'?'All types':v);
+ fillSelect('#aircraftFilter',['all',...unique('aircraft')],ui.aircraft,v=>v==='all'?'All aircraft':v);
+ fillSelect('#mapFilter',['all',...unique('terrain')],ui.map,v=>v==='all'?'All terrains':v);
+}
+function fillSelect(sel,values,current,label){const el=document.querySelector(sel);el.innerHTML=values.map(v=>`<option value="${esc(v)}" ${v===current?'selected':''}>${esc(label(v))}</option>`).join('')}
+function filtered(){let a=state.entries.filter(e=>{
+ if(ui.status!=='all'&&e.status!==ui.status)return false;if(ui.fit==='ready'&&!isReady(e))return false;if(ui.fit==='gaps'&&isReady(e))return false;if(ui.type!=='all'&&e.type!==ui.type)return false;
+ if(ui.aircraft!=='all'&&!split(e.aircraft).includes(ui.aircraft))return false;if(ui.map!=='all'&&!split(e.terrain).includes(ui.map))return false;
+ const hay=[e.title,e.creator,e.type,e.aircraft,e.terrain,e.mode,e.dependencies,e.tags,e.notes].join(' ').toLowerCase();return !ui.search||hay.includes(ui.search.toLowerCase());
+ });
+ return a.sort((a,b)=>ui.sort==='title'?a.title.localeCompare(b.title):ui.sort==='creator'?(a.creator||'').localeCompare(b.creator||''):ui.sort==='added'?String(b.added).localeCompare(String(a.added)):String(b.updated||b.added).localeCompare(String(a.updated||a.added)));
+}
+function render(){renderFilters();const list=filtered(), results=document.querySelector('#results');results.className='results'+(ui.view==='grid'?' grid':'');
+ document.querySelector('#listView').setAttribute('aria-pressed',ui.view==='list');document.querySelector('#gridView').setAttribute('aria-pressed',ui.view==='grid');
+ document.querySelector('#totalStat').textContent=state.entries.length;document.querySelector('#readyStat').textContent=state.entries.filter(isReady).length;
+ const gc=state.entries.filter(e=>!isReady(e)).length, notice=document.querySelector('#gapNotice');notice.classList.toggle('show',gc>0&&ui.fit!=='gaps');document.querySelector('#gapNoticeText').textContent=`${gc} cataloged file${gc===1?' has':'s have'} module or terrain gaps against your install.`;
+ if(!list.length){const has=state.entries.length>0;results.innerHTML=`<div class="empty"><div class="empty-inner"><div class="signal" aria-hidden="true"></div><h2>${has?'No files match this sweep.':'Build your own signal.'}</h2><p>${has?'Clear a filter or broaden the search. Your catalog remains intact.':'Add a promising mission, campaign, livery, mod, or document. Userfile Radar will keep its requirements and install state searchable offline.'}</p><button class="btn primary" id="emptyAction">${has?'Reset filters':'Add first file'}</button></div></div>`;document.querySelector('#emptyAction').onclick=has?resetFilters:()=>openEntry();return}
+ results.innerHTML=list.map(card).join('');results.querySelectorAll('[data-edit]').forEach(b=>b.onclick=()=>openEntry(b.dataset.edit));results.querySelectorAll('[data-next]').forEach(b=>b.onclick=()=>advance(b.dataset.next));results.querySelectorAll('[data-open]').forEach(b=>b.onclick=()=>openSource(b.dataset.open));
+}
+function card(e){const gs=gaps(e), tg=split(e.tags).slice(0,5);return `<article class="card"><div class="card-main"><div class="card-top"><span class="status ${esc(e.status)}">${esc(STATUS_LABEL[e.status]||e.status)}</span><span class="type">${esc(e.type||'Other')}</span>${gs.length?`<span class="type gap">Missing: ${esc(gs.join(', '))}</span>`:''}</div><h3><button data-edit="${esc(e.id)}">${esc(e.title)}</button></h3><div class="meta">${e.creator?`<span>by <b>${esc(e.creator)}</b></span>`:''}${e.aircraft?`<span>Aircraft <b>${esc(e.aircraft)}</b></span>`:''}${e.terrain?`<span>Terrain <b>${esc(e.terrain)}</b></span>`:''}${e.mode?`<span><b>${esc(e.mode)}</b></span>`:''}${e.verified?`<span>Checked <b>${esc(e.verified)}</b></span>`:''}</div>${tg.length?`<div class="tags">${tg.map(t=>`<span class="tag">${esc(t)}</span>`).join('')}</div>`:''}</div><div class="card-side">${e.sourceUrl?`<button class="smallbtn" data-open="${esc(e.id)}" title="Open source" aria-label="Open source for ${esc(e.title)}">↗</button>`:''}<button class="smallbtn" data-next="${esc(e.id)}" title="Advance workflow" aria-label="Advance workflow for ${esc(e.title)}">→</button><button class="smallbtn" data-edit="${esc(e.id)}" title="Edit" aria-label="Edit ${esc(e.title)}">✎</button></div></article>`}
+function resetFilters(){ui={...ui,status:'all',fit:'all',type:'all',aircraft:'all',map:'all',search:''};document.querySelector('#search').value='';render()}
+function openEntry(id){const e=id?state.entries.find(x=>x.id===id):null;document.querySelector('#entryTitle').textContent=e?'Edit community file':'Add community file';document.querySelector('#entryId').value=e?.id||'';['title','creator','sourceUrl','aircraft','terrain','mode','status','updated','verified','dependencies','tags','notes'].forEach(k=>document.querySelector('#'+k).value=e?.[k]||((k==='verified'&&!e)?dateToday():(k==='status'?'watchlist':'')));document.querySelector('#fileType').value=e?.type||'Mission';document.querySelector('#deleteBtn').hidden=!e;document.querySelector('#entryDialog').showModal();setTimeout(()=>document.querySelector('#title').focus(),0)}
+function closeDialog(id){document.querySelector('#'+id).close()}
+function upsert(){const form=document.querySelector('#entryForm');if(!form.reportValidity())return;const id=document.querySelector('#entryId').value, old=state.entries.find(e=>e.id===id);const get=k=>document.querySelector('#'+k).value.trim();const item={id:id||crypto.randomUUID(),title:get('title'),creator:get('creator'),type:get('fileType'),sourceUrl:get('sourceUrl'),aircraft:get('aircraft'),terrain:get('terrain'),mode:get('mode'),status:get('status'),updated:get('updated'),verified:get('verified'),dependencies:get('dependencies'),tags:get('tags'),notes:get('notes'),added:old?.added||new Date().toISOString()};if(old)state.entries=state.entries.map(e=>e.id===id?item:e);else state.entries.push(item);save();closeDialog('entryDialog');render();toast(old?'File updated':'File added')}
+function removeCurrent(){const id=document.querySelector('#entryId').value,e=state.entries.find(x=>x.id===id);if(e&&confirm(`Delete “${e.title}” from the local catalog?`)){state.entries=state.entries.filter(x=>x.id!==id);save();closeDialog('entryDialog');render();toast('File deleted')}}
+function advance(id){const e=state.entries.find(x=>x.id===id);if(!e)return;const i=STATUSES.indexOf(e.status);e.status=STATUSES[Math.min(i+1,STATUSES.length-1)];if(e.status==='tested')e.verified=dateToday();save();render();toast(`Moved to ${STATUS_LABEL[e.status]}`)}
+function openSource(id){const e=state.entries.find(x=>x.id===id);if(e?.sourceUrl)window.open(e.sourceUrl,'_blank','noopener')}
+function renderSettings(){const owned=new Set(state.owned.map(norm));const make=n=>`<label class="check"><input type="checkbox" value="${esc(n)}" ${owned.has(norm(n))?'checked':''}> <span>${esc(n)}</span></label>`;document.querySelector('#ownedAircraft').innerHTML=COMMON_AIRCRAFT.map(make).join('');document.querySelector('#ownedMaps').innerHTML=COMMON_MAPS.map(make).join('');const common=new Set([...COMMON_AIRCRAFT,...COMMON_MAPS].map(norm));document.querySelector('#customOwned').value=state.owned.filter(x=>!common.has(norm(x))).join('\n')}
+function saveSettings(){const checks=[...document.querySelectorAll('#settingsDialog input[type=checkbox]:checked')].map(x=>x.value);const custom=document.querySelector('#customOwned').value.split(/\n/).map(x=>x.trim()).filter(Boolean);state.owned=[...new Set([...checks,...custom])];save();closeDialog('settingsDialog');render();toast('Install profile saved')}
+function exportData(){const data={...state,exported:new Date().toISOString(),app:'Userfile Radar'};const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`userfile-radar-${dateToday()}.json`;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);toast('Backup exported')}
+function importData(file){const r=new FileReader();r.onload=()=>{try{const x=JSON.parse(r.result);if(!x||!Array.isArray(x.entries)||!Array.isArray(x.owned))throw Error();if(!confirm(`Replace this catalog with ${x.entries.length} imported entries?`))return;state={version:1,entries:x.entries,owned:x.owned,created:x.created||new Date().toISOString()};save();closeDialog('dataDialog');render();toast('Catalog imported')}catch{alert('That file is not a valid Userfile Radar backup.')}};r.readAsText(file)}
+function clearData(){if(confirm('Clear every catalog entry? Ownership settings will be kept.')){state.entries=[];save();closeDialog('dataDialog');render();toast('Catalog cleared')}}
+function dataSummary(){document.querySelector('#dataSummary').textContent=`${state.entries.length} entries · ${state.owned.length} owned items · stored only in this browser profile.`}
+
+document.querySelector('#entryForm').addEventListener('submit',e=>{e.preventDefault();upsert()});document.querySelector('#deleteBtn').onclick=removeCurrent;
+document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>closeDialog(b.dataset.close));document.querySelector('#addBtn').onclick=()=>openEntry();document.querySelector('#settingsBtn').onclick=()=>{renderSettings();document.querySelector('#settingsDialog').showModal()};document.querySelector('#saveSettings').onclick=saveSettings;
+document.querySelector('#dataBtn').onclick=()=>{dataSummary();document.querySelector('#dataDialog').showModal()};document.querySelector('#exportBtn').onclick=exportData;document.querySelector('#importInput').onchange=e=>e.target.files[0]&&importData(e.target.files[0]);document.querySelector('#printBtn').onclick=()=>window.print();document.querySelector('#clearBtn').onclick=clearData;
+document.querySelector('#search').oninput=e=>{ui.search=e.target.value;render()};document.querySelector('#typeFilter').onchange=e=>{ui.type=e.target.value;render()};document.querySelector('#aircraftFilter').onchange=e=>{ui.aircraft=e.target.value;render()};document.querySelector('#mapFilter').onchange=e=>{ui.map=e.target.value;render()};document.querySelector('#sortBy').onchange=e=>{ui.sort=e.target.value;render()};document.querySelector('#showGapsBtn').onclick=()=>{ui.fit='gaps';render()};
+document.querySelector('#listView').onclick=()=>{ui.view='list';localStorage.setItem(KEY+'-view','list');render()};document.querySelector('#gridView').onclick=()=>{ui.view='grid';localStorage.setItem(KEY+'-view','grid');render()};
+document.addEventListener('keydown',e=>{if(e.key==='/'&&!['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName)){e.preventDefault();document.querySelector('#search').focus()}if(e.key.toLowerCase()==='n'&&(e.ctrlKey||e.metaKey)){e.preventDefault();openEntry()}});
+render();
+</script>
+</body>
+</html>
