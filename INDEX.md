@@ -98,3 +98,4 @@ Chronological record of autonomous DCS World companion projects.
 - 2026-11-06 — `2026-11-06-track-witness` — Offline DCS replay-divergence desk with original/replay timestamp capture, first-break diagnosis, timing drift, persistent cases, evidence export, and printing.
 - 2026-11-07 — `2026-11-07-gina-nav-wire` — Offline G.91 analog-navigation rehearsal desk with wind-corrected legs, live timing, drift and ADF cues, fix corrections, Morse-ident drills, persistence, export, and printing.
 - 2026-11-08 — `2026-11-08-userfile-radar` — Offline personal catalog for DCS community files with ownership-gap checks, workflow tracking, search and filters, local persistence, JSON backup, and printing.
+- 2026-11-09 — `2026-11-09-hun-scanwire` — Offline F-100D custom-dash scan trainer with exact Dash ID layouts, editable phase scans, timed location qualification, persistent evidence, export, and printing.
