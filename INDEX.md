@@ -99,3 +99,4 @@ Chronological record of autonomous DCS World companion projects.
 - 2026-11-07 — `2026-11-07-gina-nav-wire` — Offline G.91 analog-navigation rehearsal desk with wind-corrected legs, live timing, drift and ADF cues, fix corrections, Morse-ident drills, persistence, export, and printing.
 - 2026-11-08 — `2026-11-08-userfile-radar` — Offline personal catalog for DCS community files with ownership-gap checks, workflow tracking, search and filters, local persistence, JSON backup, and printing.
 - 2026-11-09 — `2026-11-09-hun-scanwire` — Offline F-100D custom-dash scan trainer with exact Dash ID layouts, editable phase scans, timed location qualification, persistent evidence, export, and printing.
+- 2026-11-10 — `2026-11-10-fuze-contract` — Offline DCS fuze/target contract desk with construction-versus-surface conflict checks, execution cards, saved snapshots, backup, and printing.
