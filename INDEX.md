@@ -100,3 +100,4 @@ Chronological record of autonomous DCS World companion projects.
 - 2026-11-08 — `2026-11-08-userfile-radar` — Offline personal catalog for DCS community files with ownership-gap checks, workflow tracking, search and filters, local persistence, JSON backup, and printing.
 - 2026-11-09 — `2026-11-09-hun-scanwire` — Offline F-100D custom-dash scan trainer with exact Dash ID layouts, editable phase scans, timed location qualification, persistent evidence, export, and printing.
 - 2026-11-10 — `2026-11-10-fuze-contract` — Offline DCS fuze/target contract desk with construction-versus-surface conflict checks, execution cards, saved snapshots, backup, and printing.
+- 2026-11-11 — `2026-11-11-fcr-slice-coach` — Offline F-16C radar-geometry trainer with live FCR and side-profile views, datalink-versus-ownship diagnosis, scenario presets, persistent drills, and printing.
