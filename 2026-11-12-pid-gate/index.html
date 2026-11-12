@@ -1,0 +1,857 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark">
+<title>PID Gate — DCS Multiplayer Release-Discipline Trainer</title>
+<style>
+:root {
+  --bg: #0c0e0f;
+  --surface: #141719;
+  --surface-2: #1b1f21;
+  --line: #343a3d;
+  --line-strong: #596166;
+  --ink: #f1eee4;
+  --muted: #a7aca8;
+  --dim: #747b7a;
+  --amber: #f2b84b;
+  --amber-ink: #231a09;
+  --green: #7fc48f;
+  --red: #e58172;
+  --blue: #8db7c7;
+  --radius: 3px;
+  --mono: "SFMono-Regular", "Roboto Mono", "Liberation Mono", monospace;
+  --sans: "Avenir Next", Avenir, "Helvetica Neue", Arial, sans-serif;
+  --condensed: "Arial Narrow", "Avenir Next Condensed", var(--sans);
+}
+* { box-sizing: border-box; }
+html { background: var(--bg); }
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--sans);
+  line-height: 1.45;
+}
+button, input, select { font: inherit; }
+button { color: inherit; }
+button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-visible {
+  outline: 3px solid var(--amber);
+  outline-offset: 2px;
+}
+button { min-height: 44px; }
+.sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+}
+.shell { min-height: 100vh; display: grid; grid-template-rows: auto 1fr auto; }
+.topbar {
+  min-height: 68px;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 24px;
+  padding: 12px clamp(16px, 3vw, 40px);
+  border-bottom: 1px solid var(--line);
+  background: #101214;
+}
+.brand { display: flex; align-items: baseline; gap: 12px; white-space: nowrap; }
+.brand strong {
+  font-family: var(--condensed);
+  font-size: 23px;
+  letter-spacing: .11em;
+  text-transform: uppercase;
+}
+.brand span { color: var(--amber); font: 700 11px/1 var(--mono); letter-spacing: .12em; }
+.runline { display: flex; align-items: center; gap: 14px; min-width: 0; }
+.progress-track { height: 5px; flex: 1; max-width: 500px; background: #272b2d; overflow: hidden; }
+.progress-fill { height: 100%; width: 0; background: var(--amber); transition: width 180ms ease; }
+.run-count { color: var(--muted); font: 700 11px/1 var(--mono); white-space: nowrap; }
+.top-actions { display: flex; gap: 8px; }
+.text-button, .icon-button {
+  border: 1px solid var(--line);
+  background: transparent;
+  border-radius: var(--radius);
+  cursor: pointer;
+  padding: 8px 12px;
+  font: 700 11px/1 var(--mono);
+  text-transform: uppercase;
+  letter-spacing: .06em;
+}
+.text-button:hover, .icon-button:hover { border-color: var(--line-strong); background: var(--surface-2); }
+.workspace {
+  display: grid;
+  grid-template-columns: minmax(190px, .7fr) minmax(440px, 1.75fr) minmax(290px, 1fr);
+  min-height: 0;
+}
+.queue, .decision-panel { background: #101214; }
+.queue { border-right: 1px solid var(--line); padding: 24px 18px; }
+.decision-panel { border-left: 1px solid var(--line); padding: 24px; }
+.stage { padding: clamp(22px, 4vw, 54px); min-width: 0; }
+.eyebrow, .section-label {
+  color: var(--muted);
+  font: 700 11px/1.2 var(--mono);
+  letter-spacing: .11em;
+  text-transform: uppercase;
+}
+.queue-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+.queue-head b { color: var(--amber); font: 700 11px/1 var(--mono); }
+.case-list { display: grid; gap: 4px; }
+.case-item {
+  width: 100%; min-height: 48px; padding: 8px 10px;
+  display: grid; grid-template-columns: 28px 1fr auto; align-items: center; gap: 8px;
+  border: 1px solid transparent; border-radius: var(--radius); background: transparent;
+  text-align: left; cursor: pointer;
+}
+.case-item:hover { background: var(--surface-2); }
+.case-item[aria-current="true"] { border-color: var(--amber); background: #1b1913; }
+.case-item:disabled { cursor: not-allowed; opacity: .72; }
+.case-number { color: var(--dim); font: 700 11px/1 var(--mono); }
+.case-name { font-family: var(--condensed); font-weight: 700; letter-spacing: .02em; }
+.case-mark { width: 9px; height: 9px; border: 1px solid var(--line-strong); border-radius: 50%; }
+.case-mark.correct { border-color: var(--green); background: var(--green); }
+.case-mark.wrong { border-color: var(--red); background: var(--red); }
+.case-mark.current { border-color: var(--amber); box-shadow: inset 0 0 0 2px #101214; background: var(--amber); }
+.queue-tools { margin-top: 22px; display: grid; gap: 8px; }
+.queue-tools button { width: 100%; }
+.case-header { display: grid; grid-template-columns: 1fr auto; gap: 18px; align-items: start; margin-bottom: 38px; }
+.case-title { margin: 7px 0 0; font-family: var(--condensed); font-size: clamp(32px, 5vw, 62px); line-height: .98; letter-spacing: -.025em; text-wrap: balance; }
+.clock {
+  min-width: 92px; padding: 10px 12px; border: 1px solid var(--line); background: var(--surface);
+  text-align: right;
+}
+.clock span { display: block; color: var(--muted); font: 700 10px/1 var(--mono); letter-spacing: .08em; }
+.clock strong { display: block; margin-top: 6px; font: 700 24px/1 var(--mono); color: var(--amber); }
+.clock.urgent strong { color: var(--red); }
+.contact-strip {
+  display: grid; grid-template-columns: repeat(4, 1fr); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); margin-bottom: 30px;
+}
+.contact-cell { padding: 15px 14px 15px 0; }
+.contact-cell + .contact-cell { border-left: 1px solid var(--line); padding-left: 14px; }
+.contact-cell span { display: block; color: var(--dim); font: 700 10px/1 var(--mono); text-transform: uppercase; letter-spacing: .1em; }
+.contact-cell strong { display: block; margin-top: 7px; font-family: var(--condensed); font-size: 18px; }
+.situation { margin: 0 0 28px; max-width: 72ch; color: #d7d7d1; font-size: 17px; text-wrap: pretty; }
+.evidence-head { display: flex; justify-content: space-between; gap: 16px; align-items: baseline; margin-bottom: 12px; }
+.evidence-head small { color: var(--dim); font: 11px/1.3 var(--mono); }
+.evidence-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); border-top: 1px solid var(--line); }
+.evidence-row {
+  min-height: 88px; padding: 16px 14px 15px 0; border-bottom: 1px solid var(--line);
+  display: grid; grid-template-columns: 110px 1fr; gap: 14px;
+}
+.evidence-row:nth-child(even) { padding-left: 18px; border-left: 1px solid var(--line); }
+.evidence-key { color: var(--muted); font: 700 10px/1.3 var(--mono); text-transform: uppercase; letter-spacing: .08em; }
+.evidence-value { font-size: 14px; }
+.evidence-value .state {
+  display: inline-block; margin-bottom: 5px; padding: 3px 6px; border: 1px solid var(--line-strong);
+  color: var(--ink); font: 700 10px/1 var(--mono); text-transform: uppercase; letter-spacing: .05em;
+}
+.state.supports { color: var(--green); border-color: #41694a; }
+.state.conflicts { color: var(--red); border-color: #7b463e; }
+.state.unknown { color: var(--muted); }
+.contract-summary {
+  margin-bottom: 26px; padding-bottom: 18px; border-bottom: 1px solid var(--line);
+}
+.contract-summary h2 { margin: 7px 0 8px; font-family: var(--condensed); font-size: 24px; }
+.contract-summary p { margin: 0; color: var(--muted); font-size: 13px; }
+.gate-list { display: grid; gap: 8px; margin-bottom: 24px; }
+.gate {
+  min-height: 44px; display: grid; grid-template-columns: 18px 1fr; gap: 10px; align-items: center;
+  padding: 9px 10px; border: 1px solid var(--line); color: var(--muted); font-size: 13px;
+}
+.gate-dot { width: 9px; height: 9px; border: 1px solid var(--line-strong); border-radius: 50%; }
+.gate.pass { color: var(--ink); }
+.gate.pass .gate-dot { border-color: var(--green); background: var(--green); }
+.gate.fail .gate-dot { border-color: var(--red); background: var(--red); }
+.gate.na { opacity: .56; }
+.decision-label { margin-bottom: 10px; }
+.decision-buttons { display: grid; gap: 9px; }
+.decision-button {
+  min-height: 62px; display: grid; grid-template-columns: 34px 1fr auto; gap: 10px; align-items: center;
+  border: 1px solid var(--line-strong); border-radius: var(--radius); background: var(--surface); cursor: pointer; text-align: left; padding: 10px 12px;
+}
+.decision-button:hover:not(:disabled) { border-color: var(--amber); background: #1d1b15; }
+.decision-button:disabled { cursor: not-allowed; opacity: .55; }
+.decision-button .key { color: var(--dim); font: 700 12px/1 var(--mono); }
+.decision-button strong { font-family: var(--condensed); font-size: 18px; letter-spacing: .05em; text-transform: uppercase; }
+.decision-button small { color: var(--muted); font-size: 11px; text-align: right; }
+.decision-button.selected.correct { border-color: var(--green); background: #132019; }
+.decision-button.selected.wrong { border-color: var(--red); background: #241615; }
+.feedback {
+  display: none; margin-top: 20px; padding-top: 18px; border-top: 1px solid var(--line);
+}
+.feedback.visible { display: block; }
+.feedback .result { margin: 0 0 8px; font-family: var(--condensed); font-size: 26px; }
+.feedback .result.correct { color: var(--green); }
+.feedback .result.wrong { color: var(--red); }
+.feedback p { margin: 0 0 13px; color: #d2d2cc; font-size: 13px; }
+.next-button {
+  width: 100%; border: 0; border-radius: var(--radius); background: var(--amber); color: var(--amber-ink); cursor: pointer;
+  font: 800 13px/1 var(--mono); text-transform: uppercase; letter-spacing: .08em;
+}
+.next-button:hover { background: #ffd070; }
+.run-footer {
+  min-height: 42px; padding: 9px clamp(16px, 3vw, 40px); border-top: 1px solid var(--line); background: #101214;
+  display: flex; justify-content: space-between; gap: 20px; color: var(--dim); font: 10px/1.4 var(--mono); text-transform: uppercase; letter-spacing: .06em;
+}
+.dialog {
+  width: min(560px, calc(100vw - 28px)); max-height: calc(100vh - 28px); overflow: auto;
+  border: 1px solid var(--line-strong); border-radius: var(--radius); padding: 0; background: var(--surface); color: var(--ink);
+}
+.dialog::backdrop { background: rgb(0 0 0 / .78); }
+.dialog-head { position: sticky; top: 0; z-index: 1; padding: 18px 20px; display: flex; align-items: center; justify-content: space-between; background: var(--surface); border-bottom: 1px solid var(--line); }
+.dialog-head h2 { margin: 0; font-family: var(--condensed); font-size: 25px; }
+.close-button { width: 44px; border: 1px solid var(--line); background: transparent; border-radius: var(--radius); cursor: pointer; }
+.dialog-body { padding: 22px 20px 24px; }
+.rule-row { padding: 14px 0; border-bottom: 1px solid var(--line); }
+.rule-row:last-child { border-bottom: 0; }
+.rule-row label { display: flex; justify-content: space-between; gap: 20px; align-items: center; font-weight: 700; }
+.rule-row p { margin: 5px 0 0; color: var(--muted); font-size: 13px; }
+.rule-row input[type="checkbox"] { width: 22px; height: 22px; accent-color: var(--amber); }
+.rule-row select { min-height: 44px; color: var(--ink); background: var(--bg); border: 1px solid var(--line-strong); padding: 6px 34px 6px 10px; }
+.dialog-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 22px; }
+.primary-small { border: 0; background: var(--amber); color: var(--amber-ink); border-radius: var(--radius); padding: 8px 15px; font-weight: 800; cursor: pointer; }
+.stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); margin-bottom: 18px; }
+.stat { padding: 16px 10px; text-align: center; }
+.stat + .stat { border-left: 1px solid var(--line); }
+.stat strong { display: block; font: 700 28px/1 var(--mono); }
+.stat span { display: block; margin-top: 7px; color: var(--dim); font: 10px/1 var(--mono); text-transform: uppercase; }
+.shortcut-list { display: grid; grid-template-columns: auto 1fr; gap: 10px 16px; align-items: center; }
+kbd { display: inline-grid; place-items: center; min-width: 35px; height: 30px; padding: 0 8px; border: 1px solid var(--line-strong); background: var(--bg); font: 700 12px/1 var(--mono); }
+.summary-screen { display: none; max-width: 760px; margin: 0 auto; padding-top: 8vh; }
+.summary-screen.visible { display: block; }
+.summary-screen h1 { margin: 8px 0 14px; font-family: var(--condensed); font-size: clamp(44px, 8vw, 82px); line-height: .95; }
+.summary-screen > p { color: var(--muted); max-width: 58ch; }
+.summary-actions { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 28px; }
+.summary-actions button { padding: 8px 16px; }
+.history { margin-top: 32px; border-top: 1px solid var(--line); }
+.history-row { display: grid; grid-template-columns: 40px 1fr auto auto; gap: 12px; align-items: center; min-height: 52px; border-bottom: 1px solid var(--line); }
+.history-row .outcome { font: 700 11px/1 var(--mono); }
+.history-row .outcome.correct { color: var(--green); }
+.history-row .outcome.wrong { color: var(--red); }
+.toast {
+  position: fixed; left: 50%; bottom: 22px; transform: translate(-50%, 20px); opacity: 0; pointer-events: none;
+  background: var(--ink); color: #111; padding: 10px 14px; border-radius: var(--radius); font: 700 12px/1 var(--mono); transition: 160ms ease;
+}
+.toast.show { opacity: 1; transform: translate(-50%, 0); }
+@media (max-width: 1050px) {
+  .workspace { grid-template-columns: minmax(0, 1fr) 310px; }
+  .queue { display: none; }
+}
+@media (max-width: 760px) {
+  .topbar { grid-template-columns: 1fr auto; gap: 12px; }
+  .runline { grid-column: 1 / -1; grid-row: 2; }
+  .top-actions .print-label { display: none; }
+  .workspace { display: block; }
+  .stage { padding: 26px 18px; }
+  .decision-panel { border-left: 0; border-top: 1px solid var(--line); padding: 24px 18px 34px; }
+  .case-header { margin-bottom: 26px; }
+  .contact-strip { grid-template-columns: repeat(2, 1fr); }
+  .contact-cell:nth-child(3) { border-left: 0; padding-left: 0; border-top: 1px solid var(--line); }
+  .contact-cell:nth-child(4) { border-top: 1px solid var(--line); }
+  .evidence-grid { grid-template-columns: 1fr; }
+  .evidence-row:nth-child(even) { padding-left: 0; border-left: 0; }
+  .run-footer { display: none; }
+  .summary-screen { padding-top: 2vh; }
+}
+@media (max-width: 430px) {
+  .brand span { display: none; }
+  .case-title { font-size: 38px; }
+  .case-header { grid-template-columns: 1fr; }
+  .clock { width: 100%; display: flex; justify-content: space-between; align-items: center; text-align: left; }
+  .clock strong { margin: 0; }
+  .evidence-row { grid-template-columns: 92px 1fr; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; }
+}
+@media print {
+  :root { color-scheme: light; --bg: #fff; --surface: #fff; --surface-2: #fff; --ink: #111; --muted: #333; --dim: #555; --line: #999; --line-strong: #333; --amber: #111; --green: #111; --red: #111; }
+  body { background: #fff; color: #111; font-size: 12pt; }
+  .topbar, .queue, .decision-buttons, .feedback, .run-footer, .toast, .summary-screen, .clock { display: none !important; }
+  .workspace { display: block; }
+  .stage, .decision-panel { padding: 0; border: 0; }
+  .case-title { font-size: 28pt; }
+  .decision-panel { margin-top: 20pt; }
+  .contract-summary p::after { content: " — Training aid only. Server briefing and controllers govern."; }
+  .gate-list { grid-template-columns: repeat(2, 1fr); }
+  .gate { break-inside: avoid; }
+}
+</style>
+</head>
+<body>
+<div class="shell">
+  <header class="topbar">
+    <div class="brand"><strong>PID Gate</strong><span>MP discipline trainer</span></div>
+    <div class="runline" aria-label="Run progress">
+      <div class="progress-track" aria-hidden="true"><div class="progress-fill" id="progressFill"></div></div>
+      <span class="run-count" id="runCount">Case 1 / 10</span>
+    </div>
+    <div class="top-actions">
+      <button class="text-button" id="rulesButton" type="button">Rules</button>
+      <button class="text-button" id="printButton" type="button"><span class="print-label">Print </span>card</button>
+      <button class="icon-button" id="helpButton" type="button" aria-label="Keyboard shortcuts">?</button>
+    </div>
+  </header>
+
+  <main class="workspace">
+    <aside class="queue" aria-label="Scenario queue">
+      <div class="queue-head"><span class="section-label">Scenario queue</span><b id="scoreMini">0 correct</b></div>
+      <div class="case-list" id="caseList"></div>
+      <div class="queue-tools">
+        <button class="text-button" id="reviewButton" type="button">Review misses</button>
+        <button class="text-button" id="resetButton" type="button">Reset run</button>
+      </div>
+    </aside>
+
+    <section class="stage" aria-live="polite">
+      <div id="caseScreen">
+        <div class="case-header">
+          <div>
+            <div class="eyebrow" id="caseEyebrow">Contact 01 · BVR intercept</div>
+            <h1 class="case-title" id="caseTitle">The silent return</h1>
+          </div>
+          <div class="clock" id="clock"><span>Decision window</span><strong id="clockValue">45</strong></div>
+        </div>
+
+        <div class="contact-strip" aria-label="Contact data">
+          <div class="contact-cell"><span>Bearing</span><strong id="bearing">042°</strong></div>
+          <div class="contact-cell"><span>Range</span><strong id="range">31 NM</strong></div>
+          <div class="contact-cell"><span>Altitude</span><strong id="altitude">18,000 ft</strong></div>
+          <div class="contact-cell"><span>Track</span><strong id="track">Southwest</strong></div>
+        </div>
+
+        <p class="situation" id="situation"></p>
+
+        <div class="evidence-head">
+          <span class="section-label">Evidence ledger</span>
+          <small>Inputs support a decision; none is a fire button.</small>
+        </div>
+        <div class="evidence-grid" id="evidenceGrid"></div>
+      </div>
+
+      <section class="summary-screen" id="summaryScreen" aria-labelledby="summaryTitle">
+        <div class="eyebrow">Run complete</div>
+        <h1 id="summaryTitle">Gate discipline held.</h1>
+        <p id="summaryCopy"></p>
+        <div class="stats-grid" aria-label="Run statistics">
+          <div class="stat"><strong id="finalScore">0/10</strong><span>Correct</span></div>
+          <div class="stat"><strong id="finalAvg">0s</strong><span>Avg decision</span></div>
+          <div class="stat"><strong id="finalStreak">0</strong><span>Best streak</span></div>
+        </div>
+        <div class="summary-actions">
+          <button class="primary-small" id="summaryReview" type="button">Review misses</button>
+          <button class="text-button" id="summaryRestart" type="button">New run</button>
+          <button class="text-button" id="summaryPrint" type="button">Print card</button>
+        </div>
+        <div class="history" id="history"></div>
+      </section>
+    </section>
+
+    <aside class="decision-panel" id="decisionPanel" aria-label="Decision panel">
+      <section class="contract-summary">
+        <div class="eyebrow">Active rules contract</div>
+        <h2 id="contractName">Positive ID · standard</h2>
+        <p id="contractText"></p>
+      </section>
+      <div class="section-label" style="margin-bottom:10px">Gate status</div>
+      <div class="gate-list" id="gateList"></div>
+      <div class="decision-label section-label">Your decision</div>
+      <div class="decision-buttons">
+        <button class="decision-button" data-decision="hold" type="button"><span class="key">1</span><strong>Hold</strong><small>Maintain / separate</small></button>
+        <button class="decision-button" data-decision="query" type="button"><span class="key">2</span><strong>Query</strong><small>Cross-check / call</small></button>
+        <button class="decision-button" data-decision="commit" type="button"><span class="key">3</span><strong>Commit</strong><small>Gate met</small></button>
+      </div>
+      <section class="feedback" id="feedback">
+        <h2 class="result" id="resultTitle">Correct</h2>
+        <p id="resultCopy"></p>
+        <button class="next-button" id="nextButton" type="button">Next case · N</button>
+      </section>
+    </aside>
+  </main>
+
+  <footer class="run-footer">
+    <span>Simulation training aid · fictional scenarios · server rules govern</span>
+    <span>1 Hold · 2 Query · 3 Commit · N Next · ? Help</span>
+  </footer>
+</div>
+
+<dialog class="dialog" id="rulesDialog">
+  <form method="dialog" id="rulesForm">
+    <div class="dialog-head"><h2>Rules contract</h2><button class="close-button" value="cancel" aria-label="Close rules">×</button></div>
+    <div class="dialog-body">
+      <p style="margin-top:0;color:var(--muted)">Set the fictional mission standard used to score commit decisions. A direct friendly-risk conflict always blocks commit.</p>
+      <div class="rule-row">
+        <label for="confirmations">Independent supporting inputs
+          <select id="confirmations" name="confirmations"><option value="1">At least 1</option><option value="2">At least 2</option><option value="3">At least 3</option></select>
+        </label>
+        <p>Counts declared hostile, onboard classification, offboard correlation, visual ID, route fit, and hostile behavior.</p>
+      </div>
+      <div class="rule-row"><label for="requireDeclaration">Require hostile declaration <input id="requireDeclaration" type="checkbox"></label><p>Commit is blocked unless a controller or mission authority has declared the track hostile.</p></div>
+      <div class="rule-row"><label for="requireCorridor">Require clear corridor <input id="requireCorridor" type="checkbox"></label><p>Commit is blocked when friendlies, protected traffic, or an uncertain route occupy the shot corridor.</p></div>
+      <div class="rule-row"><label for="requireVisual">Require visual identification <input id="requireVisual" type="checkbox"></label><p>Useful for visual-ID exercises; intentionally restrictive for BVR cases.</p></div>
+      <div class="dialog-actions"><button class="text-button" value="cancel" type="button" id="cancelRules">Cancel</button><button class="primary-small" value="default" type="submit">Save contract</button></div>
+    </div>
+  </form>
+</dialog>
+
+<dialog class="dialog" id="helpDialog">
+  <div class="dialog-head"><h2>Keyboard shortcuts</h2><button class="close-button" id="closeHelp" aria-label="Close help">×</button></div>
+  <div class="dialog-body">
+    <div class="shortcut-list">
+      <kbd>1</kbd><span>Hold</span><kbd>2</kbd><span>Query</span><kbd>3</kbd><span>Commit</span>
+      <kbd>N</kbd><span>Next case after debrief</span><kbd>R</kbd><span>Repeat the current case</span><kbd>?</kbd><span>Open this help</span>
+    </div>
+  </div>
+</dialog>
+
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+(() => {
+  'use strict';
+
+  const STORAGE_KEY = 'pid-gate-v1';
+  const DEFAULT_RULES = { confirmations: 2, requireDeclaration: false, requireCorridor: true, requireVisual: false };
+  const evidenceLabels = {
+    declaration: 'Authority', onboard: 'Onboard ID', offboard: 'Offboard', visual: 'Visual', corridor: 'Corridor', behavior: 'Behavior'
+  };
+
+  const scenarios = [
+    {
+      id: 'silent-return', name: 'Silent return', type: 'BVR intercept', title: 'The silent return',
+      bearing: '042°', range: '31 NM', altitude: '18,000 ft', track: 'Southwest', window: 45,
+      situation: 'A track is descending toward your defended lane after an offboard picture call. Your sensor classifies it as a fighter, but a friendly two-ship returning from the range is overdue and not answering on the package frequency.',
+      evidence: {
+        declaration: ['unknown', 'No hostile declaration has been issued.'],
+        onboard: ['supports', 'Fighter-type classification; coalition remains unresolved.'],
+        offboard: ['unknown', 'Picture call reports a track, not identity.'],
+        visual: ['unknown', 'No visual identification at this range.'],
+        corridor: ['conflicts', 'Overdue friendly route overlaps the contact track.'],
+        behavior: ['unknown', 'Descending and steady; no attack behavior observed.']
+      }, baseDecision: 'query', rationale: 'The fighter classification is not identity, and the overdue friendly route creates a direct conflict. Query the controller/package and continue to separate.'
+    },
+    {
+      id: 'declared-raider', name: 'Declared raider', type: 'Defensive counter-air', title: 'The declared raider',
+      bearing: '317°', range: '42 NM', altitude: '27,000 ft', track: 'Inbound', window: 40,
+      situation: 'Control declares a single track hostile after correlation with the mission picture. It is fast, inbound to the defended asset, outside all friendly transit lanes, and your onboard classification agrees.',
+      evidence: {
+        declaration: ['supports', 'Control: “Track 317/42 declared hostile.”'],
+        onboard: ['supports', 'Fighter classification agrees with the call.'],
+        offboard: ['supports', 'Track correlated continuously from hostile launch area.'],
+        visual: ['unknown', 'No visual identification.'],
+        corridor: ['supports', 'No friendlies or protected traffic in the commit lane.'],
+        behavior: ['supports', 'High speed, direct inbound geometry.']
+      }, baseDecision: 'commit', rationale: 'The track is declared hostile, independently correlated, inbound, and the corridor is clear. Under the standard contract, the commit gate is met.'
+    },
+    {
+      id: 'merge-crossing', name: 'Crossing merge', type: 'Visual arena', title: 'The crossing merge',
+      bearing: 'Right 2', range: '1.8 NM', altitude: 'Co-altitude', track: 'Crossing left', window: 25,
+      situation: 'You enter a close merge after losing the tactical picture. A swept-wing aircraft crosses right-to-left. Your wingman is also engaged nearby and has not called position.',
+      evidence: {
+        declaration: ['unknown', 'No declaration applies to this visual contact.'],
+        onboard: ['unknown', 'Sensor track was lost before the merge.'],
+        offboard: ['unknown', 'Control has multiple merged groups and cannot correlate.'],
+        visual: ['unknown', 'Silhouette is not yet positively identified.'],
+        corridor: ['conflicts', 'Wingman position is unknown inside the merge.'],
+        behavior: ['unknown', 'Crossing motion alone does not establish hostility.']
+      }, baseDecision: 'hold', rationale: 'At the merge, uncertainty plus an unlocated wingman is enough to stop the shot. Hold, separate if needed, and rebuild identification.'
+    },
+    {
+      id: 'cold-transit', name: 'Cold transit', type: 'CAP station', title: 'The cold transit',
+      bearing: '188°', range: '24 NM', altitude: '12,000 ft', track: 'South', window: 38,
+      situation: 'A contact appears behind the CAP line, moving away from the defended area. Its transponder correlation is unavailable, but it follows the published egress lane and has shown no threatening maneuver.',
+      evidence: {
+        declaration: ['unknown', 'No hostile declaration.'],
+        onboard: ['unknown', 'Aircraft-type classification is unavailable.'],
+        offboard: ['unknown', 'Track quality is intermittent.'],
+        visual: ['unknown', 'No visual identification.'],
+        corridor: ['supports', 'Track aligns with the published friendly egress lane.'],
+        behavior: ['conflicts', 'Cold, steady, and moving away from the defended asset.']
+      }, baseDecision: 'hold', rationale: 'There is no immediate threat and the route/behavior fit friendly egress. Hold rather than manufacturing urgency from missing data.'
+    },
+    {
+      id: 'pop-up-attacker', name: 'Pop-up attacker', type: 'Point defense', title: 'The pop-up attacker',
+      bearing: '096°', range: '9 NM', altitude: '1,500 ft', track: 'Direct', window: 20,
+      situation: 'A low contact emerges from terrain inside the defended zone, turns directly toward the protected helicopter orbit, and launches a weapon. Your sensor and a nearby flight both correlate the same track; the corridor is clear.',
+      evidence: {
+        declaration: ['unknown', 'No time for a formal declaration call.'],
+        onboard: ['supports', 'Single low aircraft track, stable correlation.'],
+        offboard: ['supports', 'Nearby flight confirms the same contact and position.'],
+        visual: ['unknown', 'No visual type identification.'],
+        corridor: ['supports', 'Protected flight is offset; no friendly is beyond the target.'],
+        behavior: ['supports', 'Observed weapon launch toward the protected orbit.']
+      }, baseDecision: 'commit', rationale: 'Observed hostile behavior, independent correlation, and a clear corridor satisfy the standard contract even without a formal declaration.'
+    },
+    {
+      id: 'mark-mismatch', name: 'Mark mismatch', type: 'Close air support', title: 'The wrong smoke',
+      bearing: 'Target area', range: '6 NM', altitude: 'Surface', track: 'Stationary', window: 35,
+      situation: 'The briefed target is a vehicle column north of a road junction. You see smoke south of the junction and a group of vehicles nearby, but the controller’s last readback placed friendlies on the southern side.',
+      evidence: {
+        declaration: ['supports', 'The northern column is cleared as the target.'],
+        onboard: ['unknown', 'Pod image shows vehicles but no reliable type identification.'],
+        offboard: ['conflicts', 'Controller’s last friendly position is near the observed smoke.'],
+        visual: ['unknown', 'No distinctive target features confirmed.'],
+        corridor: ['conflicts', 'Friendly proximity and mark location disagree with the brief.'],
+        behavior: ['unknown', 'No hostile action observed from the viewed group.']
+      }, baseDecision: 'query', rationale: 'The mark, target description, and friendly position do not agree. Query the controller and obtain a fresh talk-on before any attack.'
+    },
+    {
+      id: 'runway-contact', name: 'Runway contact', type: 'Airfield defense', title: 'The runway crossing',
+      bearing: 'Airfield 11', range: '14 NM', altitude: '3,000 ft', track: 'East', window: 32,
+      situation: 'A fast contact crosses the departure end of a friendly runway. Tower reports a friendly trainer airborne but has not provided its direction. Your sensor returns an ambiguous classification.',
+      evidence: {
+        declaration: ['unknown', 'No hostile declaration.'],
+        onboard: ['unknown', 'Ambiguous small-aircraft classification.'],
+        offboard: ['conflicts', 'Friendly trainer is airborne in the same airfield volume.'],
+        visual: ['unknown', 'No visual identification.'],
+        corridor: ['conflicts', 'Shot line crosses the active friendly airfield environment.'],
+        behavior: ['unknown', 'Crossing the runway axis is not inherently hostile.']
+      }, baseDecision: 'hold', rationale: 'The contact sits inside a friendly airfield problem with unresolved traffic. Hold and rebuild the picture; a query may follow, but there is no valid commit.'
+    },
+    {
+      id: 'visual-bandit', name: 'Visual bandit', type: 'Escort defense', title: 'The painted attacker',
+      bearing: 'Left 10', range: '3.2 NM', altitude: '500 ft high', track: 'Closing', window: 24,
+      situation: 'You visually identify an aircraft in the hostile paint scheme rolling in behind the escorted transport. The escort lead calls the contact, your sensor track agrees, and the line beyond the attacker is clear.',
+      evidence: {
+        declaration: ['supports', 'Escort lead calls the attacker hostile.'],
+        onboard: ['supports', 'Track position and closure agree with the visual contact.'],
+        offboard: ['supports', 'Escort lead independently correlates the same aircraft.'],
+        visual: ['supports', 'Distinctive hostile type and markings positively identified.'],
+        corridor: ['supports', 'Transport is laterally clear of the firing line.'],
+        behavior: ['supports', 'Attacker is maneuvering into a firing position.']
+      }, baseDecision: 'commit', rationale: 'Visual ID, independent correlation, hostile behavior, and a clear line satisfy even a restrictive identification contract.'
+    },
+    {
+      id: 'stale-declaration', name: 'Stale declaration', type: 'Long-range intercept', title: 'The broken correlation',
+      bearing: '263°', range: '47 NM', altitude: '23,000 ft', track: 'Northeast', window: 42,
+      situation: 'A track was declared hostile three minutes ago, then faded during a crossing maneuver. A new track appears nearby, but control warns the correlation is uncertain and a neutral flight is scheduled through the area.',
+      evidence: {
+        declaration: ['unknown', 'Prior declaration cannot be confidently tied to this new track.'],
+        onboard: ['supports', 'Fighter-type classification.'],
+        offboard: ['conflicts', 'Control reports broken correlation and neutral traffic.'],
+        visual: ['unknown', 'No visual identification.'],
+        corridor: ['conflicts', 'Neutral route intersects the current track volume.'],
+        behavior: ['unknown', 'Northeast track is not threatening the defended asset.']
+      }, baseDecision: 'query', rationale: 'A stale declaration does not survive a broken correlation by assumption. Query for a new declaration or correlation while respecting the neutral corridor.'
+    },
+    {
+      id: 'friendly-spike', name: 'Friendly spike', type: 'Package deconfliction', title: 'The angry scope',
+      bearing: '221°', range: '19 NM', altitude: '16,000 ft', track: 'Reciprocal', window: 30,
+      situation: 'Your warning receiver shows a strong fighter radar indication from a reciprocal contact. The package card places a friendly sweep in that sector, and the contact makes no weapon employment or attack turn.',
+      evidence: {
+        declaration: ['unknown', 'No hostile declaration.'],
+        onboard: ['unknown', 'Radar warning indicates illumination, not coalition identity.'],
+        offboard: ['conflicts', 'Friendly sweep is expected in the same sector and altitude band.'],
+        visual: ['unknown', 'No visual identification.'],
+        corridor: ['conflicts', 'Friendly package route lies beyond the contact.'],
+        behavior: ['unknown', 'Radar illumination alone is not confirmed hostile action.']
+      }, baseDecision: 'query', rationale: 'The indication matters, but package geometry creates a credible friendly explanation. Query on the package frequency and maneuver defensively without committing a weapon.'
+    }
+  ];
+
+  const $ = (selector, root = document) => root.querySelector(selector);
+  const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
+  const els = {
+    progressFill: $('#progressFill'), runCount: $('#runCount'), scoreMini: $('#scoreMini'), caseList: $('#caseList'),
+    caseScreen: $('#caseScreen'), summaryScreen: $('#summaryScreen'), decisionPanel: $('#decisionPanel'),
+    caseEyebrow: $('#caseEyebrow'), caseTitle: $('#caseTitle'), bearing: $('#bearing'), range: $('#range'), altitude: $('#altitude'), track: $('#track'), situation: $('#situation'), evidenceGrid: $('#evidenceGrid'),
+    clock: $('#clock'), clockValue: $('#clockValue'), contractName: $('#contractName'), contractText: $('#contractText'), gateList: $('#gateList'),
+    feedback: $('#feedback'), resultTitle: $('#resultTitle'), resultCopy: $('#resultCopy'), nextButton: $('#nextButton'),
+    rulesDialog: $('#rulesDialog'), helpDialog: $('#helpDialog'), rulesForm: $('#rulesForm'), confirmations: $('#confirmations'), requireDeclaration: $('#requireDeclaration'), requireCorridor: $('#requireCorridor'), requireVisual: $('#requireVisual'), toast: $('#toast'),
+    finalScore: $('#finalScore'), finalAvg: $('#finalAvg'), finalStreak: $('#finalStreak'), summaryTitle: $('#summaryTitle'), summaryCopy: $('#summaryCopy'), history: $('#history')
+  };
+
+  let saved = loadSaved();
+  let state = {
+    order: [...Array(scenarios.length).keys()], current: 0, answers: [], answered: false, startedAt: Date.now(),
+    remaining: scenarios[0].window, timer: null, reviewMode: false, rules: { ...DEFAULT_RULES, ...(saved.rules || {}) }
+  };
+
+  function loadSaved() {
+    try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; } catch { return {}; }
+  }
+  function persist() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ rules: state.rules, lastRun: state.answers, lifetime: saved.lifetime || { runs: 0, correct: 0, decisions: 0 } }));
+  }
+  function scenario() { return scenarios[state.order[state.current]]; }
+  function evidenceState(key) { return scenario().evidence[key][0]; }
+  function supportCount() { return Object.values(scenario().evidence).filter(([status]) => status === 'supports').length; }
+  function hasConflict() { return Object.values(scenario().evidence).some(([status]) => status === 'conflicts'); }
+
+  function evaluateGates() {
+    const s = scenario();
+    const gates = [
+      { label: `${supportCount()} supporting inputs · ${state.rules.confirmations} required`, pass: supportCount() >= state.rules.confirmations, required: true },
+      { label: 'Hostile declaration', pass: evidenceState('declaration') === 'supports', required: state.rules.requireDeclaration },
+      { label: 'Clear corridor', pass: evidenceState('corridor') === 'supports', required: state.rules.requireCorridor },
+      { label: 'Visual identification', pass: evidenceState('visual') === 'supports', required: state.rules.requireVisual },
+      { label: 'No explicit friendly-risk conflict', pass: !hasConflict(), required: true }
+    ];
+    const commitAllowed = gates.every(g => !g.required || g.pass);
+    let expected = s.baseDecision;
+    if (s.baseDecision === 'commit' && !commitAllowed) expected = hasConflict() ? 'query' : 'hold';
+    if (s.baseDecision !== 'commit' && commitAllowed && s.id === 'pop-up-attacker') expected = 'commit';
+    return { gates, commitAllowed, expected };
+  }
+
+  function renderContract() {
+    const bits = [`${state.rules.confirmations}+ independent input${state.rules.confirmations === 1 ? '' : 's'}`];
+    if (state.rules.requireDeclaration) bits.push('declaration required');
+    if (state.rules.requireCorridor) bits.push('clear corridor');
+    if (state.rules.requireVisual) bits.push('visual ID');
+    els.contractName.textContent = state.rules.requireVisual ? 'Positive ID · visual' : 'Positive ID · standard';
+    els.contractText.textContent = bits.join(' · ') + '. Any explicit friendly-risk conflict blocks commit.';
+  }
+
+  function renderCaseList() {
+    els.caseList.innerHTML = '';
+    state.order.forEach((scenarioIndex, position) => {
+      const s = scenarios[scenarioIndex];
+      const answer = state.answers.find(a => a.position === position);
+      const button = document.createElement('button');
+      button.className = 'case-item';
+      button.type = 'button';
+      button.disabled = position > state.current && !answer;
+      button.setAttribute('aria-current', position === state.current && !isComplete() ? 'true' : 'false');
+      const markClass = answer ? (answer.correct ? 'correct' : 'wrong') : (position === state.current ? 'current' : '');
+      button.innerHTML = `<span class="case-number">${String(position + 1).padStart(2, '0')}</span><span class="case-name">${s.name}</span><span class="case-mark ${markClass}" aria-hidden="true"></span>`;
+      button.addEventListener('click', () => { if (position <= state.current || answer) goTo(position); });
+      els.caseList.appendChild(button);
+    });
+  }
+
+  function render() {
+    if (isComplete()) { renderSummary(); return; }
+    els.caseScreen.style.display = '';
+    els.summaryScreen.classList.remove('visible');
+    els.decisionPanel.style.display = '';
+    const s = scenario();
+    els.caseEyebrow.textContent = `Contact ${String(state.current + 1).padStart(2, '0')} · ${s.type}`;
+    els.caseTitle.textContent = s.title;
+    els.bearing.textContent = s.bearing;
+    els.range.textContent = s.range;
+    els.altitude.textContent = s.altitude;
+    els.track.textContent = s.track;
+    els.situation.textContent = s.situation;
+    els.runCount.textContent = `Case ${state.current + 1} / ${state.order.length}`;
+    els.progressFill.style.width = `${(state.current / state.order.length) * 100}%`;
+    els.scoreMini.textContent = `${state.answers.filter(a => a.correct).length} correct`;
+    renderEvidence(s);
+    renderContract();
+    renderGates();
+    renderCaseList();
+    clearFeedback();
+    state.remaining = s.window;
+    state.startedAt = Date.now();
+    renderClock();
+    startTimer();
+  }
+
+  function renderEvidence(s) {
+    els.evidenceGrid.innerHTML = '';
+    Object.entries(s.evidence).forEach(([key, [status, text]]) => {
+      const row = document.createElement('div');
+      row.className = 'evidence-row';
+      row.innerHTML = `<div class="evidence-key">${evidenceLabels[key]}</div><div class="evidence-value"><span class="state ${status}">${status}</span><br>${text}</div>`;
+      els.evidenceGrid.appendChild(row);
+    });
+  }
+
+  function renderGates() {
+    const { gates } = evaluateGates();
+    els.gateList.innerHTML = '';
+    gates.forEach(g => {
+      const div = document.createElement('div');
+      const statusClass = !g.required ? 'na' : (g.pass ? 'pass' : 'fail');
+      div.className = `gate ${statusClass}`;
+      div.innerHTML = `<span class="gate-dot" aria-hidden="true"></span><span>${g.label}${g.required ? '' : ' · not required'}</span>`;
+      els.gateList.appendChild(div);
+    });
+  }
+
+  function renderClock() {
+    els.clockValue.textContent = String(Math.max(0, state.remaining));
+    els.clock.classList.toggle('urgent', state.remaining <= 10);
+  }
+
+  function startTimer() {
+    stopTimer();
+    state.timer = window.setInterval(() => {
+      if (state.answered || document.hidden) return;
+      state.remaining -= 1;
+      renderClock();
+      if (state.remaining <= 0) choose('hold', true);
+    }, 1000);
+  }
+  function stopTimer() { if (state.timer) window.clearInterval(state.timer); state.timer = null; }
+
+  function choose(decision, timedOut = false) {
+    if (state.answered || isComplete()) return;
+    state.answered = true;
+    stopTimer();
+    const s = scenario();
+    const expected = evaluateGates().expected;
+    const correct = decision === expected;
+    const seconds = Math.max(1, Math.round((Date.now() - state.startedAt) / 1000));
+    const answer = { position: state.current, scenarioId: s.id, decision, expected, correct, seconds, timedOut };
+    state.answers = state.answers.filter(a => a.position !== state.current).concat(answer).sort((a,b) => a.position - b.position);
+    $$('.decision-button').forEach(button => {
+      button.disabled = true;
+      if (button.dataset.decision === decision) button.classList.add('selected', correct ? 'correct' : 'wrong');
+    });
+    els.feedback.classList.add('visible');
+    els.resultTitle.textContent = correct ? (timedOut ? 'Safe timeout' : 'Gate discipline held') : 'Gate broken';
+    els.resultTitle.className = `result ${correct ? 'correct' : 'wrong'}`;
+    const lead = timedOut ? 'The decision window expired; the trainer defaulted to Hold. ' : '';
+    els.resultCopy.textContent = `${lead}Expected: ${expected.toUpperCase()}. ${s.rationale}`;
+    els.nextButton.textContent = state.current === state.order.length - 1 ? 'Finish run · N' : 'Next case · N';
+    renderCaseList();
+    els.scoreMini.textContent = `${state.answers.filter(a => a.correct).length} correct`;
+    persist();
+  }
+
+  function clearFeedback() {
+    state.answered = false;
+    els.feedback.classList.remove('visible');
+    $$('.decision-button').forEach(button => { button.disabled = false; button.classList.remove('selected', 'correct', 'wrong'); });
+  }
+
+  function next() {
+    if (!state.answered) return;
+    if (state.current < state.order.length - 1) { state.current += 1; render(); }
+    else { state.current = state.order.length; renderSummary(); }
+  }
+
+  function goTo(position) {
+    stopTimer();
+    state.current = position;
+    render();
+    const prior = state.answers.find(a => a.position === position);
+    if (prior) {
+      state.answered = true;
+      stopTimer();
+      $$('.decision-button').forEach(button => {
+        button.disabled = true;
+        if (button.dataset.decision === prior.decision) button.classList.add('selected', prior.correct ? 'correct' : 'wrong');
+      });
+      els.feedback.classList.add('visible');
+      els.resultTitle.textContent = prior.correct ? 'Gate discipline held' : 'Gate broken';
+      els.resultTitle.className = `result ${prior.correct ? 'correct' : 'wrong'}`;
+      els.resultCopy.textContent = `Expected: ${prior.expected.toUpperCase()}. ${scenario().rationale}`;
+    }
+  }
+
+  function repeatCurrent() {
+    if (isComplete()) return;
+    state.answers = state.answers.filter(a => a.position !== state.current);
+    render();
+    toast('Case reset');
+  }
+
+  function isComplete() { return state.current >= state.order.length; }
+
+  function renderSummary() {
+    stopTimer();
+    els.caseScreen.style.display = 'none';
+    els.summaryScreen.classList.add('visible');
+    els.decisionPanel.style.display = 'none';
+    els.progressFill.style.width = '100%';
+    els.runCount.textContent = 'Run complete';
+    const correct = state.answers.filter(a => a.correct).length;
+    const avg = state.answers.length ? Math.round(state.answers.reduce((sum, a) => sum + a.seconds, 0) / state.answers.length) : 0;
+    let streak = 0, best = 0;
+    state.answers.forEach(a => { streak = a.correct ? streak + 1 : 0; best = Math.max(best, streak); });
+    els.finalScore.textContent = `${correct}/${state.order.length}`;
+    els.finalAvg.textContent = `${avg}s`;
+    els.finalStreak.textContent = String(best);
+    els.summaryTitle.textContent = correct === state.order.length ? 'Gate discipline held.' : correct >= 8 ? 'Picture mostly protected.' : 'Ambiguity won too often.';
+    els.summaryCopy.textContent = correct === state.order.length
+      ? 'You kept identification, geometry, and release authority aligned across the full run.'
+      : `${state.order.length - correct} case${state.order.length - correct === 1 ? '' : 's'} need another pass. Review the first conflicting input before acting on the strongest-looking cue.`;
+    els.history.innerHTML = state.answers.map((a, i) => {
+      const s = scenarios.find(item => item.id === a.scenarioId);
+      return `<div class="history-row"><span class="case-number">${String(i+1).padStart(2,'0')}</span><strong>${s ? s.name : a.scenarioId}</strong><span>${a.decision.toUpperCase()} · ${a.seconds}s</span><span class="outcome ${a.correct ? 'correct' : 'wrong'}">${a.correct ? 'PASS' : 'MISS'}</span></div>`;
+    }).join('');
+    renderCaseList();
+    const life = saved.lifetime || { runs: 0, correct: 0, decisions: 0 };
+    life.runs += 1; life.correct += correct; life.decisions += state.answers.length;
+    saved.lifetime = life;
+    persist();
+  }
+
+  function resetRun(reviewOnly = false) {
+    stopTimer();
+    const missedIds = state.answers.filter(a => !a.correct).map(a => a.scenarioId);
+    if (reviewOnly && !missedIds.length) { toast('No misses to review'); return; }
+    state.order = reviewOnly ? missedIds.map(id => scenarios.findIndex(s => s.id === id)) : [...Array(scenarios.length).keys()];
+    state.current = 0;
+    state.answers = [];
+    state.reviewMode = reviewOnly;
+    render();
+    toast(reviewOnly ? 'Review run loaded' : 'New run started');
+  }
+
+  function openRules() {
+    els.confirmations.value = String(state.rules.confirmations);
+    els.requireDeclaration.checked = state.rules.requireDeclaration;
+    els.requireCorridor.checked = state.rules.requireCorridor;
+    els.requireVisual.checked = state.rules.requireVisual;
+    els.rulesDialog.showModal();
+  }
+
+  function saveRules(event) {
+    event.preventDefault();
+    state.rules = {
+      confirmations: Number(els.confirmations.value),
+      requireDeclaration: els.requireDeclaration.checked,
+      requireCorridor: els.requireCorridor.checked,
+      requireVisual: els.requireVisual.checked
+    };
+    persist();
+    els.rulesDialog.close();
+    if (!isComplete()) { renderContract(); renderGates(); }
+    toast('Rules contract saved');
+  }
+
+  let toastTimer;
+  function toast(message) {
+    els.toast.textContent = message;
+    els.toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => els.toast.classList.remove('show'), 1600);
+  }
+
+  $$('.decision-button').forEach(button => button.addEventListener('click', () => choose(button.dataset.decision)));
+  $('#nextButton').addEventListener('click', next);
+  $('#rulesButton').addEventListener('click', openRules);
+  $('#printButton').addEventListener('click', () => window.print());
+  $('#helpButton').addEventListener('click', () => els.helpDialog.showModal());
+  $('#closeHelp').addEventListener('click', () => els.helpDialog.close());
+  $('#cancelRules').addEventListener('click', () => els.rulesDialog.close());
+  els.rulesForm.addEventListener('submit', saveRules);
+  $('#resetButton').addEventListener('click', () => resetRun(false));
+  $('#reviewButton').addEventListener('click', () => resetRun(true));
+  $('#summaryReview').addEventListener('click', () => resetRun(true));
+  $('#summaryRestart').addEventListener('click', () => resetRun(false));
+  $('#summaryPrint').addEventListener('click', () => window.print());
+
+  document.addEventListener('keydown', event => {
+    if (event.target.matches('input, select, button') && event.key !== '?') return;
+    if (event.key === '?') { event.preventDefault(); if (!els.helpDialog.open) els.helpDialog.showModal(); return; }
+    if (els.rulesDialog.open || els.helpDialog.open) return;
+    const key = event.key.toLowerCase();
+    if (key === '1') choose('hold');
+    if (key === '2') choose('query');
+    if (key === '3') choose('commit');
+    if (key === 'n') next();
+    if (key === 'r') repeatCurrent();
+  });
+
+  document.addEventListener('visibilitychange', () => { if (!document.hidden && !state.answered && !isComplete()) state.startedAt = Date.now() - ((scenario().window - state.remaining) * 1000); });
+  render();
+})();
+</script>
+</body>
+</html>
