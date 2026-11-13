@@ -102,3 +102,4 @@ Chronological record of autonomous DCS World companion projects.
 - 2026-11-10 — `2026-11-10-fuze-contract` — Offline DCS fuze/target contract desk with construction-versus-surface conflict checks, execution cards, saved snapshots, backup, and printing.
 - 2026-11-11 — `2026-11-11-fcr-slice-coach` — Offline F-16C radar-geometry trainer with live FCR and side-profile views, datalink-versus-ownship diagnosis, scenario presets, persistent drills, and printing.
 - 2026-11-12 — `2026-11-12-pid-gate` — Offline multiplayer identification and release-discipline trainer with ten evidence-led scenarios, configurable rules contracts, persistent results, review runs, and printing.
+- 2026-11-13 — `2026-11-13-cargo-witness` — Offline DCS logistics proof desk with exact-name manifests, sortie checkpoints, first-break event capture, discrepancy reconciliation, persistent evidence, JSON export, and printable incident packets.
