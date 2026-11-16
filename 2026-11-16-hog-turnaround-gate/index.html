@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark">
+<title>Hog Turnaround Gate — A-10C II</title>
+<style>
+:root{
+  --bg:#11130f;--panel:#181c16;--panel-2:#20251c;--ink:#eef0e6;--muted:#a7ad9a;
+  --line:#3a4232;--line-strong:#667257;--amber:#e7b84c;--amber-soft:#4b3c19;
+  --green:#9bc46b;--green-soft:#26391c;--red:#e17763;--red-soft:#49231d;--blue:#8eb6bd;
+  --shadow:0 18px 50px rgba(0,0,0,.28);--radius:10px;
+  --sans:"Avenir Next","Segoe UI",sans-serif;--condensed:"Avenir Next Condensed","Arial Narrow",sans-serif;
+  --mono:"SFMono-Regular",Consolas,"Liberation Mono",monospace;
+}
+*{box-sizing:border-box}
+html{background:var(--bg)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);min-height:100vh;letter-spacing:.01em}
+button,input,textarea,select{font:inherit}
+button{cursor:pointer}
+button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:3px solid var(--amber);outline-offset:2px}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.app{min-height:100vh;display:grid;grid-template-rows:auto 1fr}
+.topbar{display:grid;grid-template-columns:minmax(240px,1fr) auto auto;gap:20px;align-items:center;padding:18px 24px;border-bottom:1px solid var(--line);background:#141711;position:sticky;top:0;z-index:10}
+.brand{display:flex;align-items:center;gap:14px;min-width:0}.roundel{width:34px;height:34px;border:2px solid var(--amber);border-radius:50%;display:grid;place-items:center;color:var(--amber);font:800 11px var(--mono);flex:0 0 auto}.brand h1{font:700 clamp(18px,2vw,25px) var(--condensed);letter-spacing:.09em;text-transform:uppercase;margin:0}.brand p{margin:2px 0 0;color:var(--muted);font:12px var(--mono)}
+.clockbox{display:flex;gap:18px;align-items:center;font:13px var(--mono);color:var(--muted)}.clockbox strong{display:block;color:var(--ink);font-size:18px;font-weight:600}.status-pill{min-width:132px;text-align:center;padding:10px 14px;border:1px solid var(--line-strong);border-radius:4px;font:800 13px var(--condensed);letter-spacing:.1em;text-transform:uppercase}.status-pill.hold{color:var(--amber);background:var(--amber-soft)}.status-pill.ready{color:var(--green);background:var(--green-soft);border-color:#5e7c42}.status-pill.stop{color:var(--red);background:var(--red-soft);border-color:#8d493c}
+.shell{display:grid;grid-template-columns:250px minmax(0,1fr) 330px;min-height:0}.rail{border-right:1px solid var(--line);padding:22px 16px;background:#141711}.rail-label,.eyebrow{font:800 11px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--amber)}.phases{list-style:none;padding:0;margin:14px 0 26px}.phase-btn{width:100%;display:grid;grid-template-columns:34px 1fr auto;gap:10px;align-items:center;text-align:left;border:0;border-top:1px solid var(--line);background:transparent;color:var(--muted);padding:13px 8px;min-height:58px}.phase-btn:last-child{border-bottom:1px solid var(--line)}.phase-btn:hover{background:var(--panel)}.phase-btn.active{background:var(--panel-2);color:var(--ink)}.phase-num{font:700 13px var(--mono);color:var(--amber)}.phase-name{font:700 14px var(--condensed);letter-spacing:.06em;text-transform:uppercase}.phase-count{font:11px var(--mono)}
+.field{display:grid;gap:6px;margin:14px 0}.field label{font:700 11px var(--mono);color:var(--muted);text-transform:uppercase;letter-spacing:.08em}.field input,.field textarea,.field select{width:100%;border:1px solid var(--line-strong);background:#0f110e;color:var(--ink);border-radius:4px;padding:10px 11px}.field textarea{resize:vertical;min-height:76px}.compact-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.ghost,.primary,.danger{border-radius:4px;min-height:44px;padding:10px 14px;font:800 12px var(--condensed);letter-spacing:.08em;text-transform:uppercase}.ghost{border:1px solid var(--line-strong);background:transparent;color:var(--ink)}.ghost:hover{background:var(--panel-2)}.primary{border:1px solid #8f6c1f;background:var(--amber);color:#1b1609}.primary:hover{background:#f2c963}.danger{border:1px solid #814237;background:var(--red-soft);color:#ffc6ba}.btn-stack{display:grid;gap:8px}
+.main{padding:28px clamp(20px,3.5vw,48px) 60px;overflow:auto}.phase-head{display:flex;justify-content:space-between;gap:20px;align-items:end;border-bottom:1px solid var(--line);padding-bottom:18px;margin-bottom:18px}.phase-head h2{font:700 clamp(28px,4vw,46px) var(--condensed);letter-spacing:.035em;text-transform:uppercase;margin:4px 0 0}.phase-head p{margin:0;color:var(--muted);max-width:500px;line-height:1.5}.progress{font:700 30px var(--mono);color:var(--amber);white-space:nowrap}
+.task-list{display:grid;gap:8px}.task{display:grid;grid-template-columns:48px 1fr auto;gap:14px;align-items:start;background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:16px;transition:border-color .15s,background .15s}.task:hover{border-color:var(--line-strong)}.task.done{background:#172015;border-color:#405b31}.check{appearance:none;width:32px;height:32px;border:2px solid var(--line-strong);border-radius:3px;background:#0f110e;display:grid;place-content:center;margin:1px 0 0}.check:checked{background:var(--green);border-color:var(--green)}.check:checked::after{content:"✓";color:#13200d;font-weight:900;font-size:22px}.task h3{margin:0 0 5px;font:700 16px var(--condensed);letter-spacing:.04em;text-transform:uppercase}.task p{margin:0;color:var(--muted);line-height:1.45;font-size:14px;max-width:720px}.tag{font:700 10px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--blue);padding-top:6px}.phase-note{margin-top:16px;padding:15px 0;border-top:1px dashed var(--line-strong);color:var(--muted);font-size:13px;line-height:1.55}.phase-note strong{color:var(--ink)}
+.inspector{border-left:1px solid var(--line);background:#141711;padding:22px 18px;overflow:auto}.inspector section{padding:0 0 20px;margin:0 0 20px;border-bottom:1px solid var(--line)}.inspector h2{font:800 13px var(--condensed);letter-spacing:.09em;text-transform:uppercase;margin:0 0 12px}.gate{border:1px solid var(--line-strong);background:var(--panel);border-radius:var(--radius);padding:14px}.gate strong{display:block;font:800 17px var(--condensed);letter-spacing:.06em;text-transform:uppercase}.gate p{color:var(--muted);font-size:13px;line-height:1.45;margin:7px 0 0}.gate.ok{border-color:#54723d;background:var(--green-soft)}.gate.bad{border-color:#8d493c;background:var(--red-soft)}.gate.warn{border-color:#84661f;background:var(--amber-soft)}
+.switch-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.toggle{position:relative}.toggle input{position:absolute;opacity:0;pointer-events:none}.toggle label{display:grid;place-items:center;min-height:44px;border:1px solid var(--line-strong);border-radius:4px;color:var(--muted);font:700 11px var(--condensed);letter-spacing:.06em;text-transform:uppercase;text-align:center;padding:7px}.toggle input:checked+label{background:var(--amber-soft);color:var(--amber);border-color:#8f6c1f}.toggle input:focus-visible+label{outline:3px solid var(--amber);outline-offset:2px}.toggle.good input:checked+label{background:var(--green-soft);color:var(--green);border-color:#54723d}
+.symptoms{display:flex;flex-wrap:wrap;gap:7px}.chip{position:relative}.chip input{position:absolute;opacity:0}.chip label{display:block;border:1px solid var(--line);border-radius:999px;padding:7px 10px;color:var(--muted);font-size:11px}.chip input:checked+label{border-color:#a95545;background:var(--red-soft);color:#ffc3b7}.chip input:focus-visible+label{outline:3px solid var(--amber);outline-offset:2px}.advice{margin-top:12px;color:var(--muted);font-size:13px;line-height:1.5}.advice b{color:var(--ink)}
+.history{display:grid;gap:7px;max-height:230px;overflow:auto}.history-item{border:1px solid var(--line);padding:9px;border-radius:4px;font-size:12px;color:var(--muted)}.history-item strong{color:var(--ink);display:block;margin-bottom:3px}.empty{font-size:12px;color:var(--muted);font-style:italic}
+.footer-note{font:11px var(--mono);color:#7c8372;line-height:1.5}
+.toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,20px);opacity:0;background:var(--ink);color:#111;padding:10px 14px;border-radius:4px;font:700 12px var(--mono);pointer-events:none;transition:.2s;z-index:30}.toast.show{transform:translate(-50%,0);opacity:1}
+@media(max-width:1050px){.shell{grid-template-columns:210px minmax(0,1fr)}.inspector{grid-column:1/-1;border-left:0;border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(3,1fr);gap:18px}.inspector section{border-bottom:0;margin:0;padding:0}.inspector section:last-child{grid-column:1/-1}}
+@media(max-width:720px){.topbar{grid-template-columns:1fr auto;padding:14px}.clockbox{display:none}.status-pill{min-width:110px}.shell{display:block}.rail{border-right:0;border-bottom:1px solid var(--line);padding:12px}.phases{display:grid;grid-template-columns:repeat(4,1fr);margin:8px 0 14px}.phase-btn{grid-template-columns:1fr;text-align:center;border:1px solid var(--line);padding:9px 4px}.phase-num{display:none}.phase-count{font-size:10px}.phase-name{font-size:11px}.main{padding:22px 14px 40px}.phase-head{display:block}.progress{margin-top:12px;font-size:22px}.task{grid-template-columns:40px 1fr}.tag{grid-column:2}.inspector{display:block;padding:20px 14px}.inspector section{padding-bottom:18px;margin-bottom:18px;border-bottom:1px solid var(--line)}.compact-row{grid-template-columns:1fr}.brand p{display:none}}
+@media print{body{background:#fff;color:#111}.topbar,.rail,.btn-stack,.history-controls,.toast{display:none!important}.shell{display:block}.main,.inspector{padding:16px;border:0;background:#fff}.inspector{display:block}.task,.gate{break-inside:avoid;background:#fff!important;border-color:#777}.task p,.phase-head p,.gate p,.field label,.footer-note{color:#333}.check{border-color:#333}.check:checked{background:#333}.field input,.field textarea{background:#fff;color:#111;border-color:#777}.phase-head h2,.inspector h2{color:#111}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="topbar">
+  <div class="brand"><div class="roundel" aria-hidden="true">A-10</div><div><h1>Hog Turnaround Gate</h1><p>Post-repair navigation rebuild &amp; proof desk</p></div></div>
+  <div class="clockbox"><div>RUN TIME<strong id="elapsed">00:00</strong></div><div>LOCAL<strong id="clock">--:--</strong></div></div>
+  <div id="overallStatus" class="status-pill hold" aria-live="polite">Hold</div>
+</header>
+<div class="shell">
+<nav class="rail" aria-label="Turnaround phases">
+  <div class="rail-label">Turnaround sequence</div>
+  <ol id="phaseNav" class="phases"></ol>
+  <div class="field"><label for="sortieName">Sortie / server</label><input id="sortieName" maxlength="60" placeholder="e.g. Hog 1-1 / Training"></div>
+  <div class="field"><label for="tailNote">Aircraft / slot note</label><input id="tailNote" maxlength="60" placeholder="e.g. A-10C II, ramp 14"></div>
+  <div class="btn-stack">
+    <button id="timerBtn" class="primary" type="button">Start run timer</button>
+    <button id="saveBtn" class="ghost" type="button">Save evidence run</button>
+    <button id="printBtn" class="ghost" type="button">Print proof card</button>
+    <button id="resetBtn" class="danger" type="button">Reset current run</button>
+  </div>
+</nav>
+<main class="main">
+  <header class="phase-head"><div><div id="phaseEyebrow" class="eyebrow"></div><h2 id="phaseTitle"></h2><p id="phaseIntro"></p></div><div id="phaseProgress" class="progress"></div></header>
+  <div id="taskList" class="task-list"></div>
+  <div id="phaseNote" class="phase-note"></div>
+</main>
+<aside class="inspector" aria-label="Readiness inspector">
+  <section><h2>Release gate</h2><div id="gate" class="gate warn" aria-live="polite"></div></section>
+  <section><h2>Cockpit evidence</h2>
+    <div class="switch-grid">
+      <div class="toggle good"><input id="navReady" type="checkbox"><label for="navReady">NAV ready shown</label></div>
+      <div class="toggle good"><input id="egiSelected" type="checkbox"><label for="egiSelected">EGI selected</label></div>
+      <div class="toggle good"><input id="eacArmed" type="checkbox"><label for="eacArmed">EAC armed</label></div>
+      <div class="toggle good"><input id="steerStable" type="checkbox"><label for="steerStable">Steer cue stable</label></div>
+    </div>
+    <div class="field"><label for="alignReadout">Alignment readout (as observed)</label><input id="alignReadout" maxlength="30" placeholder="Record; do not infer"></div>
+  </section>
+  <section><h2>Observed symptoms</h2><div id="symptoms" class="symptoms"></div><div id="advice" class="advice"></div></section>
+  <section><h2>Turnaround note</h2><div class="field"><label class="sr-only" for="notes">Turnaround notes</label><textarea id="notes" placeholder="What changed, what was tested, first bad cue…"></textarea></div></section>
+  <section><h2>Saved evidence</h2><div id="history" class="history"></div><div class="history-controls btn-stack" style="margin-top:10px"><button id="exportBtn" class="ghost" type="button">Export JSON</button><button id="clearHistoryBtn" class="ghost" type="button">Clear saved runs</button></div></section>
+  <section class="footer-note">SIMULATION AID — not an official checklist. Follow the current DCS A-10C II manual and cockpit indications. This desk deliberately avoids inventing a numeric alignment threshold.</section>
+</aside>
+</div>
+</div>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+<script>
+(()=>{
+'use strict';
+const STORE='hogTurnaroundGate.v1';
+const HISTORY='hogTurnaroundGate.history.v1';
+const phases=[
+ {id:'secure',title:'Secure the jet',intro:'Establish a known condition before repair. Capture what was good before anything is powered down.',note:'<strong>Why this gate exists:</strong> a clean before/after boundary keeps a repair-side symptom from being confused with a pre-existing navigation or weapon problem.',tasks:[
+  ['Park at a valid friendly service point','Stop in a location where DCS ground crew service is available. Set parking brake or chocks as your procedure requires.','condition'],
+  ['Record the pre-repair symptom','Write the first bad cue—not a diagnosis—in the turnaround note. Examples: steerpoint slides, CCIP solution is laterally displaced, or EAC will not arm.','evidence'],
+  ['Record present-position confidence','Note whether the displayed aircraft position and selected steerpoint looked credible before shutdown.','evidence'],
+  ['Shut down for repair','DCS documentation states repair service follows engine shutdown. Confirm the aircraft is fully stopped and use your current checklist.','action']
+ ]},
+ {id:'repair',title:'Protect the repair',intro:'Keep the repair event observable. Avoid adding unrelated changes while the aircraft is being rebuilt.',note:'<strong>Discipline:</strong> one change at a time. A repair, mod change, rearm, coordinate edit, and rushed restart performed together produce no useful evidence.',tasks:[
+  ['Request repair and mark the start','Use the DCS ground-crew command and start the run timer.','action'],
+  ['Hold the aircraft stationary','Do not taxi or disturb the jet while repair is in progress.','condition'],
+  ['Confirm repair completion','Wait for the in-sim completion cue before beginning the avionics rebuild.','gate'],
+  ['Log other changes separately','If you rearmed, changed payload, or edited coordinates, record it in the note so it is not mistaken for an alignment effect.','evidence']
+ ]},
+ {id:'rebuild',title:'Rebuild navigation',intro:'Treat post-repair avionics as a fresh evidence chain: power, BIT, alignment, NAV-ready indication, then mode selection.',note:'<strong>Manual-grounded assumption:</strong> after power is applied, the CDU and EGI initialize and begin alignment; the mission file supplies data and waypoint 0 represents aircraft present position. Use the current manual for switch actions and acceptability criteria.',tasks:[
+  ['Apply power using the current checklist','Bring the electrical system, CDU, and EGI online in the approved sequence for your chosen start method.','action'],
+  ['Observe CDU BIT and ALIGN transition','Confirm the CDU startup test completes and the alignment page/state appears.','evidence'],
+  ['Cross-check present position','Compare the cockpit present position / waypoint 0 against the known parking location. Do not blindly re-enter coordinates.','gate'],
+  ['Wait for the cockpit NAV-ready cue','Let the alignment complete to the standard required by the current module manual and mission conditions. Record the displayed readout at right.','gate'],
+  ['Select navigation mode deliberately','Complete the checklist transition to navigation and select EGI on the navigation mode panel.','action']
+ ]},
+ {id:'proof',title:'Prove before launch',intro:'A completed alignment is not the same as a proven jet. Check independent cues before committing to another attack.',note:'<strong>Release rule:</strong> if navigation cues drift, EAC will not arm, or the computed solution remains implausible, hold the sortie. Preserve the evidence and retest from a known state rather than compensating the sight picture by eye.',tasks:[
+  ['Verify stable steerpoint geometry','While stationary, watch the selected steerpoint cue long enough to detect sliding, jumping, or implausible bearing changes.','proof'],
+  ['Verify flight/navigation presentation','Check that expected HUD navigation cues and attitude/velocity presentation are sane for the parked aircraft.','proof'],
+  ['Verify EGI selection and EAC','Confirm the intended navigation source is selected and the EAC can be armed under normal checklist conditions.','proof'],
+  ['Run a non-release weapon sanity check','Configure a familiar mode and inspect the computed cue for plausibility. Do not release weapons solely to force a pass.','proof'],
+  ['Make the release decision','Only mark complete when the four cockpit evidence switches are set and no active symptom remains.','gate']
+ ]}
+];
+const symptomDefs=[
+ ['drift','Steerpoint drift'],['ccip','CCIP displaced'],['jump','Pipper jumps'],['eac','EAC blocked'],['map','Map / nav absent'],['unknown','Other anomaly']
+];
+const defaults={active:'secure',tasks:{},sortieName:'',tailNote:'',alignReadout:'',notes:'',checks:{navReady:false,egiSelected:false,eacArmed:false,steerStable:false},symptoms:{},timer:{running:false,started:0,accumulated:0}};
+let state=load(STORE,defaults);
+let history=load(HISTORY,[]);
+function clone(v){return JSON.parse(JSON.stringify(v))}
+function load(key,fallback){try{const x=JSON.parse(localStorage.getItem(key));return x?Object.assign(clone(fallback),x):clone(fallback)}catch(e){return clone(fallback)}}
+function persist(){localStorage.setItem(STORE,JSON.stringify(state))}
+function allTasks(){return phases.flatMap(p=>p.tasks.map((t,i)=>({key:p.id+'-'+i,phase:p.id}))) }
+function phaseDone(p){return p.tasks.filter((_,i)=>state.tasks[p.id+'-'+i]).length}
+function symptomsActive(){return symptomDefs.filter(([id])=>state.symptoms[id]).map(x=>x[1])}
+function evidenceComplete(){return Object.values(state.checks).every(Boolean)}
+function taskComplete(){return allTasks().every(x=>state.tasks[x.key])}
+function status(){
+ const active=symptomsActive();
+ if(active.length) return {type:'bad',label:'STOP',title:'Hold — anomaly active',text:'Do not compensate by eye. First active cue: '+active[0]+'. Return to the earliest unproven gate and preserve the observation.'};
+ if(taskComplete()&&evidenceComplete()) return {type:'ok',label:'READY',title:'Turnaround proof complete',text:'All phase gates and cockpit evidence checks are marked complete. Apply your current official checklist before taxi.'};
+ const remaining=allTasks().filter(x=>!state.tasks[x.key]).length;
+ return {type:'warn',label:'HOLD',title:'Proof incomplete',text:remaining+' task'+(remaining===1?'':'s')+' remain; cockpit evidence is '+(evidenceComplete()?'complete':'incomplete')+'.'};
+}
+function renderNav(){
+ const nav=document.getElementById('phaseNav');nav.innerHTML='';
+ phases.forEach((p,idx)=>{const li=document.createElement('li');const b=document.createElement('button');b.type='button';b.className='phase-btn'+(state.active===p.id?' active':'');b.innerHTML=`<span class="phase-num">0${idx+1}</span><span class="phase-name">${p.title}</span><span class="phase-count">${phaseDone(p)}/${p.tasks.length}</span>`;b.onclick=()=>{state.active=p.id;persist();render()};li.appendChild(b);nav.appendChild(li)});
+}
+function renderPhase(){
+ const p=phases.find(x=>x.id===state.active)||phases[0];
+ document.getElementById('phaseEyebrow').textContent=`Phase ${phases.indexOf(p)+1} of ${phases.length}`;
+ document.getElementById('phaseTitle').textContent=p.title;
+ document.getElementById('phaseIntro').textContent=p.intro;
+ document.getElementById('phaseProgress').textContent=`${phaseDone(p)} / ${p.tasks.length}`;
+ document.getElementById('phaseNote').innerHTML=p.note;
+ const list=document.getElementById('taskList');list.innerHTML='';
+ p.tasks.forEach((t,i)=>{const key=p.id+'-'+i;const row=document.createElement('article');row.className='task'+(state.tasks[key]?' done':'');const cb=document.createElement('input');cb.type='checkbox';cb.className='check';cb.id='task-'+key;cb.checked=!!state.tasks[key];cb.setAttribute('aria-label',t[0]);cb.onchange=()=>{state.tasks[key]=cb.checked;persist();render()};const body=document.createElement('div');body.innerHTML=`<h3><label for="task-${key}">${t[0]}</label></h3><p>${t[1]}</p>`;const tag=document.createElement('div');tag.className='tag';tag.textContent=t[2];row.append(cb,body,tag);list.appendChild(row)});
+}
+function renderSymptoms(){const box=document.getElementById('symptoms');box.innerHTML='';symptomDefs.forEach(([id,label])=>{const d=document.createElement('div');d.className='chip';d.innerHTML=`<input id="sym-${id}" type="checkbox" ${state.symptoms[id]?'checked':''}><label for="sym-${id}">${label}</label>`;d.querySelector('input').onchange=e=>{state.symptoms[id]=e.target.checked;persist();renderStatus()};box.appendChild(d)});renderAdvice()}
+function renderAdvice(){const a=symptomsActive();let html='<b>No anomaly selected.</b> Complete the proof phase before release.';if(a.length){html='<b>Use the first-break rule.</b> Identify the earliest gate that was not positively observed; repeat from there. Do not assume every displaced weapon cue is INS drift, and do not erase evidence with multiple simultaneous fixes.'}document.getElementById('advice').innerHTML=html}
+function renderStatus(){const s=status();const pill=document.getElementById('overallStatus');pill.textContent=s.label;pill.className='status-pill '+(s.type==='bad'?'stop':s.type==='ok'?'ready':'hold');const gate=document.getElementById('gate');gate.className='gate '+s.type;gate.innerHTML=`<strong>${s.title}</strong><p>${s.text}</p>`;renderAdvice()}
+function renderHistory(){const box=document.getElementById('history');box.innerHTML='';if(!history.length){box.innerHTML='<div class="empty">No saved proof runs yet.</div>';return}history.slice().reverse().forEach(h=>{const d=document.createElement('div');d.className='history-item';d.innerHTML=`<strong>${escapeHtml(h.sortieName||'Unnamed turnaround')} — ${h.result}</strong>${new Date(h.savedAt).toLocaleString()} · ${formatMs(h.elapsed)}<br>${h.symptoms.length?h.symptoms.join(', '):'No active symptoms'}`;box.appendChild(d)})}
+function renderBindings(){['sortieName','tailNote','alignReadout','notes'].forEach(id=>{const el=document.getElementById(id);el.value=state[id]||''});Object.keys(state.checks).forEach(id=>{document.getElementById(id).checked=!!state.checks[id]});document.getElementById('timerBtn').textContent=state.timer.running?'Pause run timer':(elapsedMs()>0?'Resume run timer':'Start run timer')}
+function render(){renderNav();renderPhase();renderSymptoms();renderStatus();renderHistory();renderBindings()}
+function elapsedMs(){return state.timer.accumulated+(state.timer.running?Date.now()-state.timer.started:0)}
+function formatMs(ms){const sec=Math.floor(ms/1000),m=Math.floor(sec/60),s=sec%60;return String(m).padStart(2,'0')+':'+String(s).padStart(2,'0')}
+function tick(){document.getElementById('elapsed').textContent=formatMs(elapsedMs());document.getElementById('clock').textContent=new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});requestAnimationFrame(()=>setTimeout(tick,500))}
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(toast._t);toast._t=setTimeout(()=>t.classList.remove('show'),1800)}
+function escapeHtml(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+['sortieName','tailNote','alignReadout','notes'].forEach(id=>document.getElementById(id).addEventListener('input',e=>{state[id]=e.target.value;persist()}));
+Object.keys(defaults.checks).forEach(id=>document.getElementById(id).addEventListener('change',e=>{state.checks[id]=e.target.checked;persist();renderStatus()}));
+document.getElementById('timerBtn').onclick=()=>{if(state.timer.running){state.timer.accumulated+=Date.now()-state.timer.started;state.timer.running=false}else{state.timer.started=Date.now();state.timer.running=true}persist();renderBindings()};
+document.getElementById('saveBtn').onclick=()=>{const s=status();history.push({savedAt:new Date().toISOString(),sortieName:state.sortieName,tailNote:state.tailNote,alignReadout:state.alignReadout,notes:state.notes,elapsed:elapsedMs(),result:s.label,tasks:clone(state.tasks),checks:clone(state.checks),symptoms:symptomsActive()});localStorage.setItem(HISTORY,JSON.stringify(history));renderHistory();toast('Evidence run saved')};
+document.getElementById('printBtn').onclick=()=>window.print();
+document.getElementById('resetBtn').onclick=()=>{if(!confirm('Reset the current turnaround? Saved evidence runs will remain.'))return;state=clone(defaults);persist();render();toast('Current run reset')};
+document.getElementById('clearHistoryBtn').onclick=()=>{if(!confirm('Delete all saved evidence runs?'))return;history=[];localStorage.setItem(HISTORY,'[]');renderHistory();toast('Saved runs cleared')};
+document.getElementById('exportBtn').onclick=()=>{const payload={app:'Hog Turnaround Gate',version:1,exportedAt:new Date().toISOString(),runs:history};const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='hog-turnaround-evidence-'+new Date().toISOString().slice(0,10)+'.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);toast('JSON export prepared')};
+render();tick();
+})();
+</script>
+</body>
+</html>

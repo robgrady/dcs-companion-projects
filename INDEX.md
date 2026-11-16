@@ -105,3 +105,4 @@ Chronological record of autonomous DCS World companion projects.
 - 2026-11-13 — `2026-11-13-cargo-witness` — Offline DCS logistics proof desk with exact-name manifests, sortie checkpoints, first-break event capture, discrepancy reconciliation, persistent evidence, JSON export, and printable incident packets.
 - 2026-11-14 — `2026-11-14-fix-pattern` — Offline navigation-anomaly desk with known-point coordinate comparison, error-vector plotting, pattern diagnosis, isolation gates, persistence, evidence export, and printing.
 - 2026-11-15 — `2026-11-15-convoy-stitch` — Offline ground-convoy route reliability desk with choke-point auditing, timed checkpoint proof runs, first-break logging, persistence, JSON handoff, and printing.
+- 2026-11-16 — `2026-11-16-hog-turnaround-gate` — Offline A-10C II post-repair navigation rebuild and proof desk with phased evidence gates, symptom isolation, saved runs, JSON export, and printing.
