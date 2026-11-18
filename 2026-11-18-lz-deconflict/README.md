@@ -29,11 +29,11 @@ Recent DCS community discussion continues to identify logistics missions as frag
 
 Sources reviewed on **2026-11-18**:
 
-- r/hoggit, **“DCS has a structural dependency issue”** (2026-11-10). The discussion describes logistics features, including cargo and warehouse behavior, as dependent on server-side workarounds and vulnerable to update regressions: https://www.reddit.com/r/hoggit/comments/1xsmnrp/dcs_has_a_structural_dependency_issue/
-- r/hoggit, **“Just got this, seems super nice so far.”** (2026-11-17). Current C-130J discussion shows active community attention around heavy-airlift operations and the module’s cargo-oriented role: https://www.reddit.com/r/hoggit/comments/1y1bnjf/just_got_this_seems_super_nice_so_far/
-- Eagle Dynamics Forums, **“Cargo gone after landing”**. Users report cargo disappearing after delivery rather than remaining available as expected, illustrating the need to separate placement proof from runtime-state proof: https://forum.dcs.world/topic/260339-cargo-gone-after-landing/
-- r/hoggit, **“My most needed feature in DCS...”** (2025-10-06). The author highlights the need for cargo and troop systems that visibly change the battlefield, with discussion of sling loading and loading behavior: https://www.reddit.com/r/hoggit/comments/1nyrt03/my_most_needed_feature_in_dcs/
-- Eagle Dynamics, **DCS World release changelog**, reviewed 2026-11-18. The active changelog documents recurring fixes across cargo, scripting, AI, dynamic spawn, and mission behavior, reinforcing the need for explicit preflight layouts and controlled proof tests: https://www.digitalcombatsimulator.com/en/news/changelog/release/
+- r/hoggit, **“DCS has a structural dependency issue”** (2026-11-10). The discussion specifically reports cargo disappearing, desynchronizing, or spawning inside objects and terrain, and argues that logistics missions remain dependent on server-side workarounds: https://www.reddit.com/r/hoggit/comments/1xsmnrp/dcs_has_a_structural_dependency_issue/
+- Eagle Dynamics, **DCS World release changelog**, reviewed 2026-11-18. The October 2026 releases include fixes for dynamic cargo not being created, incomplete unload lists, and CH-47F cargo loading with closed doors—current evidence that cargo setup and runtime state remain active fault areas: https://www.digitalcombatsimulator.com/en/news/changelog/release/
+- Eagle Dynamics Forums, **“AI Cargo doesn't drop cargo”**, reviewed 2026-11-18. A mission-builder reports an AI transport landing correctly while the cargo is not actually delivered, separating route success from cargo-state success: https://forum.dcs.world/topic/383769-ai-cargo-doesnt-drop-cargo/
+- r/dcs, **“Multiplayer Server Desyncs when anyone interacts with cargo”**, reviewed 2026-11-18. The report describes cargo interactions causing multiplayer desynchronization during sling-loading and logistics use: https://www.reddit.com/r/dcs/comments/1n8qs5t/
+- r/hoggit, **“C-130 Hercules on WWX – Air Drop in a Logistics Multiplayer War”** (2026-01-10). The discussion documents active multiplayer airlift use and a cargo-related workaround affecting automated drops: https://www.reddit.com/r/hoggit/comments/1q8tdbe/c130_hercules_on_wwx_air_drop_in_a_logistics/
 
 ## Design notes
 
