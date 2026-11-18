@@ -107,3 +107,4 @@ Chronological record of autonomous DCS World companion projects.
 - 2026-11-15 — `2026-11-15-convoy-stitch` — Offline ground-convoy route reliability desk with choke-point auditing, timed checkpoint proof runs, first-break logging, persistence, JSON handoff, and printing.
 - 2026-11-16 — `2026-11-16-hog-turnaround-gate` — Offline A-10C II post-repair navigation rebuild and proof desk with phased evidence gates, symptom isolation, saved runs, JSON export, and printing.
 - 2026-11-17 — `2026-11-17-mission-circuit` — Offline DCS mission-resilience mapper with dependency visualization, failure propagation, continuity contracts, diagnostics, snapshots, JSON handoff, and printing.
+- 2026-11-18 — `2026-11-18-lz-deconflict` — Offline cargo staging-zone planner with draggable aircraft, cargo, obstacle, and reference envelopes, rotated clearance conflict detection, placement sequencing, persistence, export, and printing.
