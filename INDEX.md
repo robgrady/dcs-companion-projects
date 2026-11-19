@@ -108,3 +108,4 @@ Chronological record of autonomous DCS World companion projects.
 - 2026-11-16 — `2026-11-16-hog-turnaround-gate` — Offline A-10C II post-repair navigation rebuild and proof desk with phased evidence gates, symptom isolation, saved runs, JSON export, and printing.
 - 2026-11-17 — `2026-11-17-mission-circuit` — Offline DCS mission-resilience mapper with dependency visualization, failure propagation, continuity contracts, diagnostics, snapshots, JSON handoff, and printing.
 - 2026-11-18 — `2026-11-18-lz-deconflict` — Offline cargo staging-zone planner with draggable aircraft, cargo, obstacle, and reference envelopes, rotated clearance conflict detection, placement sequencing, persistence, export, and printing.
+- 2026-11-19 — `2026-11-19-airwork-wire` — Offline DCS fundamentals practice coach with timed maneuver gates, scan cues, first-deviation logging, persistent debrief history, CSV export, and printing.
