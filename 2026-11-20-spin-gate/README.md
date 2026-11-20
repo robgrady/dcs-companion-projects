@@ -28,8 +28,8 @@ Sources reviewed on **2026-11-20**:
 - Grinnelli Designs, **DCS F-100D Manual — Spin Recovery**: https://grinnellidesigns.github.io/f-100d-manual/Procedures/Emergency/spin.html
 - r/hoggit, **DCS F-100D Flat Spin — This Vintage Fighter Has No Safety Net**: https://www.reddit.com/r/hoggit/comments/1uedf2q/dcs_f100d_flat_spin_this_vintage_fighter_has_no/
 - r/hoggit, **How will the F-100D BFM performance be compared to its peers?**: https://www.reddit.com/r/hoggit/comments/1thx791/how_will_the_f100d_bfm_performance_be_compared_to/
-- r/dcsworld, **DCS: F-100D Super Sabre | Early Access Launch**: https://www.reddit.com/r/dcsworld/comments/1u4l6yd/dcs_f100d_super_sabre_early_access_launch/
-- Eagle Dynamics, **DCS: F-100D Development Report**: https://www.digitalcombatsimulator.com/en/news/2026-08-22/
+- r/dcsworld, **2026/06/12 DCS Change log 2.9.27.24969** (F-100D introduction and known issues): https://www.reddit.com/r/dcsworld/comments/1u46unl/20260612_dcs_change_log_292724969/
+- Eagle Dynamics, **DCS: F-100D Development Report**: https://www.digitalcombatsimulator.com/en/news/newsletters/fe1326520bb5ee8ebd6978d5e2d4ddb6/
 
 ## Privacy and portability
 
