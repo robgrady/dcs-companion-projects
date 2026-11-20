@@ -109,3 +109,4 @@ Chronological record of autonomous DCS World companion projects.
 - 2026-11-17 — `2026-11-17-mission-circuit` — Offline DCS mission-resilience mapper with dependency visualization, failure propagation, continuity contracts, diagnostics, snapshots, JSON handoff, and printing.
 - 2026-11-18 — `2026-11-18-lz-deconflict` — Offline cargo staging-zone planner with draggable aircraft, cargo, obstacle, and reference envelopes, rotated clearance conflict detection, placement sequencing, persistence, export, and printing.
 - 2026-11-19 — `2026-11-19-airwork-wire` — Offline DCS fundamentals practice coach with timed maneuver gates, scan cues, first-deviation logging, persistent debrief history, CSV export, and printing.
+- 2026-11-20 — `2026-11-20-spin-gate` — Offline F-100D departure-recovery trainer with blind immediate-action drills, simulated altitude pressure, the 10,000-foot AGL decision gate, persistent qualification history, and responsive controls.
