@@ -111,3 +111,4 @@ Chronological record of autonomous DCS World companion projects.
 - 2026-11-19 — `2026-11-19-airwork-wire` — Offline DCS fundamentals practice coach with timed maneuver gates, scan cues, first-deviation logging, persistent debrief history, CSV export, and printing.
 - 2026-11-20 — `2026-11-20-spin-gate` — Offline F-100D departure-recovery trainer with blind immediate-action drills, simulated altitude pressure, the 10,000-foot AGL decision gate, persistent qualification history, and responsive controls.
 - 2026-11-21 — `2026-11-21-waymark-ledger` — Offline waypoint crosswalk and briefing-lint desk with stable aliases, planned-versus-observed numbering, ambiguity checks, local persistence, handoff generation, CSV/JSON export, and printing.
+- 2026-11-22 — `2026-11-22-order-stack` — Offline DCS AI task-precedence inspector with role/enroute/main/triggered stack visualization, target-eligibility tests, repair diagnostics, persistence, and printable build cards.

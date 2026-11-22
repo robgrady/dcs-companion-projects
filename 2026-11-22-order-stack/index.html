@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="dark">
+<title>Order Stack — DCS AI Task Precedence Inspector</title>
+<style>
+:root{--bg:#11130f;--panel:#191c16;--panel2:#20241c;--ink:#f0f2e7;--muted:#aeb5a1;--line:#3b4234;--accent:#d7ed6a;--accent2:#91a83e;--warn:#f1be62;--bad:#e9826f;--good:#87c98b;--focus:#fff1a6;--r:6px;--shadow:0 18px 48px rgba(0,0,0,.25)}
+*{box-sizing:border-box}html{background:var(--bg);color:var(--ink);font-family:"Avenir Next","Segoe UI",sans-serif}body{margin:0;min-height:100vh;background:linear-gradient(90deg,rgba(255,255,255,.018) 1px,transparent 1px),linear-gradient(rgba(255,255,255,.018) 1px,transparent 1px),var(--bg);background-size:28px 28px}button,input,select,textarea{font:inherit}button,input,select,textarea{outline:none}button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{box-shadow:0 0 0 3px var(--focus);border-color:#000}.topbar{position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:13px 20px;background:rgba(17,19,15,.94);border-bottom:1px solid var(--line);backdrop-filter:blur(10px)}.brand{display:flex;align-items:baseline;gap:12px}.brand strong{font-size:17px;letter-spacing:.16em;text-transform:uppercase}.brand span{font:12px ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--muted)}.top-actions{display:flex;gap:8px;flex-wrap:wrap}.btn{min-height:44px;border:1px solid var(--line);border-radius:var(--r);padding:10px 14px;background:var(--panel2);color:var(--ink);cursor:pointer;font-weight:700}.btn:hover{border-color:var(--accent2);background:#292e23}.btn.primary{background:var(--accent);color:#171a11;border-color:var(--accent)}.btn.primary:hover{background:#e4f58c}.btn.danger{color:#ffc0b5}.shell{max-width:1500px;margin:auto;padding:22px}.mission-head{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:18px;align-items:end;padding:8px 0 20px;border-bottom:1px solid var(--line)}.mission-head h1{font-family:Georgia,"Times New Roman",serif;font-weight:500;font-size:clamp(28px,4vw,52px);line-height:.95;margin:0 0 10px;letter-spacing:-.03em}.mission-head p{margin:0;color:var(--muted);max-width:760px;line-height:1.5}.status-box{text-align:right}.status-box .score{font:700 30px ui-monospace,SFMono-Regular,Menlo,monospace}.status-box small{display:block;color:var(--muted);text-transform:uppercase;letter-spacing:.12em}.workspace{display:grid;grid-template-columns:minmax(300px,420px) minmax(500px,1fr);gap:18px;padding-top:18px}.panel{min-width:0;background:var(--panel);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow)}.panel-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 16px;border-bottom:1px solid var(--line)}.panel-head h2,.panel-head h3{margin:0;font-size:14px;text-transform:uppercase;letter-spacing:.12em}.panel-body{padding:16px}.field-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.field{display:grid;gap:6px}.field.full{grid-column:1/-1}.field label,.group-label{font-size:11px;color:var(--muted);font-weight:800;text-transform:uppercase;letter-spacing:.1em}.control{width:100%;min-height:44px;background:#10120e;color:var(--ink);border:1px solid var(--line);border-radius:4px;padding:9px 10px}.check{display:flex;align-items:flex-start;gap:10px;min-height:44px;padding:10px;background:#10120e;border:1px solid var(--line);border-radius:4px;cursor:pointer}.check input{width:19px;height:19px;accent-color:var(--accent);flex:0 0 auto}.check span{font-size:13px;line-height:1.35}.divider{height:1px;background:var(--line);margin:16px 0}.task-list{display:grid;gap:8px}.task-row{display:grid;grid-template-columns:30px 1fr auto;align-items:center;gap:8px;padding:8px;background:#10120e;border:1px solid var(--line);border-radius:4px}.task-row input{width:18px;height:18px;accent-color:var(--accent)}.task-name{font-size:13px}.task-type{font:10px ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--muted);text-transform:uppercase}.right{min-width:0;display:grid;gap:18px;align-content:start}.stack{display:grid;grid-template-columns:repeat(5,minmax(115px,1fr));gap:0;overflow:auto;padding:0}.lane{min-width:115px;border-right:1px solid var(--line);padding:14px}.lane:last-child{border-right:0}.lane-num{font:700 11px ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--accent);margin-bottom:18px}.lane h3{font-size:12px;text-transform:uppercase;letter-spacing:.08em;margin:0 0 12px}.lane p{font-size:12px;line-height:1.45;color:var(--muted);margin:0}.chips{display:grid;gap:7px;margin-top:12px}.chip{padding:8px;border:1px solid var(--line);border-radius:3px;background:#11140f;font-size:11px;line-height:1.35}.chip.active{border-color:var(--accent2);color:var(--ink)}.chip.conflict{border-color:var(--bad);color:#ffc1b6}.chip.off{opacity:.45;text-decoration:line-through}.diagnostics{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(250px,.75fr);gap:18px}.findings{display:grid;gap:9px}.finding{display:grid;grid-template-columns:72px 1fr;gap:12px;padding:12px;border:1px solid var(--line);background:#11140f;border-radius:4px}.severity{font:800 10px ui-monospace,SFMono-Regular,Menlo,monospace;text-transform:uppercase;letter-spacing:.08em}.severity.block{color:var(--bad)}.severity.caution{color:var(--warn)}.severity.pass{color:var(--good)}.finding h4{margin:0 0 4px;font-size:14px}.finding p{margin:0;color:var(--muted);font-size:12px;line-height:1.45}.target-test{display:grid;gap:10px}.result{padding:14px;border:1px solid var(--line);border-radius:4px;background:#10120e}.result strong{display:block;font-size:16px;margin-bottom:5px}.result p{font-size:12px;line-height:1.5;color:var(--muted);margin:0}.build-card{white-space:pre-wrap;background:#10120e;border:1px solid var(--line);padding:14px;border-radius:4px;min-height:210px;font:12px/1.55 ui-monospace,SFMono-Regular,Menlo,monospace;color:#dfe6cf}.hint{font-size:11px;color:var(--muted);line-height:1.45}.preset-row{display:flex;gap:8px;flex-wrap:wrap}.preset{min-height:40px;padding:8px 10px}.toast{position:fixed;right:18px;bottom:18px;z-index:30;background:var(--accent);color:#11140f;padding:12px 16px;border-radius:4px;font-weight:800;transform:translateY(120px);transition:.2s ease}.toast.show{transform:translateY(0)}
+@media(max-width:980px){.workspace,.diagnostics{grid-template-columns:1fr}.mission-head{grid-template-columns:1fr}.status-box{text-align:left}.stack{grid-template-columns:repeat(5,180px)}}@media(max-width:560px){.shell{padding:14px}.topbar{align-items:flex-start}.brand span{display:none}.field-grid{grid-template-columns:1fr}.field.full{grid-column:auto}.top-actions .btn:not(.primary){display:none}.finding{grid-template-columns:1fr}.mission-head h1{font-size:34px}}
+@media print{body{background:white;color:black}.topbar,.setup,.target-panel,.preset-row,.btn{display:none!important}.shell{max-width:none;padding:0}.workspace,.diagnostics{display:block}.panel{box-shadow:none;border:1px solid #999;margin:0 0 14px;background:white}.right{display:block}.stack{grid-template-columns:repeat(5,1fr);overflow:visible}.lane,.panel-head,.finding,.build-card{background:white;color:black;border-color:#999}.lane p,.finding p,.hint,.task-type{color:#333}.chip{background:white;color:black}.mission-head{border-color:#999}.status-box{text-align:right}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="brand"><strong>Order Stack</strong><span>DCS AI PRECEDENCE INSPECTOR / OFFLINE</span></div>
+  <div class="top-actions"><button class="btn" id="resetBtn">Reset</button><button class="btn" id="printBtn">Print card</button><button class="btn primary" id="auditBtn">Run audit</button></div>
+</header>
+<main class="shell">
+  <section class="mission-head" aria-labelledby="title">
+    <div><h1 id="title">Find the order your AI is actually obeying.</h1><p>Model the Mission Editor task stack, test one target, and produce a repair sequence. This is a diagnostic aid: it makes overlapping filters and route-state conflicts visible before another full mission test.</p></div>
+    <div class="status-box"><small>Readiness</small><div class="score" id="score">—</div><small id="scoreLabel">Not audited</small></div>
+  </section>
+  <div class="workspace">
+    <section class="panel setup" aria-labelledby="setupTitle">
+      <div class="panel-head"><h2 id="setupTitle">01 / Mission setup</h2></div>
+      <div class="panel-body">
+        <div class="preset-row" aria-label="Scenario presets">
+          <button class="btn preset" data-preset="cas">CAS attacks exclusions</button>
+          <button class="btn preset" data-preset="cap">CAP leaves zone</button>
+          <button class="btn preset" data-preset="strike">Strike skips target</button>
+        </div>
+        <div class="divider"></div>
+        <div class="field-grid">
+          <div class="field full"><label for="groupName">AI group</label><input class="control" id="groupName" value="COLT 3" maxlength="42"></div>
+          <div class="field"><label for="role">Mission role</label><select class="control" id="role"><option>CAS</option><option>CAP</option><option>SEAD</option><option>Ground Attack</option><option>Escort</option><option>Transport</option></select></div>
+          <div class="field"><label for="roe">ROE option</label><select class="control" id="roe"><option value="assigned">Only designated</option><option value="priority">Priority designated</option><option value="free">Weapons free</option><option value="hold">Weapon hold</option></select></div>
+          <div class="field full"><label class="check"><input id="defaultTask" type="checkbox" checked><span><b>Default role task enabled</b><br><span class="hint">The automatic CAS/CAP/SEAD mission task remains active.</span></span></label></div>
+          <div class="field"><label for="reaction">Reaction to threat</label><select class="control" id="reaction"><option value="evade">Evade fire</option><option value="passive">Passive defense</option><option value="none">No reaction</option></select></div>
+          <div class="field"><label for="lastWp">Final waypoint</label><select class="control" id="lastWp"><option value="land">Landing</option><option value="route">Turning point</option><option value="orbit">Orbit area</option></select></div>
+        </div>
+        <div class="divider"></div>
+        <div class="group-label">Background / enroute filters</div>
+        <div class="task-list" style="margin-top:8px">
+          <label class="task-row"><input id="zoneTask" type="checkbox" checked><span class="task-name">Search then engage in zone</span><span class="task-type">OR filter</span></label>
+          <label class="task-row"><input id="typeTask" type="checkbox"><span class="task-name">Search then engage target types</span><span class="task-type">OR filter</span></label>
+          <label class="task-row"><input id="groupTask" type="checkbox"><span class="task-name">Search then engage group</span><span class="task-type">OR filter</span></label>
+        </div>
+        <div class="divider"></div>
+        <div class="group-label">Main / triggered behavior</div>
+        <div class="task-list" style="margin-top:8px">
+          <label class="task-row"><input id="attackTask" type="checkbox"><span class="task-name">Perform Task: Attack Group</span><span class="task-type">main</span></label>
+          <label class="task-row"><input id="pushTask" type="checkbox"><span class="task-name">Triggered Action + AI Task Push</span><span class="task-type">queue</span></label>
+          <label class="task-row"><input id="stopCondition" type="checkbox"><span class="task-name">Explicit stop condition / task off</span><span class="task-type">release</span></label>
+        </div>
+        <div class="divider"></div>
+        <div class="field"><label for="intent">Intended behavior</label><textarea class="control" id="intent" rows="3">Attack armor inside TARGET zone; do not attack air defenses or unarmed support vehicles.</textarea></div>
+      </div>
+    </section>
+    <div class="right">
+      <section class="panel" aria-labelledby="stackTitle">
+        <div class="panel-head"><h2 id="stackTitle">02 / Effective order stack</h2><span class="hint">Left → right through the sortie</span></div>
+        <div class="stack" id="stackView"></div>
+      </section>
+      <section class="diagnostics">
+        <section class="panel" aria-labelledby="findingsTitle">
+          <div class="panel-head"><h2 id="findingsTitle">03 / Findings</h2><button class="btn" id="copyBtn">Copy repair card</button></div>
+          <div class="panel-body"><div class="findings" id="findings" aria-live="polite"></div></div>
+        </section>
+        <section class="panel target-panel" aria-labelledby="testTitle">
+          <div class="panel-head"><h2 id="testTitle">Target eligibility test</h2></div>
+          <div class="panel-body target-test">
+            <div class="field"><label for="targetType">Contact</label><select class="control" id="targetType"><option value="armor">Armor</option><option value="sam">Air defense</option><option value="support">Unarmed support</option><option value="air">Aircraft</option></select></div>
+            <label class="check"><input id="insideZone" type="checkbox" checked><span>Inside assigned search zone</span></label>
+            <label class="check"><input id="isAssigned" type="checkbox"><span>Explicitly assigned target/group</span></label>
+            <label class="check"><input id="detected" type="checkbox" checked><span>Detected and attack parameters available</span></label>
+            <div class="result" id="targetResult"></div>
+          </div>
+        </section>
+      </section>
+      <section class="panel" aria-labelledby="cardTitle">
+        <div class="panel-head"><h2 id="cardTitle">04 / Mission Editor repair card</h2><span class="hint">Generated from current settings</span></div>
+        <div class="panel-body"><div class="build-card" id="buildCard"></div></div>
+      </section>
+    </div>
+  </div>
+</main>
+<div class="toast" id="toast" role="status">Copied</div>
+<script>
+const $=id=>document.getElementById(id);
+const ids=['groupName','role','roe','defaultTask','reaction','lastWp','zoneTask','typeTask','groupTask','attackTask','pushTask','stopCondition','intent','targetType','insideZone','isAssigned','detected'];
+const defaults={groupName:'COLT 3',role:'CAS',roe:'assigned',defaultTask:true,reaction:'evade',lastWp:'land',zoneTask:true,typeTask:false,groupTask:false,attackTask:false,pushTask:false,stopCondition:false,intent:'Attack armor inside TARGET zone; do not attack air defenses or unarmed support vehicles.',targetType:'armor',insideZone:true,isAssigned:false,detected:true};
+const presets={
+ cas:{role:'CAS',roe:'assigned',defaultTask:true,reaction:'evade',lastWp:'route',zoneTask:true,typeTask:false,groupTask:false,attackTask:false,pushTask:false,stopCondition:false,intent:'Attack armor inside TARGET zone; exclude air defenses and unarmed support vehicles.'},
+ cap:{role:'CAP',roe:'assigned',defaultTask:true,reaction:'evade',lastWp:'land',zoneTask:true,typeTask:false,groupTask:false,attackTask:false,pushTask:false,stopCondition:false,intent:'Defend only the patrol zone and do not chase contacts beyond it.'},
+ strike:{role:'Ground Attack',roe:'assigned',defaultTask:false,reaction:'evade',lastWp:'land',zoneTask:false,typeTask:false,groupTask:false,attackTask:true,pushTask:false,stopCondition:false,intent:'Attack the named group once, then continue to egress and land.'}
+};
+let findings=[];
+function getState(){let s={};ids.forEach(id=>{const e=$(id);s[id]=e.type==='checkbox'?e.checked:e.value});return s}
+function setState(s){ids.forEach(id=>{if(s[id]===undefined)return;const e=$(id);if(e.type==='checkbox')e.checked=s[id];else e.value=s[id]});save();audit()}
+function save(){localStorage.setItem('dcs-order-stack-v1',JSON.stringify(getState()))}
+function restore(){try{const s=JSON.parse(localStorage.getItem('dcs-order-stack-v1'));setState(s||defaults)}catch(e){setState(defaults)}}
+function add(level,title,text){findings.push({level,title,text})}
+function audit(){const s=getState();findings=[];
+ if(s.defaultTask&&(s.zoneTask||s.typeTask||s.groupTask))add('block','Default role task broadens the target set','Background filters combine as permissions rather than a narrow ranked list. Disable the broad default '+s.role+' task when the added search task is intended to be the boundary.');
+ if(s.defaultTask&&s.roe==='assigned')add('caution','ROE does not cancel a valid background target','“Only designated” still depends on which tasks designate targets. A broad role task can make an excluded class valid before your zone filter is considered.');
+ if(s.lastWp!=='land')add('block','Route can enter arrival logic early','Use a dedicated landing waypoint after the objective. A non-landing final route point can lead the group to consider the route complete and transition toward recovery.');
+ if(s.reaction!=='none')add('caution','Threat reaction may interrupt the attack contract','Defensive behavior can override geometry or abort an attack. For a controlled test, use No Reaction temporarily, then restore survivability behavior after proving the task stack.');
+ if(s.pushTask&&!s.stopCondition)add('caution','Pushed task has no explicit release','Add a stop condition, task-off action, or an unambiguous completion path before expecting the prior route behavior to resume.');
+ if(s.attackTask&&s.zoneTask)add('caution','Exact and open-ended attack instructions overlap','An exact Attack Group task and a background zone search can compete for weapons and timing. Prove the exact task alone before adding autonomous cleanup behavior.');
+ if(!s.defaultTask&&!s.zoneTask&&!s.typeTask&&!s.groupTask&&!s.attackTask&&!s.pushTask)add('block','No attack authority is active','The group has no enabled task that makes a target eligible. Add one narrow task and test it in isolation.');
+ if(s.roe==='hold')add('block','Weapon Hold prevents the requested attack','Change ROE before the attack task or trigger the ROE change with the task activation.');
+ if(!s.detected)add('caution','The test target is not available to the AI','Task permission is not detection. Verify sensor, line-of-sight, range, emission state, and attack geometry separately.');
+ if(!findings.some(f=>f.level==='block'))add('pass','No structural blocker detected','The modeled stack is testable. Run a minimal mission with one group, one target, and labels/logging before restoring complexity.');
+ render(s);save()}
+function render(s){
+ const activeFilters=[s.defaultTask?`${s.role} default task`:null,s.zoneTask?'Search in zone':null,s.typeTask?'Search target types':null,s.groupTask?'Search group':null].filter(Boolean);
+ const lanes=[
+  ['01','Role seed','Created with the group and easy to overlook.',[{t:`${s.role} role`,c:'active'},{t:'Default role task',c:s.defaultTask?'conflict':'off'}]],
+  ['02','Enroute filters','Long-lived target permissions; multiple filters broaden eligibility.',activeFilters.length?activeFilters.map((t,i)=>({t,c:i===0&&s.defaultTask?'conflict':'active'})):[{t:'No filters active',c:'off'}]],
+  ['03','Main task','A bounded action such as attacking a named group.',[{t:'Attack Group',c:s.attackTask?'active':'off'}]],
+  ['04','Triggered queue','Push adds work to the controller; release logic matters.',[{t:'AI Task Push',c:s.pushTask?'active':'off'},{t:'Stop / off condition',c:s.stopCondition?'active':'off'}]],
+  ['05','Route end','Terminal route state changes what the group will initiate.',[{t:s.lastWp==='land'?'Landing waypoint':s.lastWp==='route'?'Turning point (final)':'Orbit area (final)',c:s.lastWp==='land'?'active':'conflict'}]]
+ ];
+ $('stackView').innerHTML=lanes.map(l=>`<div class="lane"><div class="lane-num">${l[0]}</div><h3>${l[1]}</h3><p>${l[2]}</p><div class="chips">${l[3].map(x=>`<div class="chip ${x.c}">${x.t}</div>`).join('')}</div></div>`).join('');
+ $('findings').innerHTML=findings.map(f=>`<article class="finding"><div class="severity ${f.level}">${f.level==='block'?'Blocker':f.level==='caution'?'Caution':'Ready'}</div><div><h4>${f.title}</h4><p>${f.text}</p></div></article>`).join('');
+ const blocks=findings.filter(f=>f.level==='block').length,cautions=findings.filter(f=>f.level==='caution').length;const score=Math.max(0,100-blocks*28-cautions*9);$('score').textContent=score+'%';$('scoreLabel').textContent=blocks?`${blocks} blocker${blocks>1?'s':''}`:cautions?`${cautions} caution${cautions>1?'s':''}`:'Test ready';
+ renderTarget(s);renderCard(s,blocks,cautions)
+}
+function renderTarget(s){let eligible=false,reasons=[];
+ if(s.roe==='hold')reasons.push('Weapon Hold is active.');
+ const explicit=s.isAssigned&&(s.groupTask||s.attackTask||s.pushTask);
+ const broad=s.defaultTask;
+ const zoned=s.insideZone&&s.zoneTask;
+ const typed=s.typeTask;
+ eligible=(explicit||broad||zoned||typed)&&s.roe!=='hold'&&s.detected;
+ if(explicit)reasons.push('An exact assignment makes this contact eligible.');
+ if(broad)reasons.push(`The enabled ${s.role} role task may admit this contact by class.`);
+ if(zoned)reasons.push('The active zone search admits detected contacts inside its filter.');
+ if(!s.insideZone&&s.zoneTask)reasons.push('The contact is outside the zone filter.');
+ if(!s.detected)reasons.push('The AI cannot currently detect or prosecute it.');
+ if(!explicit&&!broad&&!zoned&&!typed)reasons.push('No active task admits this contact.');
+ const label={armor:'Armor',sam:'Air defense',support:'Unarmed support',air:'Aircraft'}[s.targetType];
+ $('targetResult').innerHTML=`<strong style="color:${eligible?'var(--warn)':'var(--good)'}">${label}: ${eligible?'ELIGIBLE':'NOT ELIGIBLE'}</strong><p>${reasons.join(' ')}</p>`
+}
+function renderCard(s,blocks,cautions){const repair=findings.filter(f=>f.level!=='pass').map((f,i)=>`${i+1}. ${f.title}`).join('\n')||'1. No structural change required; run the minimal proof mission.';const active=[s.defaultTask?`Default ${s.role}`:null,s.zoneTask?'Search in zone':null,s.typeTask?'Search types':null,s.groupTask?'Search group':null,s.attackTask?'Attack Group':null,s.pushTask?'AI Task Push':null].filter(Boolean).join(' + ')||'None';$('buildCard').textContent=`DCS AI ORDER STACK — ${s.groupName}\nSTATUS: ${blocks} blocker(s), ${cautions} caution(s)\nINTENT: ${s.intent}\n\nACTIVE AUTHORITY\n${active}\nROE: ${$('roe').selectedOptions[0].text}\nREACTION: ${$('reaction').selectedOptions[0].text}\nFINAL WP: ${$('lastWp').selectedOptions[0].text}\n\nREPAIR ORDER\n${repair}\n\nPROOF RUN\n• One AI group, one intended target, one excluded target.\n• Start the search/attack instruction before attack geometry is required.\n• Observe first weapon release and route behavior.\n• Add only one removed behavior back per run.\n\nNOTE: Order Stack is a planning aid, not a DCS runtime parser. Confirm behavior in the current DCS build.`}
+function toast(msg){$('toast').textContent=msg;$('toast').classList.add('show');setTimeout(()=>$('toast').classList.remove('show'),1400)}
+ids.forEach(id=>$(id).addEventListener('input',audit));
+document.querySelectorAll('[data-preset]').forEach(b=>b.addEventListener('click',()=>setState({...defaults,...presets[b.dataset.preset]})));
+$('auditBtn').addEventListener('click',()=>{audit();toast('Audit refreshed')});
+$('resetBtn').addEventListener('click',()=>{localStorage.removeItem('dcs-order-stack-v1');setState(defaults);toast('Reset complete')});
+$('printBtn').addEventListener('click',()=>window.print());
+$('copyBtn').addEventListener('click',async()=>{try{await navigator.clipboard.writeText($('buildCard').textContent);toast('Repair card copied')}catch(e){const r=document.createRange();r.selectNode($('buildCard'));getSelection().removeAllRanges();getSelection().addRange(r);toast('Card selected — copy manually')}});
+restore();
+</script>
+</body>
+</html>
