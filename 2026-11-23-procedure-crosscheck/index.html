@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="dark">
+<title>Procedure Crosscheck — DCS checklist source reconciler</title>
+<style>
+:root{
+  --bg:#10120f;--panel:#171a16;--panel-2:#1d211c;--ink:#f1f0e7;--muted:#a9ad9f;
+  --line:#343a31;--line-strong:#515b4d;--accent:#e8b85c;--accent-ink:#1d180d;
+  --good:#82bd83;--warn:#e0a05d;--bad:#d8796e;--blue:#7ca8bd;
+  --radius:10px;--shadow:0 16px 40px rgba(0,0,0,.24);
+  --serif:Georgia,"Times New Roman",serif;--sans:"Avenir Next",Avenir,"Segoe UI",sans-serif;
+  --mono:"SFMono-Regular",Consolas,"Liberation Mono",monospace;
+}
+*{box-sizing:border-box} html{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16px}
+body{margin:0;min-height:100vh;background:linear-gradient(90deg,rgba(255,255,255,.018) 1px,transparent 1px) 0 0/32px 32px,var(--bg)}
+button,input,textarea,select{font:inherit} button,input,textarea,select{color:var(--ink)}
+button{cursor:pointer} button:disabled{cursor:not-allowed;opacity:.45}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.skip-link{position:fixed;left:12px;top:-80px;background:var(--accent);color:var(--accent-ink);padding:10px 14px;z-index:30}.skip-link:focus{top:12px}
+header{position:sticky;top:0;z-index:20;display:grid;grid-template-columns:minmax(240px,1fr) auto;gap:20px;align-items:center;padding:17px clamp(18px,3vw,42px);border-bottom:1px solid var(--line);background:rgba(16,18,15,.94);backdrop-filter:blur(12px)}
+.brand{display:flex;align-items:baseline;gap:14px}.brand h1{font:700 clamp(20px,2vw,29px)/1 var(--serif);letter-spacing:-.02em;margin:0}.brand span{font:600 11px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--accent)}
+.header-actions{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end}
+button,.button-label{min-height:44px;border:1px solid var(--line-strong);border-radius:7px;background:var(--panel-2);padding:9px 13px;font-weight:650;color:var(--ink)}
+button:hover,.button-label:hover{border-color:var(--muted);background:#252a23}.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}.primary:hover{background:#f2c86f;border-color:#f2c86f}.quiet{background:transparent}.danger{color:#f1aaa2}
+main{width:min(1680px,100%);margin:0 auto;padding:clamp(18px,3vw,40px)}
+.intro{display:grid;grid-template-columns:minmax(260px,.75fr) minmax(420px,1.25fr);gap:clamp(24px,5vw,80px);align-items:end;margin:8px 0 30px}
+.eyebrow{font:700 11px/1.2 var(--mono);letter-spacing:.13em;text-transform:uppercase;color:var(--accent);margin:0 0 12px}.intro h2{font:700 clamp(35px,5vw,68px)/.98 var(--serif);letter-spacing:-.045em;margin:0;max-width:12ch}.intro-copy{max-width:760px;color:var(--muted);font-size:clamp(16px,1.5vw,20px);line-height:1.55;margin:0}.intro-copy strong{color:var(--ink)}
+.workspace{display:grid;grid-template-columns:minmax(0,1fr) 56px minmax(0,1fr);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;background:var(--panel);box-shadow:var(--shadow)}
+.source{min-width:0}.source-head{display:grid;grid-template-columns:1fr auto;gap:12px;padding:18px;border-bottom:1px solid var(--line)}.source-head h3{margin:0;font:700 21px/1.1 var(--serif)}.source-tag{font:700 11px/1 var(--mono);letter-spacing:.1em;color:var(--muted)}
+.meta-grid{display:grid;grid-template-columns:1fr 150px;gap:10px;padding:14px 18px;border-bottom:1px solid var(--line)}
+.field{display:grid;gap:6px}.field label{font:700 11px/1.2 var(--mono);text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+input,textarea,select{width:100%;border:1px solid var(--line);border-radius:6px;background:#111410;padding:11px 12px}textarea{min-height:300px;resize:vertical;line-height:1.55;font-family:var(--mono);font-size:13px;tab-size:2}.paste-wrap{padding:18px}.paste-note{display:flex;justify-content:space-between;gap:12px;color:var(--muted);font-size:12px;margin-top:9px}.paste-note output{font-family:var(--mono);color:var(--ink)}
+.versus{display:grid;place-items:center;border-left:1px solid var(--line);border-right:1px solid var(--line);background:#131612}.versus span{writing-mode:vertical-rl;transform:rotate(180deg);font:700 10px/1 var(--mono);letter-spacing:.2em;color:var(--muted)}
+.analyze-bar{display:flex;align-items:center;justify-content:space-between;gap:16px;margin:16px 0 34px;padding:14px 0;border-bottom:1px solid var(--line)}.analyze-note{color:var(--muted);font-size:13px}.analyze-note kbd{border:1px solid var(--line-strong);border-bottom-width:2px;border-radius:4px;padding:2px 6px;font:12px var(--mono);color:var(--ink)}
+.results{display:none}.results.active{display:block}.result-head{display:grid;grid-template-columns:minmax(220px,1fr) auto;gap:20px;align-items:end;margin-bottom:17px}.result-head h2{font:700 clamp(28px,3vw,43px)/1 var(--serif);letter-spacing:-.03em;margin:0}.metrics{display:flex;flex-wrap:wrap;gap:7px;justify-content:flex-end}.metric{border:1px solid var(--line);border-radius:999px;padding:7px 10px;font:700 11px/1 var(--mono);color:var(--muted)}.metric b{color:var(--ink)}
+.tool-row{display:flex;flex-wrap:wrap;gap:9px;align-items:center;margin-bottom:14px}.tool-row select{width:auto;min-height:44px}.tool-row .spacer{flex:1}
+.compare-table{border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;background:var(--panel)}
+.compare-header,.compare-row{display:grid;grid-template-columns:minmax(0,1fr) 240px minmax(0,1fr)}.compare-header{background:#111410;color:var(--muted);font:700 11px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase}.compare-header div{padding:13px 16px}.compare-header div+div{border-left:1px solid var(--line)}
+.compare-row{border-top:1px solid var(--line);min-height:102px}.compare-row:first-of-type{border-top:0}.compare-row[data-kind="match"]{--row-mark:var(--good)}.compare-row[data-kind="review"]{--row-mark:var(--warn)}.compare-row[data-kind="a"],.compare-row[data-kind="b"]{--row-mark:var(--blue)}
+.step-cell{padding:16px;position:relative;display:grid;align-content:start;gap:7px;min-width:0}.step-cell+.decision{border-left:1px solid var(--line)}.decision+.step-cell{border-left:1px solid var(--line)}.step-num{font:700 10px/1 var(--mono);color:var(--muted);letter-spacing:.08em}.step-text{line-height:1.45;overflow-wrap:anywhere}.empty-step{color:#697063;font-style:italic}.decision{display:grid;align-content:center;gap:9px;padding:13px;background:color-mix(in srgb,var(--row-mark) 5%,transparent)}
+.kind-line{display:flex;justify-content:space-between;gap:8px;align-items:center}.kind{font:700 10px/1 var(--mono);letter-spacing:.09em;text-transform:uppercase;color:var(--row-mark)}.score{font:10px/1 var(--mono);color:var(--muted)}
+.choice-group{display:grid;grid-template-columns:repeat(4,1fr);gap:5px}.choice-group button{min-height:34px;padding:5px;border-radius:5px;font:700 10px/1 var(--mono)}.choice-group button[aria-pressed="true"]{background:var(--row-mark);border-color:var(--row-mark);color:#10120f}.merge-edit{min-height:64px;resize:vertical;font:12px/1.4 var(--mono);padding:8px;display:none}.decision[data-choice="merge"] .merge-edit{display:block}
+.canonical{margin-top:34px;display:grid;grid-template-columns:minmax(0,.72fr) minmax(420px,1.28fr);gap:25px;align-items:start}.canon-intro{position:sticky;top:92px}.canon-intro h2{font:700 clamp(30px,4vw,54px)/1 var(--serif);letter-spacing:-.04em;margin:0 0 14px}.canon-intro p{color:var(--muted);line-height:1.6;max-width:48ch}.ready-line{display:flex;align-items:center;gap:10px;margin:20px 0;font-weight:700}.ready-dot{width:10px;height:10px;border-radius:50%;background:var(--warn);box-shadow:0 0 0 5px rgba(224,160,93,.12)}.ready-line.ready .ready-dot{background:var(--good);box-shadow:0 0 0 5px rgba(130,189,131,.12)}
+.canon-list{display:grid;gap:8px}.canon-item{display:grid;grid-template-columns:38px minmax(0,1fr) auto;gap:9px;align-items:center;border:1px solid var(--line);border-radius:8px;background:var(--panel);padding:9px}.drag-index{font:700 11px/1 var(--mono);color:var(--muted);text-align:center}.canon-item textarea{min-height:56px;resize:vertical;font-family:var(--sans);font-size:14px;line-height:1.4}.item-actions{display:grid;grid-template-columns:repeat(2,44px);gap:5px}.item-actions button{padding:0;min-height:38px}.canon-empty{border:1px dashed var(--line-strong);border-radius:8px;padding:28px;color:var(--muted);text-align:center}
+.add-row{display:grid;grid-template-columns:1fr auto;gap:8px;margin-top:10px}.add-row input{min-height:44px}
+.drawer{position:fixed;inset:0 0 0 auto;width:min(480px,100%);z-index:40;background:var(--panel);border-left:1px solid var(--line);box-shadow:-18px 0 50px rgba(0,0,0,.4);padding:26px;transform:translateX(102%);transition:transform .24s ease;overflow:auto}.drawer.open{transform:none}.drawer h2{font:700 36px/1 var(--serif);margin:0}.drawer h3{margin-top:28px}.drawer p,.drawer li{color:var(--muted);line-height:1.55}.drawer .close{position:absolute;right:18px;top:18px}.backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.58);z-index:35}.backdrop.open{display:block}
+.toast{position:fixed;left:50%;bottom:24px;z-index:60;transform:translate(-50%,20px);opacity:0;background:var(--ink);color:var(--bg);padding:11px 15px;border-radius:7px;font-weight:700;transition:.2s;pointer-events:none}.toast.show{opacity:1;transform:translate(-50%,0)}
+.sr-only{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+@media(max-width:900px){header{grid-template-columns:1fr}.header-actions{justify-content:flex-start}.intro{grid-template-columns:1fr}.workspace{grid-template-columns:1fr}.versus{min-height:42px;border:0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}.versus span{writing-mode:horizontal-tb;transform:none}.compare-header{display:none}.compare-row{grid-template-columns:1fr}.decision,.decision+.step-cell{border-left:0!important}.decision{border-top:1px solid var(--line);border-bottom:1px solid var(--line)}.canonical{grid-template-columns:1fr}.canon-intro{position:static}}
+@media(max-width:560px){main{padding:16px}.meta-grid{grid-template-columns:1fr}.result-head{grid-template-columns:1fr}.metrics{justify-content:flex-start}.choice-group{grid-template-columns:repeat(2,1fr)}.canon-item{grid-template-columns:30px 1fr}.item-actions{grid-column:2;grid-template-columns:repeat(4,44px)}.header-actions .optional-mobile{display:none}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition:none!important}}
+@media print{body{background:#fff;color:#111}header,.intro,.workspace,.analyze-bar,.result-head,.tool-row,.compare-table,.canon-intro .print-hide,.add-row,.item-actions,.drawer,.backdrop,.toast{display:none!important}main{width:100%;padding:0}.results{display:block!important}.canonical{display:block;margin:0}.canon-intro{position:static}.canon-intro h2{font-size:24pt}.canon-intro p{color:#333}.canon-list{counter-reset:item}.canon-item{border:0;border-bottom:1px solid #aaa;border-radius:0;background:#fff;grid-template-columns:32px 1fr;padding:9px 0;break-inside:avoid}.drag-index{color:#333}.canon-item textarea{border:0;background:#fff;color:#111;resize:none;min-height:0;padding:0;height:auto}.ready-line{color:#111}}
+</style>
+</head>
+<body>
+<a class="skip-link" href="#workspace">Skip to comparison workspace</a>
+<header>
+  <div class="brand"><h1>Procedure Crosscheck</h1><span>DCS source reconciler</span></div>
+  <nav class="header-actions" aria-label="Project actions">
+    <button id="helpBtn" class="quiet" type="button">Method</button>
+    <button id="importBtn" class="quiet optional-mobile" type="button">Import</button>
+    <button id="exportBtn" class="quiet optional-mobile" type="button">Export</button>
+    <button id="resetBtn" class="danger quiet" type="button">New crosscheck</button>
+  </nav>
+</header>
+<main>
+  <section class="intro" aria-labelledby="introTitle">
+    <div><p class="eyebrow">Compare surface · evidence before habit</p><h2 id="introTitle">Two procedures enter. One trusted checklist leaves.</h2></div>
+    <p class="intro-copy">Paste two versions of the same DCS procedure. The desk aligns likely equivalents, exposes omissions and reorderings, then lets <strong>you</strong> choose the canonical sequence. It never decides aircraft procedure truth for you.</p>
+  </section>
+
+  <section id="workspace" class="workspace" aria-label="Source procedure entry">
+    <article class="source">
+      <div class="source-head"><h3>Source A</h3><span class="source-tag">PRIMARY / OLDER / OFFICIAL</span></div>
+      <div class="meta-grid">
+        <div class="field"><label for="labelA">Source label</label><input id="labelA" value="Official manual" autocomplete="off"></div>
+        <div class="field"><label for="dateA">Version or date</label><input id="dateA" autocomplete="off" aria-describedby="dateHintA"></div>
+      </div>
+      <div class="paste-wrap">
+        <div class="field"><label for="textA">One step per line</label><textarea id="textA" spellcheck="true" aria-describedby="hintA"></textarea></div>
+        <div class="paste-note" id="hintA"><span>Numbering and bullets are removed automatically.</span><output id="countA">0 steps</output></div>
+      </div>
+    </article>
+    <div class="versus" aria-hidden="true"><span>ALIGN AGAINST</span></div>
+    <article class="source">
+      <div class="source-head"><h3>Source B</h3><span class="source-tag">FIELD / UPDATED / PERSONAL</span></div>
+      <div class="meta-grid">
+        <div class="field"><label for="labelB">Source label</label><input id="labelB" value="Current field notes" autocomplete="off"></div>
+        <div class="field"><label for="dateB">Version or date</label><input id="dateB" autocomplete="off"></div>
+      </div>
+      <div class="paste-wrap">
+        <div class="field"><label for="textB">One step per line</label><textarea id="textB" spellcheck="true" aria-describedby="hintB"></textarea></div>
+        <div class="paste-note" id="hintB"><span>Short action-led steps align best.</span><output id="countB">0 steps</output></div>
+      </div>
+    </article>
+  </section>
+
+  <div class="analyze-bar">
+    <span class="analyze-note">Local only · saved in this browser · <kbd>⌘/Ctrl</kbd> + <kbd>Enter</kbd> to compare</span>
+    <button class="primary" id="compareBtn" type="button">Crosscheck procedures</button>
+  </div>
+
+  <section id="results" class="results" aria-labelledby="resultsTitle" aria-live="polite">
+    <div class="result-head">
+      <div><p class="eyebrow">Alignment desk</p><h2 id="resultsTitle">Resolve the differences</h2></div>
+      <div class="metrics" aria-label="Comparison summary">
+        <span class="metric"><b id="metricRows">0</b> aligned rows</span>
+        <span class="metric"><b id="metricShared">0</b> close matches</span>
+        <span class="metric"><b id="metricReview">0</b> review</span>
+        <span class="metric"><b id="metricOnly">0</b> single-source</span>
+      </div>
+    </div>
+    <div class="tool-row">
+      <label class="sr-only" for="filterKind">Filter comparison rows</label>
+      <select id="filterKind"><option value="all">All rows</option><option value="differences">Differences only</option><option value="review">Needs review</option><option value="single">Single-source only</option><option value="chosen">Chosen only</option></select>
+      <button id="autoChooseBtn" type="button">Accept close matches</button>
+      <button id="clearChoicesBtn" type="button" class="quiet">Clear choices</button>
+      <span class="spacer"></span>
+      <button id="printBtn" type="button" class="quiet">Print checklist</button>
+      <button id="copyBtn" type="button" class="primary">Copy canonical</button>
+    </div>
+    <div class="compare-table" role="region" aria-label="Aligned procedure comparison" tabindex="0">
+      <div class="compare-header" aria-hidden="true"><div id="headA">Source A</div><div>Disposition</div><div id="headB">Source B</div></div>
+      <div id="compareRows"></div>
+    </div>
+
+    <div class="canonical">
+      <aside class="canon-intro">
+        <p class="eyebrow">Canonical procedure</p>
+        <h2>Your reconciled run card</h2>
+        <p id="canonProvenance">Choose a source step, merge the wording, or skip it. Reorder and edit the resulting checklist without losing the source comparison.</p>
+        <div id="readyLine" class="ready-line"><span class="ready-dot" aria-hidden="true"></span><span id="readyText">No canonical steps selected</span></div>
+        <div class="print-hide"><button id="jsonBackupBtn" type="button" class="quiet">Download backup</button></div>
+      </aside>
+      <div>
+        <div id="canonList" class="canon-list"></div>
+        <div class="add-row"><label class="sr-only" for="newStep">Add an original canonical step</label><input id="newStep" autocomplete="off"><button id="addStepBtn" type="button">Add step</button></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<aside id="drawer" class="drawer" aria-labelledby="drawerTitle" aria-hidden="true">
+  <button id="closeDrawer" class="close quiet" type="button" aria-label="Close method panel">Close</button>
+  <p class="eyebrow">Method, not authority</p><h2 id="drawerTitle">How the crosscheck works</h2>
+  <h3>1. Name the evidence</h3><p>Record where each procedure came from and its date or version. A newer source is not automatically a better source.</p>
+  <h3>2. Align the wording</h3><p>The app compares normalized action words and order. Green means similar language, amber means a possible match, and blue marks a step present in only one source.</p>
+  <h3>3. Make the call</h3><p>Choose A, B, merge the wording, or skip each row. Verify disputed steps in the current module manual, official change log, or a controlled cockpit test.</p>
+  <h3>4. Preserve provenance</h3><p>Export the project before a module update. Re-run the crosscheck when a patch changes cockpit behavior.</p>
+  <h3>Limits</h3><ul><li>Text similarity is not procedural correctness.</li><li>The app does not know airframe limitations.</li><li>Do not use this artifact for real-world aviation.</li></ul>
+</aside>
+<div id="backdrop" class="backdrop"></div>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+<input id="fileInput" type="file" accept="application/json,.json" hidden>
+<script>
+'use strict';
+const STORAGE_KEY='dcs-procedure-crosscheck-v1';
+const STOP=new Set('a an the to of and or then for with in on at from is are be set select switch button knob lever control verify check ensure confirm place move press hold release turn use using as by into until'.split(' '));
+const $=s=>document.querySelector(s); const $$=s=>[...document.querySelectorAll(s)];
+const state={labelA:'Official manual',dateA:'',textA:'',labelB:'Current field notes',dateB:'',textB:'',rows:[],choices:{},custom:{},canonical:[],analyzed:false};
+let saveTimer;
+function escText(v){return String(v??'')}
+function parseSteps(text){return text.split(/\r?\n/).map(s=>s.trim().replace(/^\s*(?:[-*•–—]|\d+[.)\]:-]?|[A-Z][.)])\s*/,'').trim()).filter(Boolean)}
+function tokens(s){return new Set(s.toLowerCase().replace(/[^a-z0-9\s-]/g,' ').split(/\s+/).filter(w=>w.length>1&&!STOP.has(w)).map(w=>w.replace(/(ing|ed|es|s)$/,'')))}
+function similarity(a,b){const A=tokens(a),B=tokens(b);if(!A.size||!B.size)return a.toLowerCase()===b.toLowerCase()?1:0;let hit=0;A.forEach(x=>{if(B.has(x))hit++});const jac=hit/(A.size+B.size-hit);const lead=[...A][0]&&[...B][0]&&[...A][0]===[...B][0]?0.12:0;return Math.min(1,jac+lead)}
+function align(a,b){const n=a.length,m=b.length,gap=-.32,dp=Array.from({length:n+1},()=>Array(m+1).fill(0)),bt=Array.from({length:n+1},()=>Array(m+1).fill(''));
+ for(let i=1;i<=n;i++){dp[i][0]=i*gap;bt[i][0]='a'} for(let j=1;j<=m;j++){dp[0][j]=j*gap;bt[0][j]='b'}
+ for(let i=1;i<=n;i++)for(let j=1;j<=m;j++){const sim=similarity(a[i-1],b[j-1]);const diag=dp[i-1][j-1]+(sim>=.28?sim:-.45),up=dp[i-1][j]+gap,left=dp[i][j-1]+gap;const best=Math.max(diag,up,left);dp[i][j]=best;bt[i][j]=best===diag?'d':best===up?'a':'b'}
+ const out=[];let i=n,j=m;while(i||j){const move=bt[i][j];if(move==='d'){const sim=similarity(a[i-1],b[j-1]);if(sim<.28){out.push({a:a[i-1],b:null,ai:i-1,bi:null,sim:0});out.push({a:null,b:b[j-1],ai:null,bi:j-1,sim:0})}else out.push({a:a[i-1],b:b[j-1],ai:i-1,bi:j-1,sim});i--;j--}else if(move==='a'){out.push({a:a[i-1],b:null,ai:i-1,bi:null,sim:0});i--}else{out.push({a:null,b:b[j-1],ai:null,bi:j-1,sim:0});j--}}
+ return out.reverse().map((r,idx)=>({...r,id:'r'+idx,kind:r.a&&r.b?(r.sim>=.55?'match':'review'):(r.a?'a':'b')}))}
+function kindLabel(k){return k==='match'?'Close match':k==='review'?'Review wording':k==='a'?'Only in A':'Only in B'}
+function readInputs(){['labelA','dateA','textA','labelB','dateB','textB'].forEach(k=>state[k]=$('#'+k).value)}
+function updateCounts(){const a=parseSteps($('#textA').value).length,b=parseSteps($('#textB').value).length;$('#countA').textContent=`${a} step${a===1?'':'s'}`;$('#countB').textContent=`${b} step${b===1?'':'s'}`}
+function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('show');clearTimeout(t._timer);t._timer=setTimeout(()=>t.classList.remove('show'),1800)}
+function scheduleSave(){clearTimeout(saveTimer);saveTimer=setTimeout(save,180)}
+function save(){readInputs();localStorage.setItem(STORAGE_KEY,JSON.stringify(state))}
+function load(){try{const x=JSON.parse(localStorage.getItem(STORAGE_KEY));if(x&&typeof x==='object')Object.assign(state,x)}catch(e){console.warn('Saved project could not be loaded',e)};['labelA','dateA','textA','labelB','dateB','textB'].forEach(k=>$('#'+k).value=state[k]||'');updateCounts();if(state.analyzed&&state.rows.length){renderResults();$('#results').classList.add('active')}}
+function compare(){readInputs();const a=parseSteps(state.textA),b=parseSteps(state.textB);if(!a.length||!b.length){toast('Enter at least one step in each source');(!a.length?$('#textA'):$('#textB')).focus();return}state.rows=align(a,b);state.choices={};state.custom={};state.canonical=[];state.analyzed=true;renderResults();$('#results').classList.add('active');save();$('#resultsTitle').focus?.();$('#results').scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'})}
+function renderResults(){readInputs();$('#headA').textContent=state.labelA||'Source A';$('#headB').textContent=state.labelB||'Source B';const counts={match:0,review:0,a:0,b:0};state.rows.forEach(r=>counts[r.kind]++);$('#metricRows').textContent=state.rows.length;$('#metricShared').textContent=counts.match;$('#metricReview').textContent=counts.review;$('#metricOnly').textContent=counts.a+counts.b;const host=$('#compareRows');host.replaceChildren();state.rows.forEach((r,idx)=>host.appendChild(buildRow(r,idx)));applyFilter();rebuildCanonical(false)}
+function cell(side,text,num){const d=document.createElement('div');d.className='step-cell';const n=document.createElement('span');n.className='step-num';n.textContent=text?`${side} · STEP ${num+1}`:`${side} · NO STEP`;const t=document.createElement('div');t.className=text?'step-text':'step-text empty-step';t.textContent=text||'No corresponding step';d.append(n,t);return d}
+function buildRow(r,idx){const row=document.createElement('article');row.className='compare-row';row.dataset.kind=r.kind;row.dataset.id=r.id;row.append(cell('A',r.a,r.ai));const dec=document.createElement('div');dec.className='decision';dec.dataset.choice=state.choices[r.id]||'';const top=document.createElement('div');top.className='kind-line';const kind=document.createElement('span');kind.className='kind';kind.textContent=kindLabel(r.kind);const score=document.createElement('span');score.className='score';score.textContent=r.a&&r.b?`${Math.round(r.sim*100)}% text overlap`:'unpaired';top.append(kind,score);const group=document.createElement('div');group.className='choice-group';group.setAttribute('role','group');group.setAttribute('aria-label',`Choose disposition for row ${idx+1}`);[['a','Use A'],['merge','Merge'],['b','Use B'],['skip','Skip']].forEach(([value,label])=>{const btn=document.createElement('button');btn.type='button';btn.textContent=label;btn.dataset.value=value;btn.disabled=(value==='a'&&!r.a)||(value==='b'&&!r.b)||(value==='merge'&&(!r.a||!r.b));btn.setAttribute('aria-pressed',state.choices[r.id]===value?'true':'false');btn.addEventListener('click',()=>choose(r.id,value));group.append(btn)});const edit=document.createElement('textarea');edit.className='merge-edit';edit.setAttribute('aria-label',`Merged wording for row ${idx+1}`);edit.value=state.custom[r.id]||mergeSuggestion(r);edit.addEventListener('input',()=>{state.custom[r.id]=edit.value;rebuildCanonical();scheduleSave()});dec.append(top,group,edit);row.append(dec,cell('B',r.b,r.bi));return row}
+function mergeSuggestion(r){if(!r.a)return r.b||'';if(!r.b)return r.a;return r.a.length<=r.b.length?r.a:r.b}
+function choose(id,value){state.choices[id]=state.choices[id]===value?'':value;const row=$(`.compare-row[data-id="${id}"]`),dec=row.querySelector('.decision');dec.dataset.choice=state.choices[id];row.querySelectorAll('.choice-group button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.value===state.choices[id]?'true':'false'));if(value==='merge'&&!state.custom[id]){const r=state.rows.find(x=>x.id===id);state.custom[id]=mergeSuggestion(r);row.querySelector('.merge-edit').value=state.custom[id]}rebuildCanonical();applyFilter();save()}
+function selectedFromRows(){return state.rows.flatMap(r=>{const c=state.choices[r.id];if(!c||c==='skip')return[];return[{key:r.id,text:c==='a'?r.a:c==='b'?r.b:(state.custom[r.id]||mergeSuggestion(r)),source:c}]})}
+function rebuildCanonical(preserveEdits=true){const selected=selectedFromRows();const old=new Map((state.canonical||[]).map(x=>[x.key,x]));const extras=(state.canonical||[]).filter(x=>x.key.startsWith('manual-'));const next=selected.map(x=>preserveEdits&&old.has(x.key)?{...x,text:old.get(x.key).text}:x);extras.forEach(x=>next.push(x));state.canonical=next;renderCanonical();scheduleSave()}
+function renderCanonical(){const host=$('#canonList');host.replaceChildren();if(!state.canonical.length){const e=document.createElement('div');e.className='canon-empty';e.textContent='Choose steps above, or add an original step below.';host.append(e)}state.canonical.forEach((item,i)=>{const row=document.createElement('div');row.className='canon-item';const n=document.createElement('span');n.className='drag-index';n.textContent=String(i+1).padStart(2,'0');const ta=document.createElement('textarea');ta.value=item.text;ta.setAttribute('aria-label',`Canonical step ${i+1}`);ta.addEventListener('input',()=>{state.canonical[i].text=ta.value;scheduleSave()});const actions=document.createElement('div');actions.className='item-actions';[['↑','Move up',()=>moveCanon(i,-1)],['↓','Move down',()=>moveCanon(i,1)],['⎘','Duplicate',()=>duplicateCanon(i)],['×','Remove',()=>removeCanon(i)]].forEach(([symbol,label,fn])=>{const b=document.createElement('button');b.type='button';b.textContent=symbol;b.title=label;b.setAttribute('aria-label',`${label} step ${i+1}`);b.addEventListener('click',fn);actions.append(b)});row.append(n,ta,actions);host.append(row)});const selected=state.canonical.filter(x=>x.text.trim()).length,unresolved=state.rows.filter(r=>!state.choices[r.id]).length;$('#readyLine').classList.toggle('ready',selected>0&&unresolved===0);$('#readyText').textContent=!selected?'No canonical steps selected':unresolved?`${selected} steps · ${unresolved} rows unresolved`:`${selected} steps · all rows dispositioned`;$('#canonProvenance').textContent=`Built from “${state.labelA||'Source A'}” and “${state.labelB||'Source B'}”. Text remains editable; verify disputed actions in authoritative current material.`}
+function moveCanon(i,d){const j=i+d;if(j<0||j>=state.canonical.length)return;[state.canonical[i],state.canonical[j]]=[state.canonical[j],state.canonical[i]];renderCanonical();save()}
+function duplicateCanon(i){state.canonical.splice(i+1,0,{key:'manual-'+crypto.randomUUID(),text:state.canonical[i].text,source:'manual'});renderCanonical();save()}
+function removeCanon(i){const item=state.canonical[i];if(!item.key.startsWith('manual-'))state.choices[item.key]='skip';state.canonical.splice(i,1);renderResults();save()}
+function addStep(){const input=$('#newStep'),text=input.value.trim();if(!text){input.focus();return}state.canonical.push({key:'manual-'+crypto.randomUUID(),text,source:'manual'});input.value='';renderCanonical();save();input.focus()}
+function applyFilter(){const v=$('#filterKind').value;$$('.compare-row').forEach(row=>{const c=state.choices[row.dataset.id],k=row.dataset.kind;row.hidden=!(v==='all'||(v==='differences'&&k!=='match')||(v==='review'&&k==='review')||(v==='single'&&(k==='a'||k==='b'))||(v==='chosen'&&c))})}
+function autoChoose(){state.rows.forEach(r=>{if(r.kind==='match'&&!state.choices[r.id])state.choices[r.id]='a'});renderResults();save();toast('Close matches accepted from Source A')}
+function clearChoices(){state.choices={};state.custom={};state.canonical=state.canonical.filter(x=>x.key.startsWith('manual-'));renderResults();save()}
+function projectData(){readInputs();return{format:'dcs-procedure-crosscheck',version:1,exported:new Date().toISOString(),...state}}
+function download(name,data,type='application/json'){const blob=new Blob([data],{type}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),800)}
+function exportProject(){download('procedure-crosscheck.json',JSON.stringify(projectData(),null,2));toast('Project exported')}
+async function copyCanonical(){const steps=state.canonical.map((x,i)=>`${i+1}. ${x.text.trim()}`).filter(x=>!x.endsWith('. '));if(!steps.length){toast('Choose at least one canonical step');return}const header=`${state.labelA} × ${state.labelB}\nReconciled DCS procedure\n\n`;try{await navigator.clipboard.writeText(header+steps.join('\n'));toast('Canonical checklist copied')}catch{const ta=document.createElement('textarea');ta.value=header+steps.join('\n');document.body.append(ta);ta.select();document.execCommand('copy');ta.remove();toast('Canonical checklist copied')}}
+function importProject(file){const reader=new FileReader();reader.onload=()=>{try{const x=JSON.parse(reader.result);if(x.format!=='dcs-procedure-crosscheck')throw new Error('Wrong format');['labelA','dateA','textA','labelB','dateB','textB','rows','choices','custom','canonical','analyzed'].forEach(k=>{if(k in x)state[k]=x[k]});save();load();toast('Project imported')}catch(e){toast('Could not import that file')}};reader.readAsText(file)}
+function reset(){if(!confirm('Clear this crosscheck and its saved local state?'))return;localStorage.removeItem(STORAGE_KEY);location.reload()}
+function toggleDrawer(open){$('#drawer').classList.toggle('open',open);$('#backdrop').classList.toggle('open',open);$('#drawer').setAttribute('aria-hidden',open?'false':'true');if(open)$('#closeDrawer').focus();else $('#helpBtn').focus()}
+['labelA','dateA','textA','labelB','dateB','textB'].forEach(k=>$('#'+k).addEventListener('input',()=>{updateCounts();scheduleSave()}));
+$('#compareBtn').addEventListener('click',compare);$('#filterKind').addEventListener('change',applyFilter);$('#autoChooseBtn').addEventListener('click',autoChoose);$('#clearChoicesBtn').addEventListener('click',clearChoices);$('#addStepBtn').addEventListener('click',addStep);$('#newStep').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();addStep()}});$('#copyBtn').addEventListener('click',copyCanonical);$('#printBtn').addEventListener('click',()=>window.print());$('#exportBtn').addEventListener('click',exportProject);$('#jsonBackupBtn').addEventListener('click',exportProject);$('#importBtn').addEventListener('click',()=>$('#fileInput').click());$('#fileInput').addEventListener('change',e=>{if(e.target.files[0])importProject(e.target.files[0]);e.target.value=''});$('#resetBtn').addEventListener('click',reset);$('#helpBtn').addEventListener('click',()=>toggleDrawer(true));$('#closeDrawer').addEventListener('click',()=>toggleDrawer(false));$('#backdrop').addEventListener('click',()=>toggleDrawer(false));document.addEventListener('keydown',e=>{if((e.metaKey||e.ctrlKey)&&e.key==='Enter'){e.preventDefault();compare()}if(e.key==='Escape'&&$('#drawer').classList.contains('open'))toggleDrawer(false)});
+load();
+</script>
+</body>
+</html>
