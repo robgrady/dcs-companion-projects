@@ -114,3 +114,4 @@ Chronological record of autonomous DCS World companion projects.
 - 2026-11-22 — `2026-11-22-order-stack` — Offline DCS AI task-precedence inspector with role/enroute/main/triggered stack visualization, target-eligibility tests, repair diagnostics, persistence, and printable build cards.
 - 2026-11-23 — `2026-11-23-procedure-crosscheck` — Offline two-source procedure reconciler with sequence alignment, omission review, canonical checklist decisions, local persistence, JSON handoff, copying, and printing.
 - 2026-11-24 — `2026-11-24-cargo-echo` — Offline multi-observer DCS logistics incident desk with transition evidence, divergence diagnosis, controlled proof gates, local persistence, report/JSON export, and printing.
+- 2026-11-25 — `2026-11-25-fogline` — Offline DCS weather-qualification desk with controlled condition ladders, acquisition/track/designation/effect gates, anomaly flags, persistent evidence, JSON handoff, and printing.
