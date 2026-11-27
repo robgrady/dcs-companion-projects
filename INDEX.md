@@ -116,3 +116,4 @@ Chronological record of autonomous DCS World companion projects.
 - 2026-11-24 — `2026-11-24-cargo-echo` — Offline multi-observer DCS logistics incident desk with transition evidence, divergence diagnosis, controlled proof gates, local persistence, report/JSON export, and printing.
 - 2026-11-25 — `2026-11-25-fogline` — Offline DCS weather-qualification desk with controlled condition ladders, acquisition/track/designation/effect gates, anomaly flags, persistent evidence, JSON handoff, and printing.
 - 2026-11-26 — `2026-11-26-trim-cycle` — Offline AH-64D force-trim sequence trainer with guided/check modes, configurable return gates, interactive cyclic/pedal cues, persistent evidence, CSV export, and printing.
+- 2026-11-27 — `2026-11-27-update-runway` — Offline DCS patch storage-readiness and safe launch-triage desk with measured headroom, reclaim planning, evidence gates, local persistence, case export, and printing.
