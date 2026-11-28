@@ -1,0 +1,631 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#121713">
+  <title>Walleye Wire — A-6E Contrast-Track Rehearsal</title>
+  <style>
+    :root {
+      --bg: #111612;
+      --panel: #192019;
+      --panel-2: #202820;
+      --ink: #f1eedf;
+      --muted: #a8b0a3;
+      --line: #394239;
+      --amber: #e2b85d;
+      --green: #9fd27e;
+      --red: #e07862;
+      --screen: #142417;
+      --screen-ink: #b7e98f;
+      --radius: 6px;
+      --shadow: 0 16px 40px rgb(0 0 0 / .28);
+    }
+    * { box-sizing: border-box; }
+    html { color-scheme: dark; }
+    body {
+      margin: 0;
+      min-width: 320px;
+      min-height: 100vh;
+      background:
+        linear-gradient(rgb(255 255 255 / .018) 1px, transparent 1px),
+        #111612;
+      background-size: 100% 32px;
+      color: var(--ink);
+      font-family: "Trebuchet MS", "Avenir Next", sans-serif;
+      line-height: 1.45;
+    }
+    button, select, input { font: inherit; }
+    button, select {
+      min-height: 44px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      color: var(--ink);
+      background: #252e25;
+    }
+    button { padding: .7rem .95rem; cursor: pointer; font-weight: 700; letter-spacing: .02em; }
+    button:hover { border-color: var(--amber); background: #2c352b; }
+    button:active { transform: translateY(1px); }
+    button:focus-visible, select:focus-visible, input:focus-visible, [tabindex]:focus-visible {
+      outline: 3px solid var(--amber);
+      outline-offset: 3px;
+    }
+    button.primary { border-color: var(--amber); background: var(--amber); color: #17150d; }
+    button.primary:hover { background: #f2cc79; }
+    button.danger { color: #ffd7cf; border-color: #8b4c40; }
+    button:disabled { opacity: .48; cursor: not-allowed; transform: none; }
+    .shell { width: min(1440px, 100%); margin: 0 auto; padding: 18px; }
+    header {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 18px;
+      align-items: end;
+      border-bottom: 1px solid var(--line);
+      padding: 8px 0 16px;
+      margin-bottom: 18px;
+    }
+    .eyebrow, .label, .readout, .key, .tag {
+      font-family: "Courier New", monospace;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      font-size: .73rem;
+      font-weight: 700;
+    }
+    .eyebrow { color: var(--amber); margin: 0 0 4px; }
+    h1 { margin: 0; font-family: Georgia, serif; font-size: clamp(2rem, 5vw, 4.7rem); font-weight: 400; line-height: .92; letter-spacing: -.045em; }
+    .subtitle { color: var(--muted); max-width: 63ch; margin: .7rem 0 0; }
+    .header-status { text-align: right; }
+    .status-lamp { display: inline-flex; align-items: center; gap: 8px; color: var(--muted); }
+    .status-lamp::before { content: ""; width: 10px; height: 10px; border-radius: 50%; background: var(--red); box-shadow: 0 0 0 4px rgb(224 120 98 / .12); }
+    .status-lamp.ready::before { background: var(--green); box-shadow: 0 0 0 4px rgb(159 210 126 / .12); }
+    .layout { display: grid; grid-template-columns: minmax(270px, 340px) minmax(0, 1fr); gap: 18px; align-items: start; }
+    .sidebar { display: grid; gap: 14px; }
+    .panel { border: 1px solid var(--line); border-radius: var(--radius); background: var(--panel); box-shadow: var(--shadow); }
+    .panel-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 13px 15px; border-bottom: 1px solid var(--line); }
+    .panel-head h2, .panel-head h3 { margin: 0; font-size: 1rem; letter-spacing: .01em; }
+    .panel-body { padding: 15px; }
+    .loadout-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .station { border: 1px solid var(--line); padding: 10px; border-radius: var(--radius); background: var(--panel-2); }
+    .station.full { grid-column: 1 / -1; }
+    .station label { display: block; color: var(--muted); margin-bottom: 5px; }
+    .station select { width: 100%; padding: 8px; }
+    .gate-list { display: grid; gap: 8px; margin: 13px 0 0; padding: 0; list-style: none; }
+    .gate-list li { display: grid; grid-template-columns: 18px 1fr; gap: 8px; color: var(--muted); }
+    .gate-list li::before { content: "×"; color: var(--red); font-family: monospace; font-weight: 900; }
+    .gate-list li.pass { color: var(--ink); }
+    .gate-list li.pass::before { content: "✓"; color: var(--green); }
+    .field { display: grid; gap: 6px; margin-bottom: 12px; }
+    .field:last-child { margin-bottom: 0; }
+    .field select { width: 100%; padding: 9px; }
+    .brief { display: grid; gap: 6px; color: var(--muted); font-size: .9rem; }
+    .brief strong { color: var(--ink); }
+    .main { display: grid; gap: 14px; min-width: 0; }
+    .instrument { overflow: hidden; }
+    .instrument-top {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 1px;
+      background: var(--line);
+      border-bottom: 1px solid var(--line);
+    }
+    .instrument-top > div { background: var(--panel); padding: 10px 13px; min-width: 0; }
+    .readout { color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .readout strong { display: block; color: var(--ink); font-family: "Trebuchet MS", sans-serif; font-size: 1.02rem; letter-spacing: 0; margin-top: 2px; }
+    .screen-wrap { position: relative; background: #090d0a; padding: clamp(8px, 1.5vw, 18px); }
+    canvas { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; border: 1px solid #52604f; background: var(--screen); image-rendering: auto; touch-action: none; }
+    .screen-overlay { position: absolute; inset: 18px; pointer-events: none; border: 1px solid rgb(183 233 143 / .12); }
+    .run-banner {
+      position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+      width: min(420px, calc(100% - 64px)); padding: 18px;
+      text-align: center; background: rgb(15 20 15 / .93); border: 1px solid var(--amber); border-radius: var(--radius);
+    }
+    .run-banner h2 { margin: 0 0 6px; font-family: Georgia, serif; font-weight: 400; font-size: 1.8rem; }
+    .run-banner p { color: var(--muted); margin: 0 0 13px; }
+    .controls { display: grid; grid-template-columns: 1fr auto; gap: 14px; padding: 14px; border-top: 1px solid var(--line); align-items: center; }
+    .control-copy { color: var(--muted); font-size: .88rem; }
+    .control-copy strong { color: var(--ink); }
+    .buttons { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+    .key { display: inline-block; border: 1px solid #5a6558; border-bottom-width: 3px; border-radius: 4px; color: var(--ink); padding: 2px 6px; background: #222a22; margin: 0 2px; }
+    .lower { display: grid; grid-template-columns: 1.2fr .8fr; gap: 14px; }
+    .telemetry { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--line); }
+    .metric { background: var(--panel); padding: 14px; }
+    .metric .value { font-family: Georgia, serif; font-size: 2rem; line-height: 1; margin-top: 5px; }
+    .metric small { color: var(--muted); }
+    .history { display: grid; gap: 8px; max-height: 240px; overflow: auto; }
+    .history-row { display: grid; grid-template-columns: 1fr auto; gap: 8px; align-items: center; border-bottom: 1px solid var(--line); padding: 5px 0 9px; }
+    .history-row:last-child { border-bottom: 0; }
+    .score { font-family: Georgia, serif; font-size: 1.5rem; color: var(--amber); }
+    .empty { color: var(--muted); font-style: italic; }
+    .tag { display: inline-block; color: var(--green); border: 1px solid #466043; border-radius: 999px; padding: 3px 7px; }
+    dialog { width: min(680px, calc(100% - 30px)); background: var(--panel); color: var(--ink); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: 0 30px 80px #000; }
+    dialog::backdrop { background: rgb(0 0 0 / .72); }
+    dialog h2 { font-family: Georgia, serif; font-weight: 400; font-size: 2rem; margin-top: 0; }
+    dialog p, dialog li { color: var(--muted); }
+    dialog strong { color: var(--ink); }
+    .dialog-actions { display: flex; justify-content: flex-end; margin-top: 18px; }
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+    footer { display: flex; justify-content: space-between; gap: 18px; color: var(--muted); padding: 18px 0 4px; font-size: .82rem; }
+    @media (max-width: 900px) {
+      .layout { grid-template-columns: 1fr; }
+      .sidebar { grid-template-columns: 1fr 1fr; }
+      .sidebar .panel:last-child { grid-column: 1 / -1; }
+      .lower { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 620px) {
+      .shell { padding: 12px; }
+      header { grid-template-columns: 1fr; }
+      .header-status { text-align: left; }
+      .sidebar { grid-template-columns: 1fr; }
+      .sidebar .panel:last-child { grid-column: auto; }
+      .instrument-top { grid-template-columns: 1fr 1fr; }
+      .controls { grid-template-columns: 1fr; }
+      .buttons { justify-content: stretch; }
+      .buttons button { flex: 1; }
+      .telemetry { grid-template-columns: 1fr; }
+      footer { display: block; }
+    }
+    @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; transition: none !important; } }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header>
+      <div>
+        <p class="eyebrow">A-6E / Walleye II / Offline rehearsal</p>
+        <h1>Walleye Wire</h1>
+        <p class="subtitle">Build a valid new-patch loadout, then rehearse the hand–eye discipline of keeping a contrast aimpoint controlled through a noisy post-release video view.</p>
+      </div>
+      <div class="header-status">
+        <div id="readyLamp" class="status-lamp"><span id="readyText">Loadout blocked</span></div>
+      </div>
+    </header>
+
+    <main class="layout">
+      <aside class="sidebar" aria-label="Setup">
+        <section class="panel">
+          <div class="panel-head"><h2>01 / Loadout gate</h2><span class="tag">2.9.32</span></div>
+          <div class="panel-body">
+            <div class="loadout-grid">
+              <div class="station">
+                <label class="label" for="pylon2">Pylon 2</label>
+                <select id="pylon2"><option>Empty</option><option>Walleye II</option><option>Other store</option></select>
+              </div>
+              <div class="station">
+                <label class="label" for="pylon4">Pylon 4</label>
+                <select id="pylon4"><option>Empty</option><option>Walleye II</option><option>Other store</option></select>
+              </div>
+              <div class="station full">
+                <label class="label" for="pylon3">Pylon 3</label>
+                <select id="pylon3"><option>Empty</option><option>AN/AWW-13</option><option>Other store</option></select>
+              </div>
+            </div>
+            <ul class="gate-list" id="gateList" aria-live="polite">
+              <li id="weaponGate">Walleye II on pylon 2 or 4</li>
+              <li id="podGate">AN/AWW-13 on pylon 3</li>
+              <li id="pairGate">Weapon and pod carried together</li>
+            </ul>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-head"><h2>02 / Run setup</h2></div>
+          <div class="panel-body">
+            <div class="field">
+              <label class="label" for="difficulty">Video condition</label>
+              <select id="difficulty">
+                <option value="training">Training / stable picture</option>
+                <option value="operational">Operational / bumps + noise</option>
+                <option value="weathered">Weathered / low contrast + dropout</option>
+              </select>
+            </div>
+            <div class="field">
+              <label class="label" for="duration">Rehearsal length</label>
+              <select id="duration">
+                <option value="30">30 seconds</option>
+                <option value="45" selected>45 seconds</option>
+                <option value="60">60 seconds</option>
+              </select>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-head"><h2>Contract</h2><button id="helpBtn" type="button">How it works</button></div>
+          <div class="panel-body brief">
+            <div><strong>Acquire:</strong> bring the reticle over the fixed high-contrast aimpoint.</div>
+            <div><strong>Designate:</strong> hold <span class="key">Space</span> inside the capture circle.</div>
+            <div><strong>Guide:</strong> after simulated release, correct drift without chasing every noise pulse.</div>
+            <div><strong>Abort:</strong> stop the run if the loadout contract changes.</div>
+          </div>
+        </section>
+      </aside>
+
+      <section class="main" aria-label="Trainer">
+        <section class="panel instrument">
+          <div class="instrument-top">
+            <div class="readout">Phase<strong id="phaseReadout">SAFE</strong></div>
+            <div class="readout">Time<strong id="timeReadout">00:45</strong></div>
+            <div class="readout">Track quality<strong id="qualityReadout">—</strong></div>
+            <div class="readout">Picture<strong id="pictureReadout">STANDBY</strong></div>
+          </div>
+          <div class="screen-wrap">
+            <canvas id="scope" width="960" height="540" aria-label="Simulated monochrome Walleye video display. Move the reticle with arrow keys or WASD and hold Space to designate."></canvas>
+            <div class="screen-overlay" aria-hidden="true"></div>
+            <div class="run-banner" id="runBanner">
+              <h2>Wire not armed</h2>
+              <p>Pass the loadout gate, choose a video condition, then begin the rehearsal.</p>
+              <button id="startBtn" class="primary" type="button" disabled>Begin rehearsal</button>
+            </div>
+          </div>
+          <div class="controls">
+            <div class="control-copy"><strong>Move</strong> <span class="key">WASD</span> / <span class="key">Arrows</span> · <strong>Designate</strong> <span class="key">Space</span> · pointer/touch also supported</div>
+            <div class="buttons">
+              <button id="designateBtn" type="button" disabled>Hold designate</button>
+              <button id="resetBtn" class="danger" type="button">Reset run</button>
+            </div>
+          </div>
+        </section>
+
+        <div class="lower">
+          <section class="panel">
+            <div class="panel-head"><h3>Live control evidence</h3><span class="label" id="cueText">Awaiting run</span></div>
+            <div class="telemetry">
+              <div class="metric"><span class="label">Alignment</span><div class="value" id="alignmentMetric">—</div><small>reticle-to-aimpoint</small></div>
+              <div class="metric"><span class="label">Smoothness</span><div class="value" id="smoothMetric">—</div><small>lower correction energy wins</small></div>
+              <div class="metric"><span class="label">Wire score</span><div class="value" id="scoreMetric">—</div><small>alignment + restraint</small></div>
+            </div>
+          </section>
+          <section class="panel">
+            <div class="panel-head"><h3>Recent runs</h3><button id="clearHistory" type="button">Clear</button></div>
+            <div class="panel-body history" id="history"><div class="empty">No completed rehearsals yet.</div></div>
+          </section>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <span>Training abstraction — not a substitute for the current Heatblur manual or in-cockpit procedures.</span>
+      <span>State is stored only in this browser.</span>
+    </footer>
+  </div>
+
+  <dialog id="helpDialog">
+    <h2>What this trains</h2>
+    <p>This is a <strong>coordination rehearsal</strong>, not a switchology emulator. The target is fixed; apparent motion comes from a simulated moving viewpoint, vibration, video noise, and occasional signal loss.</p>
+    <ul>
+      <li><strong>Before release:</strong> settle the reticle inside the amber capture circle and hold designate long enough to establish a track.</li>
+      <li><strong>After release:</strong> keep the crosshair near the aimpoint. Large, frantic reversals reduce smoothness even if the average alignment is acceptable.</li>
+      <li><strong>Weathered:</strong> one short video dropout is deliberate. Keep your last correction trend; do not invent a large input while blind.</li>
+    </ul>
+    <p>The loadout gate encodes only the compatibility explicitly added in DCS update 2.9.32.30490: Walleye II on A-6E pylons 2 and 4, with AN/AWW-13 on pylon 3.</p>
+    <div class="dialog-actions"><button id="closeHelp" class="primary" type="button">Return to wire</button></div>
+  </dialog>
+
+  <div id="announcer" class="sr-only" aria-live="assertive"></div>
+
+  <script>
+    (() => {
+      'use strict';
+      const $ = id => document.getElementById(id);
+      const canvas = $('scope');
+      const ctx = canvas.getContext('2d');
+      const storageKey = 'walleye-wire-v1';
+      const settingsKey = 'walleye-wire-settings-v1';
+      const keys = new Set();
+      let pointerActive = false;
+      let raf = 0;
+      let run = null;
+
+      const modes = {
+        training: { noise: 0.018, drift: 0.42, bump: 0.16, contrast: 1, dropout: false, label: 'Training' },
+        operational: { noise: 0.045, drift: 0.68, bump: 0.30, contrast: .78, dropout: false, label: 'Operational' },
+        weathered: { noise: 0.075, drift: .86, bump: .42, contrast: .57, dropout: true, label: 'Weathered' }
+      };
+
+      const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
+      const distance = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
+      const fmtTime = seconds => {
+        const s = Math.max(0, Math.ceil(seconds));
+        return `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`;
+      };
+
+      function loadSettings() {
+        try {
+          const saved = JSON.parse(localStorage.getItem(settingsKey) || '{}');
+          ['pylon2', 'pylon3', 'pylon4', 'difficulty', 'duration'].forEach(id => {
+            if (saved[id] && [...$(id).options].some(o => o.value === saved[id] || o.text === saved[id])) $(id).value = saved[id];
+          });
+        } catch (_) { /* start clean */ }
+      }
+
+      function saveSettings() {
+        const saved = {};
+        ['pylon2', 'pylon3', 'pylon4', 'difficulty', 'duration'].forEach(id => saved[id] = $(id).value);
+        localStorage.setItem(settingsKey, JSON.stringify(saved));
+      }
+
+      function loadoutState() {
+        const weapon = $('pylon2').value === 'Walleye II' || $('pylon4').value === 'Walleye II';
+        const pod = $('pylon3').value === 'AN/AWW-13';
+        return { weapon, pod, ready: weapon && pod };
+      }
+
+      function updateGates() {
+        const state = loadoutState();
+        $('weaponGate').classList.toggle('pass', state.weapon);
+        $('podGate').classList.toggle('pass', state.pod);
+        $('pairGate').classList.toggle('pass', state.ready);
+        $('readyLamp').classList.toggle('ready', state.ready);
+        $('readyText').textContent = state.ready ? 'Loadout ready' : 'Loadout blocked';
+        $('startBtn').disabled = !state.ready || Boolean(run);
+        saveSettings();
+        if (!state.ready && run) finishRun(false, 'Loadout contract changed — run aborted.');
+        drawStandby();
+      }
+
+      function drawStandby() {
+        if (run) return;
+        const w = canvas.width, h = canvas.height;
+        ctx.fillStyle = '#132117'; ctx.fillRect(0, 0, w, h);
+        drawTerrain(0, 0, .55);
+        ctx.strokeStyle = 'rgba(183,233,143,.36)'; ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.moveTo(w / 2 - 20, h / 2); ctx.lineTo(w / 2 + 20, h / 2); ctx.moveTo(w / 2, h / 2 - 20); ctx.lineTo(w / 2, h / 2 + 20); ctx.stroke();
+        ctx.fillStyle = 'rgba(183,233,143,.75)'; ctx.font = '700 18px Courier New'; ctx.textAlign = 'center';
+        ctx.fillText(loadoutState().ready ? 'LOADOUT VALID / READY TO REHEARSE' : 'SAFE / COMPLETE LOADOUT GATE', w / 2, h * .76);
+      }
+
+      function startRun() {
+        if (!loadoutState().ready || run) return;
+        const duration = Number($('duration').value);
+        const mode = modes[$('difficulty').value];
+        run = {
+          started: performance.now(), last: performance.now(), duration, mode,
+          reticle: { x: .28, y: .62 }, target: { x: .61, y: .46 },
+          velocity: { x: 0, y: 0 }, designated: false, designateHeld: false, holdTime: 0,
+          released: false, releaseAt: Math.min(14, duration * .34),
+          samples: 0, alignmentTotal: 0, movementTotal: 0, prevReticle: { x: .28, y: .62 },
+          dropoutStart: mode.dropout ? duration * .56 : -1,
+          dropoutEnd: mode.dropout ? duration * .56 + 2.2 : -1,
+          bumps: [], lastBump: 0
+        };
+        $('runBanner').hidden = true;
+        $('designateBtn').disabled = false;
+        $('phaseReadout').textContent = 'ACQUIRE';
+        $('pictureReadout').textContent = 'VIDEO';
+        $('announcer').textContent = 'Rehearsal started. Acquire the aimpoint.';
+        cancelAnimationFrame(raf);
+        raf = requestAnimationFrame(frame);
+      }
+
+      function frame(now) {
+        if (!run) return;
+        const dt = Math.min(.05, (now - run.last) / 1000);
+        run.last = now;
+        const elapsed = (now - run.started) / 1000;
+        const remaining = run.duration - elapsed;
+        if (remaining <= 0) { finishRun(true); return; }
+        updateSimulation(dt, elapsed);
+        render(elapsed, remaining);
+        raf = requestAnimationFrame(frame);
+      }
+
+      function updateSimulation(dt, elapsed) {
+        const m = run.mode;
+        const speed = .34;
+        let dx = 0, dy = 0;
+        if (keys.has('ArrowLeft') || keys.has('a')) dx -= 1;
+        if (keys.has('ArrowRight') || keys.has('d')) dx += 1;
+        if (keys.has('ArrowUp') || keys.has('w')) dy -= 1;
+        if (keys.has('ArrowDown') || keys.has('s')) dy += 1;
+        if (dx && dy) { dx *= .707; dy *= .707; }
+        run.velocity.x += (dx * speed - run.velocity.x) * Math.min(1, dt * 12);
+        run.velocity.y += (dy * speed - run.velocity.y) * Math.min(1, dt * 12);
+        run.reticle.x = clamp(run.reticle.x + run.velocity.x * dt, .035, .965);
+        run.reticle.y = clamp(run.reticle.y + run.velocity.y * dt, .06, .94);
+
+        const viewX = Math.sin(elapsed * .48) * .09 * m.drift + Math.sin(elapsed * 1.41) * .023;
+        const viewY = Math.cos(elapsed * .37) * .065 * m.drift + Math.sin(elapsed * 1.17) * .018;
+        run.target.x = .58 + viewX;
+        run.target.y = .46 + viewY;
+
+        if (elapsed - run.lastBump > 4.4 && Math.sin(elapsed * 2.31) > .92) {
+          run.lastBump = elapsed;
+          run.bumps.push({ t: elapsed, x: (Math.random() - .5) * m.bump, y: (Math.random() - .5) * m.bump });
+        }
+        run.bumps = run.bumps.filter(b => elapsed - b.t < 1.1);
+        run.bumps.forEach(b => {
+          const f = Math.sin((elapsed - b.t) / 1.1 * Math.PI) * (1 - (elapsed - b.t) / 1.1);
+          run.target.x += b.x * f;
+          run.target.y += b.y * f;
+        });
+
+        const d = distance(run.reticle, run.target);
+        const capture = d < .055;
+        if (run.designateHeld && capture) run.holdTime += dt;
+        else run.holdTime = Math.max(0, run.holdTime - dt * 1.6);
+        if (!run.designated && run.holdTime >= .85) {
+          run.designated = true;
+          $('announcer').textContent = 'Track established.';
+        }
+        if (!run.released && elapsed >= run.releaseAt) {
+          run.released = true;
+          $('announcer').textContent = run.designated ? 'Simulated release. Guide the weapon.' : 'Released without stable designation. Recover the wire.';
+        }
+
+        const movement = distance(run.reticle, run.prevReticle);
+        run.prevReticle = { ...run.reticle };
+        run.samples += 1;
+        run.alignmentTotal += clamp(1 - d / .28, 0, 1);
+        run.movementTotal += movement;
+      }
+
+      function drawTerrain(elapsed, seed, contrast) {
+        const w = canvas.width, h = canvas.height;
+        ctx.fillStyle = `rgba(119,154,104,${.09 * contrast})`;
+        for (let i = 0; i < 18; i++) {
+          const x = ((i * 173 + seed * 71 + elapsed * 8) % (w + 180)) - 90;
+          const y = (i * 97 + seed * 43) % h;
+          ctx.fillRect(x, y, 60 + (i % 4) * 28, 18 + (i % 3) * 13);
+        }
+        ctx.strokeStyle = `rgba(165,205,144,${.12 * contrast})`;
+        ctx.lineWidth = 2;
+        for (let i = -2; i < 9; i++) {
+          ctx.beginPath();
+          ctx.moveTo(0, h * .16 + i * 78 + Math.sin(elapsed * .2 + i) * 13);
+          ctx.lineTo(w, h * .23 + i * 72 + Math.cos(elapsed * .16 + i) * 15);
+          ctx.stroke();
+        }
+      }
+
+      function render(elapsed, remaining) {
+        const w = canvas.width, h = canvas.height;
+        const dropout = elapsed >= run.dropoutStart && elapsed <= run.dropoutEnd;
+        ctx.fillStyle = dropout ? '#071009' : '#132117'; ctx.fillRect(0, 0, w, h);
+        if (!dropout) {
+          drawTerrain(elapsed, 3, run.mode.contrast);
+          const tx = run.target.x * w, ty = run.target.y * h;
+          ctx.fillStyle = `rgba(202,231,174,${.19 * run.mode.contrast})`;
+          ctx.fillRect(tx - 70, ty - 30, 140, 60);
+          ctx.fillStyle = `rgba(12,21,13,${.84})`;
+          ctx.fillRect(tx - 28, ty - 18, 56, 36);
+          ctx.strokeStyle = `rgba(183,233,143,${.78 * run.mode.contrast})`;
+          ctx.lineWidth = 2;
+          ctx.beginPath(); ctx.arc(tx, ty, 12, 0, Math.PI * 2); ctx.stroke();
+          for (let i = 0; i < Math.floor(120 * run.mode.noise); i++) {
+            ctx.fillStyle = `rgba(200,240,180,${Math.random() * .28})`;
+            ctx.fillRect(Math.random() * w, Math.random() * h, 2 + Math.random() * 8, 1);
+          }
+        } else {
+          ctx.fillStyle = 'rgba(183,233,143,.78)'; ctx.font = '700 24px Courier New'; ctx.textAlign = 'center';
+          ctx.fillText('VIDEO SIGNAL INTERRUPTED', w / 2, h / 2);
+        }
+
+        const rx = run.reticle.x * w, ry = run.reticle.y * h;
+        const d = distance(run.reticle, run.target);
+        ctx.strokeStyle = d < .055 ? '#e2b85d' : '#b7e98f';
+        ctx.lineWidth = 3;
+        ctx.beginPath(); ctx.moveTo(rx - 35, ry); ctx.lineTo(rx - 8, ry); ctx.moveTo(rx + 8, ry); ctx.lineTo(rx + 35, ry); ctx.moveTo(rx, ry - 35); ctx.lineTo(rx, ry - 8); ctx.moveTo(rx, ry + 8); ctx.lineTo(rx, ry + 35); ctx.stroke();
+        ctx.strokeStyle = 'rgba(226,184,93,.55)'; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(rx, ry, 28, 0, Math.PI * 2); ctx.stroke();
+        if (run.designateHeld) {
+          ctx.strokeStyle = '#e2b85d'; ctx.lineWidth = 5; ctx.beginPath(); ctx.arc(rx, ry, 36, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * clamp(run.holdTime / .85, 0, 1)); ctx.stroke();
+        }
+
+        const phase = !run.designated ? 'ACQUIRE' : (!run.released ? 'TRACK' : 'GUIDE');
+        const quality = d < .055 ? 'CAPTURE' : d < .13 ? 'MARGINAL' : 'LOOSE';
+        $('phaseReadout').textContent = phase;
+        $('timeReadout').textContent = fmtTime(remaining);
+        $('qualityReadout').textContent = quality;
+        $('pictureReadout').textContent = dropout ? 'DROPOUT' : 'VIDEO';
+        const alignment = Math.round(clamp(1 - d / .28, 0, 1) * 100);
+        const smooth = Math.round(clamp(100 - (run.movementTotal / Math.max(1, run.samples)) * 9000, 0, 100));
+        const score = Math.round(alignment * .72 + smooth * .28);
+        $('alignmentMetric').textContent = `${alignment}%`;
+        $('smoothMetric').textContent = `${smooth}%`;
+        $('scoreMetric').textContent = score;
+        $('cueText').textContent = dropout ? 'Hold trend — picture blind' : quality === 'CAPTURE' ? 'Small corrections only' : quality === 'MARGINAL' ? 'Ease toward contrast' : 'Reacquire without chasing';
+      }
+
+      function finishRun(completed, message) {
+        if (!run) return;
+        cancelAnimationFrame(raf);
+        const avgAlign = Math.round((run.alignmentTotal / Math.max(1, run.samples)) * 100);
+        const smooth = Math.round(clamp(100 - (run.movementTotal / Math.max(1, run.samples)) * 9000, 0, 100));
+        const finalScore = Math.round(avgAlign * .72 + smooth * .28 - (run.designated ? 0 : 15));
+        const result = { date: new Date().toISOString(), mode: run.mode.label, duration: run.duration, score: clamp(finalScore, 0, 100), alignment: avgAlign, smooth, completed };
+        if (completed) saveResult(result);
+        run = null;
+        keys.clear(); pointerActive = false;
+        $('designateBtn').disabled = true;
+        $('designateBtn').classList.remove('primary');
+        $('phaseReadout').textContent = completed ? 'COMPLETE' : 'SAFE';
+        $('pictureReadout').textContent = 'STANDBY';
+        $('qualityReadout').textContent = completed ? `${result.score} / 100` : '—';
+        $('cueText').textContent = completed ? (result.score >= 80 ? 'Wire controlled' : result.score >= 60 ? 'Review correction energy' : 'Repeat at lower difficulty') : 'Awaiting run';
+        $('runBanner').hidden = false;
+        $('runBanner').querySelector('h2').textContent = completed ? `Wire score ${result.score}` : 'Wire reset';
+        $('runBanner').querySelector('p').textContent = message || (result.score >= 80 ? 'Controlled corrections and a usable average track.' : 'Repeat the run and favor smaller, earlier corrections.');
+        $('startBtn').textContent = 'Run again';
+        $('startBtn').disabled = !loadoutState().ready;
+        $('announcer').textContent = message || `Rehearsal complete. Score ${result.score}.`;
+        renderHistory();
+        drawStandby();
+      }
+
+      function resetRun() {
+        if (run) finishRun(false, 'Run reset. No score saved.');
+        else {
+          $('alignmentMetric').textContent = '—'; $('smoothMetric').textContent = '—'; $('scoreMetric').textContent = '—';
+          $('phaseReadout').textContent = 'SAFE'; $('qualityReadout').textContent = '—'; $('timeReadout').textContent = fmtTime(Number($('duration').value));
+          $('runBanner').querySelector('h2').textContent = 'Wire not armed';
+          $('runBanner').querySelector('p').textContent = 'Pass the loadout gate, choose a video condition, then begin the rehearsal.';
+          drawStandby();
+        }
+      }
+
+      function saveResult(result) {
+        const list = getHistory();
+        list.unshift(result);
+        localStorage.setItem(storageKey, JSON.stringify(list.slice(0, 12)));
+      }
+      function getHistory() {
+        try { return JSON.parse(localStorage.getItem(storageKey) || '[]'); } catch (_) { return []; }
+      }
+      function renderHistory() {
+        const list = getHistory();
+        $('history').innerHTML = list.length ? list.map(r => {
+          const date = new Date(r.date);
+          return `<div class="history-row"><div><strong>${escapeHtml(r.mode)} · ${r.duration}s</strong><br><small>${date.toLocaleDateString()} · align ${r.alignment}% · smooth ${r.smooth}%</small></div><div class="score">${r.score}</div></div>`;
+        }).join('') : '<div class="empty">No completed rehearsals yet.</div>';
+      }
+      function escapeHtml(value) { return String(value).replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c])); }
+
+      function setDesignate(active) {
+        if (!run) return;
+        run.designateHeld = active;
+        $('designateBtn').classList.toggle('primary', active);
+      }
+
+      function pointerPosition(event) {
+        const rect = canvas.getBoundingClientRect();
+        return { x: clamp((event.clientX - rect.left) / rect.width, .035, .965), y: clamp((event.clientY - rect.top) / rect.height, .06, .94) };
+      }
+
+      ['pylon2', 'pylon3', 'pylon4'].forEach(id => $(id).addEventListener('change', updateGates));
+      ['difficulty', 'duration'].forEach(id => $(id).addEventListener('change', () => { saveSettings(); if (!run) $('timeReadout').textContent = fmtTime(Number($('duration').value)); }));
+      $('startBtn').addEventListener('click', startRun);
+      $('resetBtn').addEventListener('click', resetRun);
+      $('helpBtn').addEventListener('click', () => $('helpDialog').showModal());
+      $('closeHelp').addEventListener('click', () => $('helpDialog').close());
+      $('clearHistory').addEventListener('click', () => { localStorage.removeItem(storageKey); renderHistory(); });
+      $('designateBtn').addEventListener('pointerdown', e => { e.preventDefault(); $('designateBtn').setPointerCapture(e.pointerId); setDesignate(true); });
+      $('designateBtn').addEventListener('pointerup', () => setDesignate(false));
+      $('designateBtn').addEventListener('pointercancel', () => setDesignate(false));
+
+      window.addEventListener('keydown', e => {
+        const key = e.key.length === 1 ? e.key.toLowerCase() : e.key;
+        if (['ArrowLeft','ArrowRight','ArrowUp','ArrowDown','a','d','w','s',' '].includes(key)) e.preventDefault();
+        if (key === ' ') setDesignate(true); else keys.add(key);
+      });
+      window.addEventListener('keyup', e => {
+        const key = e.key.length === 1 ? e.key.toLowerCase() : e.key;
+        if (key === ' ') setDesignate(false); else keys.delete(key);
+      });
+      window.addEventListener('blur', () => { keys.clear(); setDesignate(false); });
+
+      canvas.addEventListener('pointerdown', e => {
+        if (!run) return;
+        pointerActive = true; canvas.setPointerCapture(e.pointerId); run.reticle = pointerPosition(e); setDesignate(true);
+      });
+      canvas.addEventListener('pointermove', e => { if (run && pointerActive) run.reticle = pointerPosition(e); });
+      canvas.addEventListener('pointerup', () => { pointerActive = false; setDesignate(false); });
+      canvas.addEventListener('pointercancel', () => { pointerActive = false; setDesignate(false); });
+
+      loadSettings();
+      updateGates();
+      renderHistory();
+      $('timeReadout').textContent = fmtTime(Number($('duration').value));
+      drawStandby();
+    })();
+  </script>
+</body>
+</html>

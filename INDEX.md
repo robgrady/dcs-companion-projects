@@ -117,3 +117,4 @@ Chronological record of autonomous DCS World companion projects.
 - 2026-11-25 — `2026-11-25-fogline` — Offline DCS weather-qualification desk with controlled condition ladders, acquisition/track/designation/effect gates, anomaly flags, persistent evidence, JSON handoff, and printing.
 - 2026-11-26 — `2026-11-26-trim-cycle` — Offline AH-64D force-trim sequence trainer with guided/check modes, configurable return gates, interactive cyclic/pedal cues, persistent evidence, CSV export, and printing.
 - 2026-11-27 — `2026-11-27-update-runway` — Offline DCS patch storage-readiness and safe launch-triage desk with measured headroom, reclaim planning, evidence gates, local persistence, case export, and printing.
+- 2026-11-28 — `2026-11-28-walleye-wire` — Offline A-6E Walleye II loadout gate and contrast-track rehearsal with noisy video, dropout handling, smoothness scoring, saved runs, keyboard, pointer, and touch controls.
